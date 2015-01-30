@@ -20,6 +20,20 @@
 #####################
 echo "${label_color}No unit tests cases have been checked in ${no_color}"
 
+echo "********************* Sample Build Script *********************************************************"
+echo "Registry URL: $REGISTRY_URL"
+echo "Registry Server: $REGISTRY_SERVER"
+echo "My repository: $REPOSITORY"
+echo "APPLICATION_VERSION: $APPLICATION_VERSION"
+echo "APPLICATION_NAME: $APPLICATION_NAME"
+echo "BUILDER: $BUILDER"
+echo "WORKSPACE: $WORKSPACE"
+echo "ARCHIVE_DIR: $ARCHIVE_DIR"
+echo "EXT_DIR: $EXT_DIR"
+echo "PATH: $PATH"
+echo "******************************************************************************"
+
+
 #########################
 # Build docker image    #
 #########################

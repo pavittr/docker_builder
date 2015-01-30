@@ -55,8 +55,9 @@ echo $EXT_DIR \n
 ls $EXT_DIR \n
 export REGISTRY_URL=#REGISTRY_URL#
 export APPLICATION_NAME=#APPLICATION_NAME#
-bash $EXT_DIR/_init.sh \n
-#COMMAND# \n"
+env
+. $EXT_DIR/_init.sh \n
+/bin/bash -e #COMMAND# \n"
     }
     },
     "project": "https://beta3.hub.jazz.net/project/minshallrobbie/test-extension",
