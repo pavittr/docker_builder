@@ -1,0 +1,65 @@
+{
+    "id": "ibm.devops.services.pipeline.docker.builder.test",
+    "version": 1,
+    "name_key": "ExtName",
+    "desc_key": "ExtDesc",
+    "extension_type": "Build",
+    "inputs": [
+        {
+            "type": "Source",
+            "inclusion": "always"
+        },
+        {
+            "type": "Bluemix",
+            "inclusion" : "optional"
+        }
+    ],
+    "params": [
+        {
+            "name": "REGISTRY_URL",
+            "type": "Text",
+            "required": "false",
+            "label_key": "REGISTRY_URL_KEY",
+            "desc_key": "REGISTRY_URL_DESC"
+        },        
+        {
+            "name": "APPLICATION_NAME",
+            "type": "Text",
+            "required": "false",
+            "label_key": "APPLICATION_NAME_KEY",
+            "desc_key": "APPLICATION_NAME_DESC"
+        },
+        {
+            "name": "COMMAND",
+            "type": "TextArea",
+            "required": "true",
+            "default" : "#!/bin/bash\n
+# default docker build script
+# put your updates here
+sample_build_script.sh",
+            "label_key": "COMMAND_KEY",
+            "desc_key": "COMMAND_DESC"
+        }
+    ],
+    "outputs": [
+        {
+            "type": "Artifacts",
+            "inclusion" : "always"
+        }
+    ],
+    "execution": {
+        "type": "JenkinsDocker",
+        "shell": "#!/bin/bash \n
+env \n
+echo $EXT_DIR \n
+ls $EXT_DIR \n
+export REGISTRY_URL=#REGISTRY_URL#
+export APPLICATION_NAME=#APPLICATION_NAME#
+bash $EXT_DIR/_init.sh \n
+#COMMAND# \n"
+    }
+    },
+    "project": "https://beta3.hub.jazz.net/project/minshallrobbie/test-extension",
+    "project_example": "https://hub.jazz.net/pipeline/rjminsha/ice-pipeline_demo",
+    "project_contact": "rjminsha@us.ibm.com"
+}
