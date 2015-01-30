@@ -18,7 +18,7 @@
         {
             "name": "REGISTRY_URL",
             "type": "Text",
-            "required": "false",
+            "required": "true",
             "label_key": "REGISTRY_URL_KEY",
             "desc_key": "REGISTRY_URL_DESC"
         },        
@@ -34,9 +34,9 @@
             "type": "TextArea",
             "required": "true",
             "default" : "#!/bin/bash\n
-# default docker build script
-# put your updates here
-sample_build_script.sh",
+# default docker build script\n
+# put your updates here\n
+sample_build_script.sh\n",
             "label_key": "COMMAND_KEY",
             "desc_key": "COMMAND_DESC"
         }
