@@ -31,7 +31,7 @@ debugme() {
 }
 export -f debugme 
 
-set +x 
+set +e
 
 ########################
 # REGISTRY INFORMATION #
