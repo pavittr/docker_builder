@@ -33,7 +33,7 @@
             "name": "COMMAND",
             "type": "TextArea",
             "required": "true",
-            "default" : "#!/bin/bash\n
+            "default_value" : "#!/bin/bash\n
 # default docker build script\n
 # put your updates here\n
 sample_build_script.sh\n",
@@ -62,7 +62,7 @@ set +e
 /bin/bash -e #COMMAND# \n"
     }
     },
-    "project": "https://beta3.hub.jazz.net/project/minshallrobbie/test-extension",
+    "project": "https://hub.jazz.net/project/rjminsha/pipeline_service_docker_builder",
     "project_example": "https://hub.jazz.net/pipeline/rjminsha/ice-pipeline_demo",
     "project_contact": "rjminsha@us.ibm.com"
 }
