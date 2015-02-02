@@ -40,8 +40,7 @@ set +e
 # Setup the default registry to be the demo account 
 if [ -z $REGISTRY_URL ]; then
     echo -e "${red}Please set REGISTRY_URL in the environment${no_color}"
-    export REGISTRY_URL="registry-ice.ng.bluemix.net/icedevops"
-    #exit 1
+    exit 1
 fi
 
 # Parse out information from the registry url 
@@ -91,8 +90,8 @@ fi
 echo "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $APPLICATION_NAME ]; then 
-    echo -e "${label_color}setting application name to helloworld, please set APPLICATION_NAME in the environment to desired name ${no_color}"
-    export APPLICATION_NAME="helloworld"
+    echo -e "${red}setting application name to helloworld, please set APPLICATION_NAME in the environment to desired name ${no_color}"
+    exit 1
 fi 
 
 ################################
@@ -104,7 +103,7 @@ if [ -z $WORKSPACE ]; then
 fi 
 
 if [ -z $ARCHIVE_DIR ]; then 
-    echo "${yellow}ARCHIVE_DIR was not set, setting to WORKSPACE/archive ${no_color}"
+    echo "${label_color}ARCHIVE_DIR was not set, setting to WORKSPACE/archive ${no_color}"
     export archive_dir="${WORKSPACE}/archive"
 else 
     export archive_dir=${ARCHIVE_DIR}

@@ -18,7 +18,7 @@
         {
             "name": "REGISTRY_URL",
             "type": "Text",
-            "required": "true",
+            "required": "false",
             "label_key": "REGISTRY_URL_KEY",
             "desc_key": "REGISTRY_URL_DESC"
         },        
