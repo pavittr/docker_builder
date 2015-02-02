@@ -129,7 +129,9 @@ if [ -z $API_KEY ]; then
         echo -e "${red}API_KEY must be set in the environement.  Add this in setenv.sh in the root of your project. ${no_color}"
         exit 1
     fi 
-fi
+else
+    echo "API_KEY set on the environment"
+fi  
 
 ######################
 # Install ICE CLI    #
