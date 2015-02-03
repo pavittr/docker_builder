@@ -21,9 +21,9 @@
 echo "${label_color}No unit tests cases have been checked in ${no_color}"
 
 echo "********************* Sample Build Script *********************************************************"
-echo "Registry URL: $REGISTRY_URL"
-echo "Registry Server: $REGISTRY_SERVER"
-echo "My repository: $REPOSITORY"
+echo "REGISTRY_URL: $REGISTRY_URL"
+echo "REGISTRY_SERVER: $REGISTRY_SERVER"
+echo "REPOSITORY: $REPOSITORY"
 echo "APPLICATION_VERSION: $APPLICATION_VERSION"
 echo "APPLICATION_NAME: $APPLICATION_NAME"
 echo "BUILDER: $BUILDER"
@@ -77,7 +77,7 @@ fi
 ########################################################################################
 # Copy any artifacts that will be needed for deployment and testing to $archive_dir    #
 ########################################################################################
-echo "Loggging build information to build.properties"
+echo "Loggging build information (IMAGE_NAME) to build.properties"
 date >> ${archive_dir}/timestamp.log
 echo "IMAGE_NAME=${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${archive_dir}/build.properties 
 more ${archive_dir}/build.properties
