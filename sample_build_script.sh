@@ -33,13 +33,8 @@ echo "EXT_DIR: $EXT_DIR"
 echo "PATH: $PATH"
 echo "******************************************************************************"
 
-
-#########################
-# Build docker image    #
-#########################
-# check if there is a Dockerfile and if so build it
-if [ -f Dockerfile ]; then 
-    echo -e "${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}"
+function buildwithboatyard () {
+    echo "Building with boatyard deployment"
     builder_boatyard.sh -t ${REPOSITORY}/${APPLICATION_NAME} -v ${APPLICATION_VERSION} -r ${REGISTRY_SERVER} -b ${BUILDER} --user ${DOCKER_REGISTRY_USER} --password ${API_KEY} --email ${DOCKER_REGISTRY_EMAIL} $WORKSPACE
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
@@ -48,6 +43,30 @@ if [ -f Dockerfile ]; then
         exit $RESULT
     else 
         echo -e "${green}(docker-builder) Building Docker Image Complete${no_color}"
+    fi 
+    return $RESULT
+}
+
+#########################
+# Build docker image    #
+#########################
+# check if there is a Dockerfile and if so build it
+# default to Container Service Build via CLI, if fails fall back to boatyard 
+if [ -f Dockerfile ]; then 
+    echo -e "${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}"
+    ice login -t ${API_KEY}
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        buildwithboatyard
+    else
+        ice build --t ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
+        RESULT=$?
+        if [ $RESULT -ne 0 ]; then
+            buildwithboatyard
+        else
+            echo "${label_color}Container build successful"
+            ice images 
+        fi  
     fi 
 else 
     echo -e "${red}Dockerfile not found in project${no_color}"
@@ -59,5 +78,5 @@ fi
 # Copy any artifacts that will be needed for deployment and testing to $archive_dir    #
 ########################################################################################
 date >> ${archive_dir}/timestamp.log
-echo "IMAGE_URL=${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${archive_dir}/build.properties 
+echo "IMAGE_NAME=${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${archive_dir}/build.properties 
 more ${archive_dir}/build.properties
