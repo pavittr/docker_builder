@@ -78,5 +78,5 @@ fi
 # Copy any artifacts that will be needed for deployment and testing to $archive_dir    #
 ########################################################################################
 date >> ${archive_dir}/timestamp.log
-echo "IMAGE_NAME=${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${archive_dir}/build.properties 
+echo "IMAGE_NAME=${Registry_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${archive_dir}/build.properties 
 more ${archive_dir}/build.properties
