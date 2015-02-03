@@ -57,7 +57,7 @@ if [ -f Dockerfile ]; then
     echo "Attempting IBM Container Service Build"
     ice login --key ${API_KEY}
     RESULT=$?
-    if [ $RESULT -ne 0 ]; then
+    if [ $RESULT -eq 1 ]; then
         buildwithboatyard
     else
         ice build --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
