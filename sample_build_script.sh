@@ -54,7 +54,7 @@ function buildwithboatyard () {
 # default to Container Service Build via CLI, if fails fall back to boatyard 
 if [ -f Dockerfile ]; then 
     echo -e "${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}"
-    ice login -t ${API_KEY}
+    ice login --key ${API_KEY}
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         buildwithboatyard
