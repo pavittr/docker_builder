@@ -59,7 +59,7 @@ if [ -f Dockerfile ]; then
     if [ $RESULT -ne 0 ]; then
         buildwithboatyard
     else
-        ice build --t ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
+        ice build --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
         RESULT=$?
         if [ $RESULT -ne 0 ]; then
             buildwithboatyard
