@@ -38,6 +38,10 @@ sample_build_script.sh\n",
         }
     ],
     "outputs": [
+        {
+            "type": "Artifacts",
+            "inclusion" : "optional"
+        }
     ],
     "execution": {
         "type": "JenkinsDocker",

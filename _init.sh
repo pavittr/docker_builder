@@ -149,7 +149,7 @@ if [ $RESULT -ne 0 ]; then
     export PATH=$PATH:~/.local/bin
     pip --version 
     pip install --user icecli-1.0-0129.zip
-    ice help
+    ice login --key ${API_KEY}
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
