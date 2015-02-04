@@ -6,10 +6,6 @@
     "extension_type": "Build",
     "inputs": [
         {
-            "type": "Source",
-            "inclusion": "always"
-        },
-        {
             "type": "Bluemix",
             "inclusion" : "optional"
         }
@@ -42,10 +38,6 @@ sample_build_script.sh\n",
         }
     ],
     "outputs": [
-        {
-            "type": "Artifacts",
-            "inclusion" : "always"
-        }
     ],
     "execution": {
         "type": "JenkinsDocker",
