@@ -1,5 +1,5 @@
 {
-    "id": "ibm.devops.services.pipeline.docker.builder.test",
+    "id": "ibm.devops.services.pipeline.docker.builder",
     "version": 1,
     "name_key": "ExtName",
     "desc_key": "ExtDesc",
