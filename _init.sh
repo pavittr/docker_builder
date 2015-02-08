@@ -172,6 +172,7 @@ fi
 #    echo "API_KEY set on the environment"
 #fi  
 
+
 ######################
 # Install ICE CLI    #
 ######################
@@ -202,6 +203,24 @@ if [ $RESULT -ne 0 ]; then
     fi 
     popd 
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
+fi 
+######################
+# Check in CF        #
+######################
+cf help 
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+    echo -e "Cloud Foundry CLI not installed"
+    gunzip cf-linux-amd64.tgz
+    tar -xvf /cf-linux-amd64.tar 
+    cf help 
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
+        exit 1
+    else 
+        echo "Installed Cloud Foundry CLI"
+    fi
 fi 
 
 ################################
