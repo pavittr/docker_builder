@@ -79,7 +79,7 @@ fi
 if [ -n "$BLUEMIX_TARGET" ]; then
     if [ "$BLUEMIX_TARGET" == "staging" ]; then 
         export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
-        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
+        export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
         if [ -z "$BLUEMIX_USER" ]; then 
             echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
@@ -92,7 +92,7 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         if [ $REGISTRY_SERVER == $CCS_REGISTRY_HOST ]; then 
             echo "Targeting CCS_API_HOST ${CCS_API_HOST},CCS_REGISTRY_HOST ${CCS_REGISTRY_HOST}, ${BLUEMIX_API_HOST} "
         else
-            echo -e "${red}Registry specified in target ( ${REGISTRY_SERVER} ) does not match the registry specified as a parameter ( ${BLUEMIX_API_HOST} ) ${no_color}"  
+            echo -e "${red}Registry specified in target ( ${REGISTRY_SERVER} ) does not match the registry specified as a parameter ( ${CCS_REGISTRY_HOST} ) ${no_color}"  
             exit 1
         fi 
     else 
