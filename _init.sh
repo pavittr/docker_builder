@@ -210,10 +210,13 @@ if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR 
     gunzip cf-linux-amd64.tgz
-    tar -xvf /cf-linux-amd64.tar 
+    tar -xvf cf-linux-amd64.tar 
     cf help 
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
+        pwd 
+        ls 
+        popd . 
         echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
         exit 1
     else 
