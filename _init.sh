@@ -67,6 +67,42 @@ if [[ -z $BUILDER ]]; then
     #export BUILDER=http://50.22.19.253 
 fi
 
+########################
+# Bluemix information  #
+########################
+#  ice --verbose login --cf -H api-ice.stage1.ng.bluemix.net/ -R registry-ice.stage1.ng.bluemix.net/ --api api.stage1.ng.bluemix.net
+# CCS host url         : https://api-ice.stage1.ng.bluemix.net//v2/containers
+# Registry host        : registry-ice.stage1.ng.bluemix.net/
+# Bluemix api url      : api.stage1.ng.bluemix.net
+# Bluemix Org          : rjminsha@us.ibm.com (ea3dbb75-8f5d-4960-b3db-dd755e60ce9c)
+# Bluemix Space        : dev (570e8a76-a833-45b0-ad50-846947fc9da1)
+if [ -n "$BLUEMIX_TARGET" ]; then
+    if [ "$BLUEMIX_TARGET" == "staging" ]; then 
+        export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
+        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
+        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+        if [ -z "$BLUEMIX_USER" ]; then 
+            echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+            exit 1
+        fi 
+        if [ -z "$BLUEMIX_PASSWORD" ]; then 
+            echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+            exit 1 
+        fi 
+        if [ $REGISTRY_SERVER == $BLUEMIX_API_HOST ]; then 
+            echo "Targeting CCS_API_HOST ${CCS_API_HOST},CCS_REGISTRY_HOST ${CCS_REGISTRY_HOST}, ${BLUEMIX_API_HOST} "
+        else
+            echo -e "${red}Registry specified in target ( ${REGISTRY_SERVER} ) does not match the registry specified as a parameter ( ${BLUEMIX_API_HOST} ) ${no_color}"  
+            exit 1
+        fi 
+    else 
+        echo -e "${red}Unknown ${BLUEMIX_TARGET} specified"
+    fi 
+else 
+    echo "Reading bluemix target environment from pipeline configuration"
+    echo -e "${label_color}TBD: load information from Cloud Fourndry credentials ${no_color}"
+fi 
+
 ################################
 # Application Name and Version #
 ################################
@@ -120,17 +156,17 @@ fi
 # Authorization and Authentication    #
 #######################################
 
-if [ -z $API_KEY ]; then
-    if [[ "$DEBUG" == 1 ]] || [[ "$BUILD_USER" == "minshallrobbie" ]] || [[ "$CF_APP" == "ice-pipeline-demo" ]] || [[ "$CF_ORG" == "rjminsha@us.ibm.com" ]] || [[ "$GIT_URL" == "https://hub.jazz.net/git/rjminsha/ice-pipeline-demo" ]] || [[ "$GIT_URL" == "https://hub.jazz.net/git/rjminsha/container-pipeline-demo" ]]; then
-        echo -e "${label_color}Using demo API key, please update set API_KEY in the environment${no_color}"
-        export API_KEY="a8fef97b461bd17b0c5c491b6b04d3f38f4b7e398d32c21a"
-    else 
-        echo -e "${red}API_KEY must be set in the environement.  Add this in setenv.sh in the root of your project. ${no_color}"
-        exit 1
-    fi 
-else
-    echo "API_KEY set on the environment"
-fi  
+# if [ -z $API_KEY ]; then
+#    if [[ "$DEBUG" == 1 ]] || [[ "$BUILD_USER" == "minshallrobbie" ]] || [[ "$CF_APP" == "ice-pipeline-demo" ]] || [[ "$CF_ORG" == "rjminsha@us.ibm.com" ]] || [[ "$GIT_URL" == "https://hub.jazz.net/git/rjminsha/ice-pipeline-demo" ]] || [[ "$GIT_URL" == "https://hub.jazz.net/git/rjminsha/container-pipeline-demo" ]]; then
+#        echo -e "${label_color}Using demo API key, please update set API_KEY in the environment${no_color}"
+#        export API_KEY="a8fef97b461bd17b0c5c491b6b04d3f38f4b7e398d32c21a"
+#    else 
+#        echo -e "${red}API_KEY must be set in the environement.  Add this in setenv.sh in the root of your project. ${no_color}"
+#        exit 1
+#    fi 
+#else
+#    echo "API_KEY set on the environment"
+#fi  
 
 ######################
 # Install ICE CLI    #
@@ -164,12 +200,32 @@ if [ $RESULT -ne 0 ]; then
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
 fi 
 
-ice login --key ${API_KEY}
-RESULT=$?
+################################
+# Login to Container Service   #
+################################
+if [ -n "$API_KEY" ]; then 
+    echo -e "${label_color}Logging on with API_KEY${no_color}"
+    ice login --key ${API_KEY}
+    RESULT=$?
+elif [[ -n "$BLUEMIX_TARGET" ]]; then
+     #statements 
+#  ice --verbose login --cf -H api-ice.stage1.ng.bluemix.net/ -R registry-ice.stage1.ng.bluemix.net/ --api api.stage1.ng.bluemix.net
+#        export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
+#        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
+#        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+    echo -e "${label_color}Logging via environment properties${no_color}"
+    ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}
+    RESULT=$?
+else 
+    echo -e "${red}TBD: support for token passed from pipeline via Cloud Foundry ${no_color}"
+    exit 1 
+fi 
+
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
     exit $RESULT
 fi 
+
 
 ###############################
 # Configure extension PATH    #
