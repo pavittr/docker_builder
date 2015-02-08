@@ -223,13 +223,13 @@ if [ $RESULT -ne 0 ]; then
     if [ $RESULT -ne 0 ]; then
         pwd 
         ls 
-        popd . 
+        popd
         echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
         exit 1
     else 
         echo "Installed Cloud Foundry CLI"
     fi
-    popd . 
+    popd
 fi 
 
 ################################
