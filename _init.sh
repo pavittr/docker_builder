@@ -89,6 +89,13 @@ if [ -n "$BLUEMIX_TARGET" ]; then
             echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
             exit 1 
         fi 
+        if [ -z "$BLUEMIX_ORG" ]; then 
+            export BLUEMIX_ORG=$BLUEMIX_USER
+        fi 
+        if [ -z "$BLUEMIX_SPACE" ]; then 
+            export BLUEMIX_SPACE="dev"
+        fi 
+
         if [ $REGISTRY_SERVER == $CCS_REGISTRY_HOST ]; then 
             echo "Targeting CCS_API_HOST ${CCS_API_HOST},CCS_REGISTRY_HOST ${CCS_REGISTRY_HOST}, ${BLUEMIX_API_HOST} "
         else
@@ -239,8 +246,8 @@ elif [[ -n "$BLUEMIX_TARGET" ]]; then
 #        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
 #        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
     echo -e "${label_color}Logging via environment properties${no_color}"
-    debugme echo "login command: ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD}"
-    ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD}
+    debugme echo "login command: ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
+    ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}
     RESULT=$?
 else 
     echo -e "${red}TBD: support for token passed from pipeline via Cloud Foundry ${no_color}"
