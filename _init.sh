@@ -89,7 +89,7 @@ if [ -n "$BLUEMIX_TARGET" ]; then
             echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
             exit 1 
         fi 
-        if [ $REGISTRY_SERVER == $BLUEMIX_API_HOST ]; then 
+        if [ $REGISTRY_SERVER == $CCS_REGISTRY_HOST ]; then 
             echo "Targeting CCS_API_HOST ${CCS_API_HOST},CCS_REGISTRY_HOST ${CCS_REGISTRY_HOST}, ${BLUEMIX_API_HOST} "
         else
             echo -e "${red}Registry specified in target ( ${REGISTRY_SERVER} ) does not match the registry specified as a parameter ( ${BLUEMIX_API_HOST} ) ${no_color}"  
