@@ -32,11 +32,7 @@ debugme() {
 export -f debugme 
 
 set +e
-debugme echo ">>>Where is Cloud Foundry"
-debugme echo $PATH 
-debugme ls /usr/bin 
-debugme which cf 
-debugme echo "<<<Where is Cloud Foundry"
+
 ########################
 # REGISTRY INFORMATION #
 ########################
@@ -211,6 +207,8 @@ cf help
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "Cloud Foundry CLI not installed"
+    pushd . 
+    cd $EXT_DIR 
     gunzip cf-linux-amd64.tgz
     tar -xvf /cf-linux-amd64.tar 
     cf help 
@@ -221,6 +219,7 @@ if [ $RESULT -ne 0 ]; then
     else 
         echo "Installed Cloud Foundry CLI"
     fi
+    popd . 
 fi 
 
 ################################
