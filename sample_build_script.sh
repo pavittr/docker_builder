@@ -55,20 +55,14 @@ function buildwithboatyard () {
 if [ -f Dockerfile ]; then 
     echo -e "${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}"
     echo "Attempting IBM Container Service Build"
-    ice login --key ${API_KEY}
+    ice build --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
     RESULT=$?
-    if [ $RESULT -eq 1 ]; then
+    if [ $RESULT -ne 0 ]; then
         buildwithboatyard
     else
-        ice build --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
-        RESULT=$?
-        if [ $RESULT -ne 0 ]; then
-            buildwithboatyard
-        else
-            echo "${label_color}Container build successful"
-            ice images 
-        fi  
-    fi 
+        echo "${label_color}Container build successful"
+        ice images 
+    fi  
 else 
     echo -e "${red}Dockerfile not found in project${no_color}"
     date >> $archive_dir/timestamp.log
