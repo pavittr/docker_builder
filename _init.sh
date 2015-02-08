@@ -239,7 +239,8 @@ elif [[ -n "$BLUEMIX_TARGET" ]]; then
 #        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
 #        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
     echo -e "${label_color}Logging via environment properties${no_color}"
-    ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}
+    debugme echo "login command: ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD}"
+    ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD}
     RESULT=$?
 else 
     echo -e "${red}TBD: support for token passed from pipeline via Cloud Foundry ${no_color}"
