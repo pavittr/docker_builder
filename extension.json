@@ -46,17 +46,12 @@ sample_build_script.sh\n",
     "execution": {
         "type": "JenkinsDocker",
         "shell": "#!/bin/bash
-env
-echo \"EXT_DIR: $EXT_DIR, directory contents: \"
-ls $EXT_DIR
 export REGISTRY_URL=#REGISTRY_URL#
 export APPLICATION_NAME=#APPLICATION_NAME#
-echo \"printing environment:\"
-env
 set +x 
 set +e 
-. $EXT_DIR/_init.sh \n
-/bin/bash -e #COMMAND# \n"
+. $EXT_DIR/_init.sh
+/bin/bash -e #COMMAND#"
     }
     },
     "project": "https://hub.jazz.net/project/rjminsha/pipeline_service_docker_builder",

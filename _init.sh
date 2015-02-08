@@ -32,7 +32,11 @@ debugme() {
 export -f debugme 
 
 set +e
-
+echo ">>>Where is Cloud Foundry"
+echo $PATH 
+ls /usr/bin 
+which cf 
+echo "<<<Where is Cloud Foundry"
 ########################
 # REGISTRY INFORMATION #
 ########################
