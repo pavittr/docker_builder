@@ -203,7 +203,7 @@ fi
 ######################
 # Check in CF        #
 ######################
-cf help 
+cf help >> ${EXT_DIR}/init.log 2>&1 
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "Cloud Foundry CLI not installed"
@@ -211,7 +211,7 @@ if [ $RESULT -ne 0 ]; then
     cd $EXT_DIR 
     gunzip cf-linux-amd64.tgz
     tar -xvf cf-linux-amd64.tar 
-    cf help 
+    cf help >> ${EXT_DIR}/init.log 2>&1
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         pwd 
