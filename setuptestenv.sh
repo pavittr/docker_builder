@@ -23,6 +23,6 @@ export APPLICATION_NAME="testapp"
 export WORKSPACE="/Users/robbie/experiments/docker-demo/ice-pipeline-demo"
 export EXT_DIR="/Users/robbie/experiments/docker-demo/pipelineservice-docker-builder"
 export ARCHIVE_DIR="/tmp/archive"
-export API_KEY="07889a87b6429714618fe23153c20e00cf02724573dedc9e"
+export API_KEY="3d48cd0fbf6c30838eacf6b4a3e34ce13cb72bac7db92d6a"
 export DEBUG=1
 
