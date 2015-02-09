@@ -82,14 +82,17 @@ if [ -n "$BLUEMIX_TARGET" ]; then
             exit 1
         fi 
         if [ -z "$BLUEMIX_PASSWORD" ]; then 
-            echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+            echo -e "${red} Please set BLUEMIX_PASSWORD on environment ${no_color} "
             exit 1 
         fi 
         if [ -z "$BLUEMIX_ORG" ]; then 
             export BLUEMIX_ORG=$BLUEMIX_USER
+            echo -e "${label_color}Defaulting bluemix org to $BLUEMIX_ORG, this can be overridden by setting BLUEMIX_ORG on the environment ${no_color}"
         fi 
         if [ -z "$BLUEMIX_SPACE" ]; then 
             export BLUEMIX_SPACE="dev"
+            echo -e "${label_color} Defaulting bluemix org to $BLUEMIX_ORG, this can be overridden by setting BLUEMIX_ORG on the environment ${no_color}"
+
         fi 
 
         if [ $REGISTRY_SERVER == $CCS_REGISTRY_HOST ]; then 
@@ -231,11 +234,8 @@ elif [[ -n "$BLUEMIX_TARGET" ]]; then
 #        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
 #        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
     echo -e "${label_color}Logging via environment properties${no_color}"
-    # removethis: 
-    echo -e "${label_color}Updating cf login${no_color}"
-    debugme more  /home/jenkins/.cf/config.json 
-    rm  /home/jenkins/.cf/config.json 
     
+    debugme echo "testing connectivity to services"
     debugme ping -c 5 -t 10 ${CCS_API_HOST}
     debugme ping -c 5 -t 10 ${BLUEMIX_API_HOST}
     debugme ping -c 5 -t 10 ${CCS_REGISTRY_HOST}
@@ -247,7 +247,7 @@ elif [[ -n "$BLUEMIX_TARGET" ]]; then
     debugme ice info
     RESULT=$?
 else 
-    echo -e "${red}TBD: support for token passed from pipeline via Cloud Foundry ${no_color}"
+    echo -e "${label_color}TBD: support for token passed from pipeline via Cloud Foundry ${no_color}"
     exit 1 
 fi 
 
