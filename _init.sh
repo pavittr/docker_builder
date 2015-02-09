@@ -257,8 +257,11 @@ elif [[ -n "$BLUEMIX_TARGET" ]]; then
     echo -e "${label_color}Updating cf login${no_color}"
     debugme more  /home/jenkins/.cf/config.json 
     rm  /home/jenkins/.cf/config.json 
+    
     debugme echo "login command: ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
     ice --verbose login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}
+    debugme more  /home/jenkins/.cf/config.json 
+    debugme more /home/jenkins/.ice/ice-cfg.ini
     debugme ice info
     RESULT=$?
 else 
