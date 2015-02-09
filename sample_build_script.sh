@@ -34,7 +34,7 @@ echo "PATH: $PATH"
 echo "******************************************************************************"
 
 function buildwithboatyard () {
-    echo "Building with boatyard deployment"
+    echo "Building with boatyard"
     builder_boatyard.sh -t ${REPOSITORY}/${APPLICATION_NAME} -v ${APPLICATION_VERSION} -r ${REGISTRY_SERVER} -b ${BUILDER} --user ${DOCKER_REGISTRY_USER} --password ${API_KEY} --email ${DOCKER_REGISTRY_EMAIL} $WORKSPACE
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
@@ -56,7 +56,7 @@ if [ -f Dockerfile ]; then
     echo -e "${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}"
     echo "Building with IBM Container Service Build"
     ice info 
-    ice build --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
+    ice build --verbose --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         buildwithboatyard
