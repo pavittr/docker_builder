@@ -56,6 +56,7 @@ if [ -f Dockerfile ]; then
     echo -e "${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}"
     echo "Building with IBM Container Service Build"
     ice info 
+    ice images 
     ice --verbose build --tag ${REPOSITORY}/${APPLICATION_NAME}:${APPLICATION_VERSION} $WORKSPACE
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
