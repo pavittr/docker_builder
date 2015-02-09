@@ -32,6 +32,7 @@ debugme() {
 export -f debugme 
 
 set +e
+set +x 
 
 ########################
 # REGISTRY INFORMATION #
@@ -54,11 +55,6 @@ if [ -z "$DOCKER_REGISTRY_EMAIL" ]; then
 fi
 if [ -z "$DOCKER_REGISTRY_USER" ]; then
     export DOCKER_REGISTRY_USER=$REPOSITORY
-fi
-
-# Setup the default registry to be the demo account 
-if [ -z "$API_URL" ]; then
-    export API_URL="https://api-ice.ng.bluemix.net/v1.0"
 fi
 
 # Location of Boatyard builder
@@ -159,23 +155,6 @@ else
   mkdir $archive_dir 
 fi 
 
-#######################################
-# Authorization and Authentication    #
-#######################################
-
-# if [ -z $API_KEY ]; then
-#    if [[ "$DEBUG" == 1 ]] || [[ "$BUILD_USER" == "minshallrobbie" ]] || [[ "$CF_APP" == "ice-pipeline-demo" ]] || [[ "$CF_ORG" == "rjminsha@us.ibm.com" ]] || [[ "$GIT_URL" == "https://hub.jazz.net/git/rjminsha/ice-pipeline-demo" ]] || [[ "$GIT_URL" == "https://hub.jazz.net/git/rjminsha/container-pipeline-demo" ]]; then
-#        echo -e "${label_color}Using demo API key, please update set API_KEY in the environment${no_color}"
-#        export API_KEY="a8fef97b461bd17b0c5c491b6b04d3f38f4b7e398d32c21a"
-#    else 
-#        echo -e "${red}API_KEY must be set in the environement.  Add this in setenv.sh in the root of your project. ${no_color}"
-#        exit 1
-#    fi 
-#else
-#    echo "API_KEY set on the environment"
-#fi  
-
-
 ######################
 # Install ICE CLI    #
 ######################
@@ -248,7 +227,6 @@ if [ -n "$API_KEY" ]; then
     RESULT=$?
 elif [[ -n "$BLUEMIX_TARGET" ]]; then
      #statements 
-#  ice --verbose login --cf -H api-ice.stage1.ng.bluemix.net/ -R registry-ice.stage1.ng.bluemix.net/ --api api.stage1.ng.bluemix.net
 #        export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
 #        export CCS_REGISTRY_HOST="api-ice.stage1.ng.bluemix.net"
 #        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
