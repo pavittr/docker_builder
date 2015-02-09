@@ -194,8 +194,10 @@ if [ $RESULT -ne 0 ]; then
     pip --version 
     # currently the 2.0 gives an error streaming output Defect 8153 
     if [ -n "$API_KEY" ]; then 
+        debugme echo "Installing 1.0 CLI"
         pip install --user icecli-1.0-0129.zip
     else 
+        debugme echo "Installing 2.0 CLI"
         pip install --user icecli-2.0.zip
     fi 
     ice help
@@ -252,6 +254,7 @@ elif [[ -n "$BLUEMIX_TARGET" ]]; then
     echo -e "${label_color}Logging via environment properties${no_color}"
     debugme echo "login command: ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
     ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}
+    debugme ice info
     RESULT=$?
 else 
     echo -e "${red}TBD: support for token passed from pipeline via Cloud Foundry ${no_color}"
