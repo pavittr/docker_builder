@@ -192,8 +192,12 @@ if [ $RESULT -ne 0 ]; then
     python get-pip.py --user
     export PATH=$PATH:~/.local/bin
     pip --version 
-    #pip install --user icecli-1.0-0129.zip
-    pip install --user icecli-2.0.zip
+    # currently the 2.0 gives an error streaming output Defect 8153 
+    if [ -n "$API_KEY" ]; then 
+        pip install --user icecli-1.0-0129.zip
+    else 
+        pip install --user icecli-2.0.zip
+    fi 
     ice help
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
