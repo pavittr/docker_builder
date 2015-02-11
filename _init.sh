@@ -137,7 +137,7 @@ fi
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    debugme echo "Installing Cloud Foundry CLI"
+    echo "Installing Cloud Foundry CLI"
     pushd . 
     cd $EXT_DIR 
     gunzip cf-linux-amd64.tgz &> /dev/null
@@ -211,6 +211,13 @@ elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
 else 
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
+    mkdir -p ~/.ice
+    echo "ccs_host = ${CCS_API_HOST}" > ~/.ice/ice-cfg.ini 
+    echo "reg_host = ${CCS_REGISTRY_HOST}" > ~/.ice/ice-cfg.ini 
+    echo "cf_api_url = ${BLUEMIX_API_HOST}" > ~/.ice/ice-cfg.ini
+    debugme more ~/.ice/ice-cfg.ini
+    debugme more ~/.cf/config.json
+
     ice ps &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
