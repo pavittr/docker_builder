@@ -120,7 +120,11 @@ if [ $RESULT -ne 0 ]; then
     # still getting a streaming error 
     #echo -e "${red}Issues encountered building with ICE 2.0 CLI, trying 1.0 version${no_color}"
     #pip install --user icecli-1.0-0129.zip 
-    pip install --user icecli-2.0-patch.zip
+    if [ "${CLI}" == "1.0" ]; then 
+        pip install --user icecli-1.0-0129.zip 
+    else 
+        pip install --user icecli-2.0-patch.zip
+    fi 
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
