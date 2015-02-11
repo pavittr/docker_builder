@@ -34,7 +34,7 @@ if [ -f Dockerfile ]; then
         ice images
         exit 1
     else
-        echo -e "${label_color}Container build of ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} was successful ${no_color}"
+        echo -e "${green}Container build of ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} was successful ${no_color}"
     fi  
 else 
     echo -e "${red}Dockerfile not found in project${no_color}"
