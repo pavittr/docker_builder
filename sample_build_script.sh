@@ -34,8 +34,7 @@ if [ -f Dockerfile ]; then
         ice images
         exit 1
     else
-        echo "${label_color}Container build successful"
-        ice images 
+        echo "${label_color}Container build of ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} was successful ${no_color}"
     fi  
 else 
     echo -e "${red}Dockerfile not found in project${no_color}"
@@ -45,8 +44,5 @@ fi
 ########################################################################################
 # Copy any artifacts that will be needed for deployment and testing to $archive_dir    #
 ########################################################################################
-echo "Loggging build information (IMAGE_NAME) to build.properties"
-date >> ${ARCHIVE_DIR}/timestamp.log
 echo "IMAGE_NAME=${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${ARCHIVE_DIR}/build.properties 
-more ${ARCHIVE_DIR}/build.properties
 exit 0

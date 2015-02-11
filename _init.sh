@@ -32,7 +32,7 @@ debugme() {
 export -f debugme 
 
 set +e
-set -x 
+set +x 
 
 ###############################
 # Configure extension PATH    #
@@ -99,24 +99,22 @@ export LOG_DIR=$ARCHIVE_DIR
 ######################
 # Install ICE CLI    #
 ######################
-debugme echo "##################"
-debugme echo "installing ICE"
-debugme echo "##################"
-ice help  
+echo "installing ICE CLI"
+ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
-    sudo apt-get update 
-    sudo apt-get -y install python2.7
+    sudo apt-get update &> /dev/null
+    sudo apt-get -y install python2.7 &> /dev/null
     python --version 
-    python get-pip.py --user 
+    python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
     #pip install --user icecli-2.0.zip 
     # still getting a streaming error 
     echo -e "${red}Issues encountered building with ICE 2.0 CLI, trying 1.0 version${no_color}"
-    pip install --user icecli-1.0-0129.zip
-    ice help 
+    pip install --user icecli-1.0-0129.zip 
+    ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
@@ -130,19 +128,15 @@ fi
 #############################
 # Install Cloud Foundry CLI #
 #############################
-cf help  
+cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    debugme echo "#############################"
-    debugme echo "# Install Cloud Foundry CLI #"
-    debugme echo "#############################"
-    echo -e "Cloud Foundry CLI not installed"
+    debugme echo "Installing Cloud Foundry CLI"
     pushd . 
     cd $EXT_DIR 
-    gunzip cf-linux-amd64.tgz  
-    tar -xvf cf-linux-amd64.tar  
-    cf help  
-
+    gunzip cf-linux-amd64.tgz &> /dev/null
+    tar -xvf cf-linux-amd64.tar  &> /dev/null
+    cf help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
@@ -175,7 +169,7 @@ fi
 ################################
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
-    debugme echo "Login command: ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}"
+    debugme echo "Login command: ice login --key ${API_KEY}"
     #ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
     ice --verbose login --key ${API_KEY}
     RESULT=$?
@@ -211,11 +205,11 @@ elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
 else 
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
-    ice ps 
+    ice ps &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo "checking login to registry server" 
-        ice images 
+        ice images &> /dev/null
         RESULT=$? 
     fi 
 fi 
