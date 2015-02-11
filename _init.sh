@@ -31,7 +31,7 @@ debugme() {
 }
 export -f debugme 
 
-sudo apt-get install -y ping 
+sudo apt-get install -y iputils-ping 
 ping -c 5 -t 10 api.ng.bluemix.net
 ping -c 5 -t 10 registry-ice.ng.bluemix.net 
 ping -c 5 -t 10 api-ice.ng.bluemix.net
