@@ -214,12 +214,13 @@ else
     fi 
 fi 
 
-debugme ice info 
-
 # check login result 
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
     exit $RESULT
+else 
+    echo -e "${green}Successfully logged into IBM Container Service${no_color}"
+    ice info 
 fi 
 
 echo -e "${label_color}Initialization complete${no_color}"
