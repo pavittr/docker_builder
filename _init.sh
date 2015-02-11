@@ -31,6 +31,12 @@ debugme() {
 }
 export -f debugme 
 
+if [ $DEBUG = 1 ]; then 
+    export ICE_ARGS="--verbose"
+else
+    export ICE_ARGS=""
+fi 
+
 set +e
 set +x 
 
@@ -169,9 +175,9 @@ fi
 ################################
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
-    debugme echo "Login command: ice login --key ${API_KEY}"
-    #ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
-    ice --verbose login --key ${API_KEY}
+    debugme echo "Login command: ice $ICE_ARGS login --key ${API_KEY}"
+    #ice $ICE_ARGS login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
+    ice $ICE_ARGS login --key ${API_KEY}
     RESULT=$?
 elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
@@ -199,8 +205,8 @@ elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     echo "BLUEMIX_PASSWORD: xxxxx"
     echo ""
     echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
-    debugme echo "login command: ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-    ice --verbose login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 
+    debugme echo "login command: ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
+    ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
