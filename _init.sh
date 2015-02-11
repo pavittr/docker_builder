@@ -31,6 +31,10 @@ debugme() {
 }
 export -f debugme 
 
+sudo apt-get install -y ping 
+ping -c 5 -t 10 api.ng.bluemix.net
+ping -c 5 -t 10 registry-ice.ng.bluemix.net 
+ping -c 5 -t 10 api-ice.ng.bluemix.net
 set +e
 set +x 
 
@@ -172,7 +176,7 @@ if [ -n "$API_KEY" ]; then
     echo -e "${label_color}Logging on with API_KEY${no_color}"
     debugme echo "Login command: ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}"
     #ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
-    ice login --key ${API_KEY} --user rjminsha@us.ibm.com
+    ice --verbose login --key ${API_KEY} --user rjminsha@us.ibm.com
     RESULT=$?
 elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
@@ -201,7 +205,7 @@ elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     echo ""
     echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
     debugme echo "login command: ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-    ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 
+    ice --verbose login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
