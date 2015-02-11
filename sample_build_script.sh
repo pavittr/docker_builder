@@ -32,13 +32,13 @@ if [ -f Dockerfile ]; then
         echo "Build command: ice build --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}"
         ice info 
         ice images
+        exit 1
     else
         echo "${label_color}Container build successful"
         ice images 
     fi  
 else 
     echo -e "${red}Dockerfile not found in project${no_color}"
-    date >> ${ARCHIVE_DIR}/timestamp.log
     exit 1
 fi  
 
@@ -49,3 +49,4 @@ echo "Loggging build information (IMAGE_NAME) to build.properties"
 date >> ${ARCHIVE_DIR}/timestamp.log
 echo "IMAGE_NAME=${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION}" >> ${ARCHIVE_DIR}/build.properties 
 more ${ARCHIVE_DIR}/build.properties
+exit 0
