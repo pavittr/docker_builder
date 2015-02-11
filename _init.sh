@@ -119,7 +119,8 @@ if [ $RESULT -ne 0 ]; then
     #pip install --user icecli-2.0.zip 
     # still getting a streaming error 
     echo -e "${red}Issues encountered building with ICE 2.0 CLI, trying 1.0 version${no_color}"
-    pip install --user icecli-1.0-0129.zip 
+    #pip install --user icecli-1.0-0129.zip 
+    pip install --user icecli-2.0-debug.zip
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
@@ -160,6 +161,11 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
         export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+    elif [ "$BLUEMIX_TARGET" == "prod" ]; then 
+        echo -e "Targetting production Bluemix"
+        export CCS_API_HOST="api-ice.ng.bluemix.net" 
+        export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
+        export BLUEMIX_API_HOST="api.ng.bluemix.net"
     else 
         echo -e "${red}Unknown Bluemix environment specified"
     fi 
