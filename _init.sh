@@ -107,6 +107,7 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
+    sudo apt-get update 
     sudo apt-get -y install python2.7
     python --version 
     python get-pip.py --user 
