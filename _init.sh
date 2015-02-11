@@ -44,110 +44,14 @@ fi
 ########################
 # REGISTRY INFORMATION #
 ########################
-        
-# Setup the default registry to be the demo account 
 if [ -z $REGISTRY_URL ]; then
     echo -e "${red}Please set REGISTRY_URL in the environment${no_color}"
     exit 1
 fi
 
-# Parse out information from the registry url 
-export REGISTRY_SERVER=${REGISTRY_URL%/*}
-export REPOSITORY=${REGISTRY_URL##*/}
-if [ -z "$DOCKER_REGISTRY_PROTOCOL" ]; then
-    export DOCKER_REGISTRY_PROTOCOL="https://"
-fi
-if [ -z "$DOCKER_REGISTRY_EMAIL" ]; then
-    export DOCKER_REGISTRY_EMAIL='ignore@us.ibm.com'
-fi
-if [ -z "$DOCKER_REGISTRY_USER" ]; then
-    export DOCKER_REGISTRY_USER=$REPOSITORY
-fi
-
-# Location of Boatyard builder
-if [[ -z $BUILDER ]]; then
-    export BUILDER="http://198.23.108.133"
-    #export BUILDER=http://50.22.19.253 
-fi
-
-#################################
-# Set Bluemix Host Information  #
-#################################
-if [ -n "$BLUEMIX_TARGET" ]; then
-    if [ "$BLUEMIX_TARGET" == "staging" ]; then 
-        export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
-        export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
-        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
-    else 
-        echo -e "Targetting production bluemix"
-        echo -e "${label_color}TBD: read targetted environment from cf config.json${no_color}"
-        export CCS_API_HOST="api-ice.ng.bluemix.net" 
-        export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
-        export BLUEMIX_API_HOST="api.ng.bluemix.net"
-    fi 
-fi 
-
-###################################
-# Get Bluemix Target Information  #
-###################################
-
-# If API_KEY is not provided get the org and space information 
-if [ -z "$API_KEY" ]; then 
-    pushd . 
-    cd ${EXT_DIR}
-    $(node cf_parser.js ~/.cf/config.json)
-    popd 
-    debugme echo "got org $CF_BLUEMIX_ORG from config.json" 
-    debugme echo "got space $CF_BLUEMIX_SPACE from config.json" 
-
-    if [ -z "$BLUEMIX_ORG" ]; then 
-        if [ -n $CF_BLUEMIX_ORG ]; then 
-            export BLUEMIX_ORG=$CF_BLUEMIX_ORG
-        elif [[ -z "$BLUEMIX_USER" ]]; then
-            export BLUEMIX_ORG=$BLUEMIX_USER
-        else 
-            echo -e "${red}Please set $BLUEMIX_USER and $BLUEMIX_ORG on the environment${no_color}"
-            exit 1
-        fi 
-        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG if on the environment if you wish to change this. ${no_color} "
-    fi 
-    if [ -z "$BLUEMIX_SPACE" ]; then
-        if [ -n "CF_BLUEMIX_SPACE" ]; then  
-            export BLUEMIX_SPACE=$CF_BLUEMIX_SPACE
-        else 
-            export BLUEMIX_SPACE="dev"
-        fi 
-        echo -e "${no_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
-    fi 
-fi 
-
-# Get the Bluemix user and password information 
-if [ -z "$BLUEMIX_USER" ]; then 
-    export BLUEMIX_USER="${CF_BLUEMIX_ORG}"
-    if [ -z "$BLUEMIX_USER" ]; then 
-        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
-        exit 1
-    else 
-        echo -e "${label_color} Using ${CF_BLUEMIX_ORG} as default user, please set BLUEMIX_USER on environment ${no_color} "
-    fi 
-fi 
-if [ -z "$BLUEMIX_PASSWORD" ]; then 
-    echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color} "
-    exit 1 
-fi 
-
-echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
-echo "BLUEMIX_USER: ${BLUEMIX_SPACE}"
-echo "BLUEMIX_SPACE: ${BLUEMIX_SPACE}"
-echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
-echo "BLUEMIX_PASSWORD: xxxxx"
-echo ""
-
-
 ################################
 # Application Name and Version #
 ################################
-
 # The build number for the builder is used for the version in the image tag 
 # For deployers this information is stored in the $BUILD_SELECTOR variable and can be pulled out
 if [ -z "$APPLICATION_VERSION" ]; then
@@ -175,23 +79,22 @@ fi
 # Setup archive information    #
 ################################
 if [ -z $WORKSPACE ]; then 
-    echo -e "${red}Please set REGISTRY_URL in the environment${no_color}"
+    echo -e "${red}Please set WORKSPACE in the environment${no_color}"
     exit 1
 fi 
 
 if [ -z $ARCHIVE_DIR ]; then 
     echo "${label_color}ARCHIVE_DIR was not set, setting to WORKSPACE/archive ${no_color}"
-    export archive_dir="${WORKSPACE}/archive"
-else 
-    export archive_dir=${ARCHIVE_DIR}
+    export ARCHIVE_DIR="${WORKSPACE}"
 fi 
 
-if [ -d "$archive_dir" ]; then
-  echo "Archiving to $archive_dir"
+if [ -d "$ARCHIVE_DIR" ]; then
+  echo "Archiving to $ARCHIVE_DIR"
 else 
-  echo "Creating archive directory $archive_dir"
-  mkdir $archive_dir 
+  echo "Creating archive directory $ARCHIVE_DIR"
+  mkdir $ARCHIVE_DIR 
 fi 
+export LOG_DIR=$ARCHIVE_DIR
 
 ######################
 # Install ICE CLI    #
@@ -243,40 +146,70 @@ popd
 debugme more ${LOG_DIR}/cf.log
 echo "Installed Cloud Foundry CLI"
 
+#################################
+# Set Bluemix Host Information  #
+#################################
+if [ -n "$BLUEMIX_TARGET" ]; then
+    if [ "$BLUEMIX_TARGET" == "staging" ]; then 
+        export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
+        export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
+        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+    else 
+        echo -e "${red}Unknown Bluemix environment specified"
+    fi 
+else 
+    echo -e "Targetting production Bluemix"
+    export CCS_API_HOST="api-ice.ng.bluemix.net" 
+    export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
+    export BLUEMIX_API_HOST="api.ng.bluemix.net"
+fi  
+
 ################################
 # Login to Container Service   #
 ################################
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
-    ice login --key ${API_KEY} >> ${LOG_DIR}/login.log 2>&1
+    debugme echo "Login command: ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}"
+    ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} >> ${LOG_DIR}/login.log 2>&1
     RESULT=$?
-elif [[ -n "$BLUEMIX_TARGET" ]]; then
-    # User wants to specify all information 
-    echo -e "${label_color}Logging via environment properties${no_color}"
-    debugme echo "login command: ice --verbose login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-    ice login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} >> ${LOG_DIR}/login.log 2>&1
+if [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
+    # need to gather information from the environment 
+    # Get the Bluemix user and password information 
+    if [ -z "$BLUEMIX_USER" ]; then 
+        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+        exit 1
+    fi 
+    if [ -z "$BLUEMIX_PASSWORD" ]; then 
+        echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color} "
+        exit 1 
+    fi 
+    if [ -z "$BLUEMIX_ORG" ]; then 
+        export BLUEMIX_ORG=$BLUEMIX_USER
+        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG if on the environment if you wish to change this. ${no_color} "
+    fi 
+    if [ -z "$BLUEMIX_SPACE" ]; then
+        export BLUEMIX_SPACE="dev"
+        echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
+    fi 
+    echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
+    echo "BLUEMIX_USER: ${BLUEMIX_SPACE}"
+    echo "BLUEMIX_SPACE: ${BLUEMIX_SPACE}"
+    echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
+    echo "BLUEMIX_PASSWORD: xxxxx"
+    echo ""
+    echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
+    debugme echo "login command: ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
+    ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} >> ${LOG_DIR}/login.log 2>&1
     RESULT=$?
 else 
-    # User wants to login to production container service 
-    if [ -f "~/.cf/config.json" ]; then 
-        # we are already logged in.  Simply check via ice command 
-        echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
-        echo "checking login to api server" >> ${LOG_DIR}/login.log 2>&1
-        ice ps >> ${LOG_DIR}/login.log 2>&1
-        RESULT=$?
-        if [ $RESULT -ne 0 ]; then
-            echo "checking login to registry server" >> ${LOG_DIR}/login.log 2>&1
-            ice images >> ${LOG_DIR}/login.log 2>&1
-            RESULT=$? 
-        fi 
-    else 
-        # we need to login directly 
-        echo -e "${label_color}Logging into IBM Container Service${no_color}"
-            # User wants to specify all information 
-            echo -e "${label_color}Logging via environment properties${no_color}"
-            debugme echo "login command: ice --verbose login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-            ice --verbose login --cf -H ${CCS_API_HOST} -R ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}  --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} >> ${LOG_DIR}/login.log 2>&1
-            RESULT=$?
+    # we are already logged in.  Simply check via ice command 
+    echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
+    ice ps >> ${LOG_DIR}/login.log 2>&1
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        echo "checking login to registry server" >> ${LOG_DIR}/login.log 2>&1
+        ice images >> ${LOG_DIR}/login.log 2>&1
+        RESULT=$? 
     fi 
 fi 
 
@@ -289,22 +222,4 @@ if [ $RESULT -eq 1 ]; then
     exit $RESULT
 fi 
 
-########################
-# Debug Information    #
-########################
-if [[ "$DEBUG" -eq 1 ]]; then
-    env
-    echo "******************************************************************************"
-    echo "Registry URL: $REGISTRY_URL"
-    echo "Registry Server: $REGISTRY_SERVER"
-    echo "My repository: $REPOSITORY"
-    echo "APPLICATION_VERSION: $APPLICATION_VERSION"
-    echo "APPLICATION_NAME: $APPLICATION_NAME"
-    echo "BUILDER: $BUILDER"
-    echo "WORKSPACE: $WORKSPACE"
-    echo "ARCHIVE_DIR: $ARCHIVE_DIR"
-    echo "EXT_DIR: $EXT_DIR"
-    echo "PATH: $PATH"
-    echo "******************************************************************************"
-fi
 
