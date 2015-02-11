@@ -88,7 +88,7 @@ if [ -z $ARCHIVE_DIR ]; then
     export ARCHIVE_DIR="${WORKSPACE}"
 fi 
 
-if [ -d "$ARCHIVE_DIR" ]; then
+if [ -d $ARCHIVE_DIR ]; then
   echo "Archiving to $ARCHIVE_DIR"
 else 
   echo "Creating archive directory $ARCHIVE_DIR"
@@ -102,25 +102,25 @@ export LOG_DIR=$ARCHIVE_DIR
 debugme echo "##################"
 debugme echo "installing ICE"
 debugme echo "##################"
-ice help >> ${LOG_DIR}/ice.log 2>&1 
+ice help 1>> ${LOG_DIR}/ice.log 2>&1 
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
-    sudo apt-get -y install python2.7 >> ${LOG_DIR}/ice.log 2>&1
-    python get-pip.py --user >> ${LOG_DIR}/ice.log 2>&1
+    sudo apt-get -y install python2.7 1>> ${LOG_DIR}/ice.log 2>&1
+    python get-pip.py --user 1>> ${LOG_DIR}/ice.log 2>&1
     export PATH=$PATH:~/.local/bin
-    pip install --user icecli-2.0.zip >> ${LOG_DIR}/ice.log 2>&1
-    ice help >> ${LOG_DIR}/ice.log 2>&1
+    pip install --user icecli-2.0.zip 1>> ${LOG_DIR}/ice.log 2>&1
+    ice help 1>> ${LOG_DIR}/ice.log 2>&1
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
-        debugme more ${LOG_DIR}/ice.log 
+        debugme cat ${LOG_DIR}/ice.log 
         debugme python --version
         exit $RESULT
     fi
     popd 
-    debugme more ${LOG_DIR}/ice.log 
+    debugme cat ${LOG_DIR}/ice.log 
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
 fi 
 
@@ -136,14 +136,15 @@ cd $EXT_DIR
 gunzip cf-linux-amd64.tgz >> ${LOG_DIR}/cf.log 2>&1 
 tar -xvf cf-linux-amd64.tar >> ${LOG_DIR}/cf.log 2>&1 
 cf help >> ${LOG_DIR}/cf.log 2>&1 
+
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
-    debugme more ${LOG_DIR}/cf.log
+    debugme cat ${LOG_DIR}/cf.log
     exit 1
 fi  
 popd
-debugme more ${LOG_DIR}/cf.log
+debugme cat ${LOG_DIR}/cf.log
 echo "Installed Cloud Foundry CLI"
 
 #################################
@@ -214,7 +215,7 @@ else
 fi 
 
 debugme ice info 
-debugme more ${LOG_DIR}/login.log
+debugme cat ${LOG_DIR}/login.log
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
