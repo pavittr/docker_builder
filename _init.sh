@@ -31,12 +31,8 @@ debugme() {
 }
 export -f debugme 
 
-sudo apt-get install -y iputils-ping 
-ping -c 5 -t 10 api.ng.bluemix.net
-ping -c 5 -t 10 registry-ice.ng.bluemix.net 
-ping -c 5 -t 10 api-ice.ng.bluemix.net
 set +e
-set +x 
+set -x 
 
 ###############################
 # Configure extension PATH    #
@@ -111,7 +107,8 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
-    sudo apt-get -y install python2.7 
+    sudo apt-get -y install python2.7
+    python --version 
     python get-pip.py --user 
     export PATH=$PATH:~/.local/bin
     pip install --user icecli-2.0.zip 
