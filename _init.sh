@@ -173,7 +173,7 @@ if [ -n "$API_KEY" ]; then
     debugme echo "Login command: ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}"
     ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
     RESULT=$?
-if [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
+elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
     # Get the Bluemix user and password information 
     if [ -z "$BLUEMIX_USER" ]; then 
@@ -222,4 +222,4 @@ if [ $RESULT -eq 1 ]; then
     exit $RESULT
 fi 
 
-
+echo -e "${label_color}Initialization complete${no_color}"
