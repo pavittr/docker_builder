@@ -172,7 +172,7 @@ if [ -n "$API_KEY" ]; then
     echo -e "${label_color}Logging on with API_KEY${no_color}"
     debugme echo "Login command: ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}"
     #ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
-    ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
+    ice login --key ${API_KEY} --user rjminsha@us.ibm.com
     RESULT=$?
 elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
