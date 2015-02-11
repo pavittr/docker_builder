@@ -122,7 +122,6 @@ if [ $RESULT -ne 0 ]; then
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
 fi 
 
-exit 
 #############################
 # Install Cloud Foundry CLI #
 #############################
