@@ -143,7 +143,7 @@ if [ $RESULT -ne 0 ]; then
         exit 1
     fi  
     popd
-    echo "Installed Cloud Foundry CLI"
+    echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
 fi 
 
 #################################
