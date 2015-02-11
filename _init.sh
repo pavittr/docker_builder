@@ -102,50 +102,51 @@ export LOG_DIR=$ARCHIVE_DIR
 debugme echo "##################"
 debugme echo "installing ICE"
 debugme echo "##################"
-ice help 1>> ${LOG_DIR}/ice.log 2>&1 
+ice help  
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
-    sudo apt-get -y install python2.7 1>> ${LOG_DIR}/ice.log 2>&1
-    python get-pip.py --user 1>> ${LOG_DIR}/ice.log 2>&1
+    sudo apt-get -y install python2.7 
+    python get-pip.py --user 
     export PATH=$PATH:~/.local/bin
-    pip install --user icecli-2.0.zip 1>> ${LOG_DIR}/ice.log 2>&1
-    ice help 1>> ${LOG_DIR}/ice.log 2>&1
+    pip install --user icecli-2.0.zip 
+    ice help 
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
-        debugme cat ${LOG_DIR}/ice.log 
         debugme python --version
         exit $RESULT
     fi
     popd 
-    debugme cat ${LOG_DIR}/ice.log 
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
 fi 
 
+exit 
 #############################
 # Install Cloud Foundry CLI #
 #############################
-debugme echo "#############################"
-debugme echo "# Install Cloud Foundry CLI #"
-debugme echo "#############################"
-echo -e "Cloud Foundry CLI not installed"
-pushd . 
-cd $EXT_DIR 
-gunzip cf-linux-amd64.tgz >> ${LOG_DIR}/cf.log 2>&1 
-tar -xvf cf-linux-amd64.tar >> ${LOG_DIR}/cf.log 2>&1 
-cf help >> ${LOG_DIR}/cf.log 2>&1 
-
+cf help  
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
-    debugme cat ${LOG_DIR}/cf.log
-    exit 1
-fi  
-popd
-debugme cat ${LOG_DIR}/cf.log
-echo "Installed Cloud Foundry CLI"
+    debugme echo "#############################"
+    debugme echo "# Install Cloud Foundry CLI #"
+    debugme echo "#############################"
+    echo -e "Cloud Foundry CLI not installed"
+    pushd . 
+    cd $EXT_DIR 
+    gunzip cf-linux-amd64.tgz  
+    tar -xvf cf-linux-amd64.tar  
+    cf help  
+
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
+        exit 1
+    fi  
+    popd
+    echo "Installed Cloud Foundry CLI"
+fi 
 
 #################################
 # Set Bluemix Host Information  #
@@ -171,7 +172,7 @@ fi
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
     debugme echo "Login command: ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST}"
-    ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} >> ${LOG_DIR}/login.log 2>&1
+    ice login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
     RESULT=$?
 if [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
@@ -200,22 +201,21 @@ if [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
     echo ""
     echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
     debugme echo "login command: ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-    ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} >> ${LOG_DIR}/login.log 2>&1
+    ice login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
-    ice ps >> ${LOG_DIR}/login.log 2>&1
+    ice ps 
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo "checking login to registry server" >> ${LOG_DIR}/login.log 2>&1
-        ice images >> ${LOG_DIR}/login.log 2>&1
+        echo "checking login to registry server" 
+        ice images 
         RESULT=$? 
     fi 
 fi 
 
 debugme ice info 
-debugme cat ${LOG_DIR}/login.log
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
