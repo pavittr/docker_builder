@@ -116,15 +116,7 @@ if [ $RESULT -ne 0 ]; then
     python --version 
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
-    #pip install --user icecli-2.0.zip 
-    # still getting a streaming error 
-    #echo -e "${red}Issues encountered building with ICE 2.0 CLI, trying 1.0 version${no_color}"
-    #pip install --user icecli-1.0-0129.zip 
-    if [ "${CLI}" == "1.0" ]; then 
-        pip install --user icecli-1.0-0129.zip 
-    else 
-        pip install --user icecli-2.0-patch.zip
-    fi 
+    pip install --user icecli-2.0.zip
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
