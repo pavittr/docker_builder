@@ -224,6 +224,8 @@ else
 
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
+    debugme cp ~/.cf/config.json foo.txt 
+    debugme cat foo.txt 
 
     ice --verbose ps
     RESULT=$?
