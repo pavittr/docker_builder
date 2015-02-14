@@ -225,7 +225,7 @@ else
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
 
-    ice ps &> /dev/null
+    ice --verbose ps
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo "checking login to registry server" 
