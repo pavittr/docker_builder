@@ -5,7 +5,10 @@
     "desc_key": "ExtDesc",
     "extension_type": "Build",
     "inputs": [
-
+        {
+            "type": "Bluemix",
+            "inclusion" : "always"
+        }
     ],
     "params": [
         {
