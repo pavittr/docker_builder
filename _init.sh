@@ -105,7 +105,7 @@ export LOG_DIR=$ARCHIVE_DIR
 ######################
 # Install ICE CLI    #
 ######################
-echo "installing ICE CLI"
+echo "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
