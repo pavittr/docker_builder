@@ -214,9 +214,13 @@ else
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
     mkdir -p ~/.ice
-    echo "ccs_host = ${CCS_API_HOST}" > ~/.ice/ice-cfg.ini 
-    echo "reg_host = ${CCS_REGISTRY_HOST}" > ~/.ice/ice-cfg.ini 
-    echo "cf_api_url = ${BLUEMIX_API_HOST}" > ~/.ice/ice-cfg.ini
+    echo "[DEFAULT]" > ~/.ice/ice-cfg.ini
+    echo "cf_path = cf" >> ~/.ice/ice-cfg.ini
+    echo "debug_cli = False" >> ~/.ice/ice-cfg.ini
+    echo "prog_name = ice" >> ~/.ice/ice-cfg.ini
+    echo "ccs_host = ${CCS_API_HOST}" >> ~/.ice/ice-cfg.ini 
+    echo "reg_host = ${CCS_REGISTRY_HOST}" >> ~/.ice/ice-cfg.ini 
+    echo "cf_api_url = ${BLUEMIX_API_HOST}" >> ~/.ice/ice-cfg.ini
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
 
