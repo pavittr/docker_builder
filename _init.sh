@@ -57,11 +57,12 @@ fi
 ########################
 # Fix timestamps 
 ########################
-echo "updating timestamps to match the git commit time"
+
+echo "Current working directory and contents:"
 pwd 
 ls -la 
-#!/bin/bash 
 
+echo "updating timestamps to match the git commit time"
 get_file_rev() {
     git rev-list -n 1 HEAD "$1"
 }
@@ -79,8 +80,11 @@ do
 done
 IFS=$old_ifs
 echo "New timestamps"
+pwd 
 pwd ls -la 
 echo "Done"
+
+exit 1
 
 ################################
 # Application Name and Version #
