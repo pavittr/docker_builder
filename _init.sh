@@ -224,10 +224,9 @@ else
 
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
-    debugme cp ~/.cf/config.json foo.txt 
-    debugme cat foo.txt 
 
-    ice --verbose ps
+    ice --verbose ps > ps.log 
+    debugme cat ps.log 
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo "checking login to registry server" 
