@@ -54,6 +54,33 @@ if [ -z $REGISTRY_URL ]; then
     echo -e "${red}Please set REGISTRY_URL in the environment${no_color}"
     exit 1
 fi
+########################
+# Fix timestamps 
+########################
+echo "updating timestamps to match the git commit time"
+pwd 
+ls -la 
+#!/bin/bash 
+
+get_file_rev() {
+    git rev-list -n 1 HEAD "$1"
+}
+
+update_file_timestamp() {
+    file_time=`git show --pretty=format:%ai --abbrev-commit "$(get_file_rev "$1")" | head -n 1`
+    sudo touch -d "$file_time" "$1"
+}
+
+old_ifs=$IFS
+IFS=$'\n' 
+for file in $(git ls-files)
+do
+    update_file_timestamp "${file}"
+done
+IFS=$old_ifs
+echo "New timestamps"
+pwd ls -la 
+echo "Done"
 
 ################################
 # Application Name and Version #
