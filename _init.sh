@@ -84,7 +84,6 @@ pwd
 ls -la 
 echo "Done"
 
-exit 1
 
 ################################
 # Application Name and Version #
