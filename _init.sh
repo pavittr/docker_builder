@@ -68,7 +68,7 @@ get_file_rev() {
 
 update_file_timestamp() {
     file_time=`git show --pretty=format:%ai --abbrev-commit "$(get_file_rev "$1")" | head -n 1`
-    sudo touch -d "$file_time" "$1"
+    touch -d "$file_time" "$1"
 }
 
 old_ifs=$IFS
