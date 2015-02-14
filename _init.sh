@@ -81,7 +81,7 @@ done
 IFS=$old_ifs
 echo "New timestamps"
 pwd 
-pwd ls -la 
+ls -la 
 echo "Done"
 
 exit 1
