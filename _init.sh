@@ -218,9 +218,9 @@ else
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
     mkdir -p ~/.ice
-    echo "[DEFAULT]" > ~/.ice/ice-cfg.ini
+    echo "Copying ${ICE-CFG}"
     cp ${ICE-CFG} ~/.ice/ice-cfg.ini
-    
+
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
 
