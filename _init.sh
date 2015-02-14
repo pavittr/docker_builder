@@ -157,11 +157,13 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
         export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+        export ICE-CFG=ice-cfg-staging.ini
     elif [ "$BLUEMIX_TARGET" == "prod" ]; then 
         echo -e "Targetting production Bluemix"
         export CCS_API_HOST="api-ice.ng.bluemix.net" 
         export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
+        export ICE-CFG=ice-cfg-prod.ini
     else 
         echo -e "${red}Unknown Bluemix environment specified"
     fi 
@@ -170,6 +172,8 @@ else
     export CCS_API_HOST="api-ice.ng.bluemix.net" 
     export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
     export BLUEMIX_API_HOST="api.ng.bluemix.net"
+    export ICE-CFG=ice-cfg-prod.ini
+
 fi  
 
 ################################
@@ -215,12 +219,8 @@ else
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
     mkdir -p ~/.ice
     echo "[DEFAULT]" > ~/.ice/ice-cfg.ini
-    echo "cf_path = cf" >> ~/.ice/ice-cfg.ini
-    echo "debug_cli = False" >> ~/.ice/ice-cfg.ini
-    echo "prog_name = ice" >> ~/.ice/ice-cfg.ini
-    echo "ccs_host = ${CCS_API_HOST}" >> ~/.ice/ice-cfg.ini 
-    echo "reg_host = ${CCS_REGISTRY_HOST}" >> ~/.ice/ice-cfg.ini 
-    echo "cf_api_url = ${BLUEMIX_API_HOST}" >> ~/.ice/ice-cfg.ini
+    cp ${ICE-CFG} ~/.ice/ice-cfg.ini
+    
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
 
