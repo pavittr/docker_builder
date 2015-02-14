@@ -157,13 +157,13 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export CCS_API_HOST="api-ice.stage1.ng.bluemix.net" 
         export CCS_REGISTRY_HOST="registry-ice.stage1.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
-        export ICE-CFG=ice-cfg-staging.ini
+        export ICE_CFG="ice-cfg-staging.ini"
     elif [ "$BLUEMIX_TARGET" == "prod" ]; then 
         echo -e "Targetting production Bluemix"
         export CCS_API_HOST="api-ice.ng.bluemix.net" 
         export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
-        export ICE-CFG=ice-cfg-prod.ini
+        export ICE_CFG="ice-cfg-prod.ini"
     else 
         echo -e "${red}Unknown Bluemix environment specified"
     fi 
@@ -172,7 +172,7 @@ else
     export CCS_API_HOST="api-ice.ng.bluemix.net" 
     export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
     export BLUEMIX_API_HOST="api.ng.bluemix.net"
-    export ICE-CFG=ice-cfg-prod.ini
+    export ICE_CFG="ice-cfg-prod.ini"
 
 fi  
 
@@ -218,8 +218,8 @@ else
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
     mkdir -p ~/.ice
-    echo "Copying ${ICE-CFG}"
-    cp ${ICE-CFG} ~/.ice/ice-cfg.ini
+    echo "Copying ${ICECFG}"
+    cp ${ICE_CFG} ~/.ice/ice-cfg.ini
 
     debugme more ~/.ice/ice-cfg.ini
     debugme more ~/.cf/config.json
