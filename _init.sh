@@ -147,8 +147,8 @@ if [ $RESULT -ne 0 ]; then
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
     echo "Installing patched CLI"
-    #pip install --user icecli-2.0-patch.zip
-    pip install --user icecli-2.0.zip
+    pip install --user icecli-2.0-patch.zip
+    #pip install --user icecli-2.0.zip
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
