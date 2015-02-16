@@ -251,11 +251,13 @@ else
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
     mkdir -p ~/.ice
     echo "Copying ${EXT_DIR}/${ICE_CFG}"
-    debugme more "${EXT_DIR}/${ICE_CFG}"
+    debugme cat "${EXT_DIR}/${ICE_CFG}"
     cp ${EXT_DIR}/${ICE_CFG} ~/.ice/ice-cfg.ini
 
-    debugme more ~/.ice/ice-cfg.ini
-    debugme more ~/.cf/config.json
+    debugme cat ~/.ice/ice-cfg.ini
+    debugme echo "config.json:"
+    debugme cat ~/.cf/config.json | cut -c1-2
+    debugme cat ~/.cf/config.json | cut -c3-
 
     ice --verbose ps > ps.log 
     debugme cat ps.log 
