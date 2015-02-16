@@ -58,11 +58,8 @@ fi
 # Fix timestamps 
 ########################
 
-echo "Current working directory and contents:"
-pwd 
+echo "Current working directory:"
 ls -la 
-
-echo "updating timestamps to match the git commit time"
 get_file_rev() {
     git rev-list -n 1 HEAD "$1"
 }
@@ -79,10 +76,6 @@ do
     update_file_timestamp "${file}"
 done
 IFS=$old_ifs
-echo "New timestamps"
-pwd 
-ls -la 
-echo "Done"
 
 
 ################################
@@ -146,9 +139,7 @@ if [ $RESULT -ne 0 ]; then
     python --version 
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
-    #echo "Installing patched CLI"
-    #pip install --user icecli-2.0-patch.zip
-    pip install --user icecli-2.0.zip
+    pip install --user icecli-2.0-173.zip
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
