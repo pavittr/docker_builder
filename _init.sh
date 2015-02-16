@@ -254,6 +254,12 @@ else
     debugme cat "${EXT_DIR}/${ICE_CFG}"
     cp ${EXT_DIR}/${ICE_CFG} ~/.ice/ice-cfg.ini
 
+    debugme whoami 
+    pushd . 
+    cd ~ 
+    pwd 
+    popd 
+    
     debugme cat ~/.ice/ice-cfg.ini
     debugme echo "config.json:"
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
