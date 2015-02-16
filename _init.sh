@@ -58,8 +58,8 @@ fi
 # Fix timestamps 
 ########################
 
-echo "Current working directory:"
-ls -la 
+debugme echo "Current working directory:"
+debugme ls -la 
 get_file_rev() {
     git rev-list -n 1 HEAD "$1"
 }
@@ -76,7 +76,8 @@ do
     update_file_timestamp "${file}"
 done
 IFS=$old_ifs
-
+debugme echo "updated files"
+debugme la -la 
 
 ################################
 # Application Name and Version #
