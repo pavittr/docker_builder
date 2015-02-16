@@ -256,8 +256,8 @@ else
 
     debugme cat ~/.ice/ice-cfg.ini
     debugme echo "config.json:"
-    debugme cat ~/.cf/config.json | cut -c1-2
-    debugme cat ~/.cf/config.json | cut -c3-
+    debugme cat /home/jenkins/.cf/config.json | cut -c1-2
+    debugme cat /home/jenkins/.cf/config.json | cut -c3-
 
     ice --verbose ps > ps.log 
     debugme cat ps.log 
