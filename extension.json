@@ -53,11 +53,11 @@ echo \"${label_color}No unit tests cases have been checked in ${no_color}\"
 ######################################
 if [ -f Dockerfile ]; then 
     echo -e \"${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}\"
-    ice build --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
+    ice build ${no-cache} --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\"
-        echo \"Build command: ice build --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}\"
+        echo \"Build command: ice build ${no-cache} --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}\"
         ice info 
         ice images
         exit 1

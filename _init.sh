@@ -82,6 +82,9 @@ if [ "$no-cache" == "false" ]; then
     IFS=$old_ifs
     debugme echo "updated files"
     debugme la -la 
+    export no-cache=""
+else 
+    export no-cache="--no-cache"
 fi 
 
 ################################
