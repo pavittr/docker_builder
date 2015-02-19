@@ -54,30 +54,35 @@ if [ -z $REGISTRY_URL ]; then
     echo -e "${red}Please set REGISTRY_URL in the environment${no_color}"
     exit 1
 fi
-########################
-# Fix timestamps 
-########################
 
-debugme echo "Current working directory:"
-debugme ls -la 
-get_file_rev() {
-    git rev-list -n 1 HEAD "$1"
-}
+########################################################################
+# Fix timestamps so that caching will be leveraged on the remove host  #
+########################################################################
+if [ -z $"no-cache" ]; then 
+    export no-cache="false"
+fi 
+if [ "$no-cache" == "false" ]; then 
+    debugme echo "Current working directory:"
+    debugme ls -la 
+    get_file_rev() {
+        git rev-list -n 1 HEAD "$1"
+    }
 
-update_file_timestamp() {
-    file_time=`git show --pretty=format:%ai --abbrev-commit "$(get_file_rev "$1")" | head -n 1`
-    touch -d "$file_time" "$1"
-}
+    update_file_timestamp() {
+        file_time=`git show --pretty=format:%ai --abbrev-commit "$(get_file_rev "$1")" | head -n 1`
+        touch -d "$file_time" "$1"
+    }
 
-old_ifs=$IFS
-IFS=$'\n' 
-for file in $(git ls-files)
-do
-    update_file_timestamp "${file}"
-done
-IFS=$old_ifs
-debugme echo "updated files"
-debugme la -la 
+    old_ifs=$IFS
+    IFS=$'\n' 
+    for file in $(git ls-files)
+    do
+        update_file_timestamp "${file}"
+    done
+    IFS=$old_ifs
+    debugme echo "updated files"
+    debugme la -la 
+fi 
 
 ################################
 # Application Name and Version #
