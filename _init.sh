@@ -59,7 +59,7 @@ fi
 # Fix timestamps so that caching will be leveraged on the remove host  #
 ########################################################################
 if [ -z "${USE_CACHED_LAYERS}" ]; then 
-    export no-cache="true"
+    export USE_CACHED_LAYERS="true"
 fi 
 if [ "${USE_CACHED_LAYERS}" == "true" ]; then 
     debugme echo "Current working directory:"
