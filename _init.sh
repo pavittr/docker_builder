@@ -209,7 +209,7 @@ if [ -n "$API_KEY" ]; then
     #ice $ICE_ARGS login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
     ice $ICE_ARGS login --key ${API_KEY}
     RESULT=$?
-elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
+elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
     # Get the Bluemix user and password information 
     if [ -z "$BLUEMIX_USER" ]; then 
@@ -229,7 +229,7 @@ elif [ -n "$BLUEMIX_TARGET" ] || [ ! -f ~/.cf/config.json ]; then
         echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
     fi 
     echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
-    echo "BLUEMIX_USER: ${BLUEMIX_SPACE}"
+    echo "BLUEMIX_USER: ${BLUEMIX_USER}"
     echo "BLUEMIX_SPACE: ${BLUEMIX_SPACE}"
     echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
     echo "BLUEMIX_PASSWORD: xxxxx"
