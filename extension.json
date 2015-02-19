@@ -22,7 +22,7 @@
             "name": "no-cache",
             "type": "Text",
             "required": "false",
-            "defalt_value":"false",
+            "default_value":"false",
             "label_key": "NO_CACHE_KEY",
             "desc_key": "NO_CACHE_DESC"
         },        
