@@ -58,10 +58,10 @@ fi
 ########################################################################
 # Fix timestamps so that caching will be leveraged on the remove host  #
 ########################################################################
-if [ -z $"no-cache" ]; then 
+if [ -z "${no-cache}" ]; then 
     export no-cache="false"
 fi 
-if [ "$no-cache" == "false" ]; then 
+if [ "${no-cache}" == "false" ]; then 
     debugme echo "Current working directory:"
     debugme ls -la 
     get_file_rev() {
@@ -84,8 +84,9 @@ if [ "$no-cache" == "false" ]; then
     debugme la -la 
     export no-cache=""
 else 
-    export no-cache="--no-cache"
+    export no-cache='--no-cache'
 fi 
+debugme echo "no-cache: ${no-cache}"
 
 ################################
 # Application Name and Version #
