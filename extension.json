@@ -19,12 +19,12 @@
             "desc_key": "REGISTRY_URL_DESC"
         }, 
         {
-            "name": "no-cache",
+            "name": "USE_CACHED_LAYERS",
             "type": "Text",
             "required": "false",
-            "default_value":"false",
-            "label_key": "NO_CACHE_KEY",
-            "desc_key": "NO_CACHE_DESC"
+            "default_value":"true",
+            "label_key": "CACHE_KEY",
+            "desc_key": "CACHE_DESC"
         },        
         {
             "name": "APPLICATION_NAME",
@@ -53,11 +53,17 @@ echo \"${label_color}No unit tests cases have been checked in ${no_color}\"
 ######################################
 if [ -f Dockerfile ]; then 
     echo -e \"${label_color}Building ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${no_color}\"
-    ice build ${no-cache} --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
-    RESULT=$?
+    if [ \"${USE_CACHED_LAYERS}\" == \"true\" ]; then 
+        ice build --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
+        RESULT=$?
+    else 
+        ice build --no-cache --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
+        RESULT=$?
+    fi 
+
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\"
-        echo \"Build command: ice build ${no-cache} --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}\"
+        echo \"Build command: ice build --tag ${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION} ${WORKSPACE}\"
         ice info 
         ice images
         exit 1
@@ -88,6 +94,7 @@ echo \"IMAGE_NAME=${REGISTRY_URL}/${APPLICATION_NAME}:${APPLICATION_VERSION}\" >
         "shell": "#!/bin/bash
 export REGISTRY_URL=#REGISTRY_URL#
 export APPLICATION_NAME=#APPLICATION_NAME#
+export USE_CACHED_LAYERS=#USE_CACHED_LAYERS#
 set +x 
 set +e 
 . $EXT_DIR/_init.sh
