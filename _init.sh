@@ -263,6 +263,8 @@ else
     fi 
 fi 
 
+sudo apt-get install bc > /dev/null 
+
 # check login result 
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
