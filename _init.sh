@@ -103,6 +103,13 @@ if [ -z "$APPLICATION_VERSION" ]; then
         export APPLICATION_VERSION=$SELECTED_BUILD
     fi 
 fi 
+sudo apt-get install bc > /dev/null 
+if [ -n "$BUILD_OFFSET" ]; then 
+    echo "Using BUILD_OFFSET of $BUILD_OFFSET"
+    export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
+    export BUILD_NUMBER=$(echo "$BUILD_NUMBER + $BUILD_OFFSET" | bc)
+fi 
+
 echo "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $APPLICATION_NAME ]; then 
@@ -262,8 +269,6 @@ else
         RESULT=$? 
     fi 
 fi 
-
-sudo apt-get install bc > /dev/null 
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
