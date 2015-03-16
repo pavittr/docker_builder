@@ -261,8 +261,8 @@ else
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
     debugme cat /home/jenkins/.cf/config.json | cut -c3-
     ice --verbose ps > ps.log 
-    debugme cat ps.log 
     RESULT=$?
+    debugme cat ps.log 
     if [ $RESULT -ne 0 ]; then
         echo "checking login to registry server" 
         ice images &> /dev/null
