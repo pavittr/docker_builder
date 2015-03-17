@@ -260,6 +260,7 @@ else
     debugme echo "config.json:"
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
     debugme cat /home/jenkins/.cf/config.json | cut -c3-
+    debugme echo "testing ice login via ps command"
     ice --verbose ps > ps.log 
     RESULT=$?
     debugme cat ps.log 
