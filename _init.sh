@@ -63,7 +63,6 @@ if [ -z "${USE_CACHED_LAYERS}" ]; then
 fi 
 if [ "${USE_CACHED_LAYERS}" == "true" ]; then 
     debugme echo "Current working directory:"
-    debugme ls -la 
     get_file_rev() {
         git rev-list -n 1 HEAD "$1"
     }
@@ -81,7 +80,6 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
     done
     IFS=$old_ifs
     debugme echo "updated files"
-    debugme la -la 
 fi 
 
 ################################
@@ -260,20 +258,34 @@ else
     debugme echo "config.json:"
     debugme cat /home/jenkins/.cf/config.json | cut -c1-2
     debugme cat /home/jenkins/.cf/config.json | cut -c3-
-    debugme echo "testing ice login via ps command"
-    ice --verbose ps > ps.log 
+    debugme echo "testing ice login via ice info command"
+    ice --verbose info > info.log 
     RESULT=$?
     debugme cat ps.log 
-    if [ $RESULT -ne 0 ]; then
-        echo "checking login to registry server" 
+    if [ $RESULT -eq 0 ]; then
+        echo "ice info was successful.  Checking login to registry server" 
         ice images &> /dev/null
         RESULT=$? 
+    else 
+        echo "ice info did not return successfully.  Login failed."
     fi 
 fi 
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
+    ice namespace get 
+    HAS_NAMESPACE=$?
+    if [ $HAS_NAMESPACE -eq 1 ]; then 
+        echo -e "${label_color}No namespace has been defined for this user ${no_color}"
+        echo -e "${label_color}It is likely that the user has not been enabled for IBM Containers on Bluemix${no_color}"
+        echo -e "Please check the following: "
+        echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
+        echo -e "   - Select IBM Containers Icon from the Dashboard" 
+        echo -e "   - Select 'Create a Container'"
+        echo -e "" 
+        echo -e "If there is a message indicating that your account needs to be enabled for IBM Containers, confirm that you would like to do so, and wait for confirmation that your account has been enabled"
+    fi 
     exit $RESULT
 else 
     echo -e "${green}Successfully logged into IBM Container Service${no_color}"
