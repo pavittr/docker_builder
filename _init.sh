@@ -278,7 +278,7 @@ if [ $RESULT -eq 1 ]; then
     HAS_NAMESPACE=$?
     if [ $HAS_NAMESPACE -eq 1 ]; then 
         echo -e "${label_color}No namespace has been defined for this user ${no_color}"
-        echo -e "${label_color}It is likely that the user has not been enabled for IBM Containers on Bluemix${no_color}"
+        echo -e "${label_color}A common cause of this is when the user has not been enabled for IBM Containers on Bluemix${no_color}"
         echo -e "Please check the following: "
         echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
         echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
