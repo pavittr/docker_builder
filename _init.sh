@@ -281,7 +281,7 @@ if [ $RESULT -eq 1 ]; then
         echo -e "${label_color}It is likely that the user has not been enabled for IBM Containers on Bluemix${no_color}"
         echo -e "Please check the following: "
         echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
-        echo -e "   - Select IBM Containers Icon from the Dashboard" 
+        echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
         echo -e "   - Select 'Create a Container'"
         echo -e "" 
         echo -e "If there is a message indicating that your account needs to be enabled for IBM Containers, confirm that you would like to do so, and wait for confirmation that your account has been enabled"
