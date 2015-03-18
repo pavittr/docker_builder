@@ -151,11 +151,14 @@ if [ $RESULT -ne 0 ]; then
     sudo apt-get -y install python3 &> /dev/null
     #python --version 
     python3 --version 
+    echo "installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
     python3 get-pip.py --user &> /dev/null
-    pip install --user icecli-2.0.zip
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip
-    export PATH=$PATH:~/.local/bin
 
 #    echo "Installing pip"
 #    apt-get install -y python-pip
