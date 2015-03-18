@@ -48,7 +48,7 @@ installwithpython34() {
 
     sudo apt-get update &> /dev/null
     debugme pythonbrew list -k
-    echo "Installing Python 3.4"
+    echo "Installing Python 3.4.1"
     pythonbrew install 3.4.1 &> /dev/null
     debugme cat /home/jenkins/.pythonbrew/log/build.log 
     pythonbrew switch 3.4.1
