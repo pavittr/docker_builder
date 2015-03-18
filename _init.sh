@@ -205,8 +205,8 @@ echo "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-#    installwithpython3
-    installwithpython27
+    installwithpython3
+#    installwithpython27
 #    installwithpython277
     ice help &> /dev/null
     RESULT=$?
