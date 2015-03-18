@@ -146,16 +146,24 @@ if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
     sudo apt-get update &> /dev/null
-#    sudo apt-get -y install python2.7 &> /dev/null
-#    python --version 
-#    python get-pip.py --user &> /dev/null
-#    export PATH=$PATH:~/.local/bin
-#    pip install --user icecli-2.0.zip
-    echo "Installing python, pip, ice"
-    apt-get install -y python-pip
-    wget https://bootstrap.pypa.io/ez_setup.py -O -| python
+    sudo apt-get upgrade &> /dev/null 
+    #sudo apt-get -y install python2.7 &> /dev/null
+    sudo apt-get -y install python3 &> /dev/null
+    #python --version 
+    python3 --version 
+    #python3 get-pip.py --user &> /dev/null
+    # pip install --user icecli-2.0.zip
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
-    pip install icecli-2.0.zip
+    pip install --user icecli-2.0.zip
+    export PATH=$PATH:~/.local/bin
+
+#    echo "Installing pip"
+#    apt-get install -y python-pip
+#    echo "Installing pip"
+
+#    wget https://bootstrap.pypa.io/ez_setup.py -O -| python
+#    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+#    pip install --user icecli-2.0.zip
 
     ice help &> /dev/null
     RESULT=$?
