@@ -42,6 +42,27 @@ installwithpython27() {
     pip install --user icecli-2.0.zip
     popd
 }
+installwithpython34() {
+    curl -kL http://xrl.us/pythonbrewinstall | bash
+    source $HOME/.pythonbrew/etc/bashrc
+
+    sudo apt-get update &> /dev/null
+    debugme pythonbrew list -k
+    echo "Installing Python 3.4"
+    pythonbrew install 3.4.1 &> /dev/null
+    debugme cat /home/jenkins/.pythonbrew/log/build.log 
+    pythonbrew switch 3.4.1
+    python --version 
+    echo "Installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    python get-pip.py --user
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "Installing ice cli"
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip
+}
+
 installwithpython277() {
     pushd . 
     cd $EXT_DIR
@@ -205,9 +226,10 @@ echo "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    installwithpython3
+#    installwithpython3
 #    installwithpython27
 #    installwithpython277
+    installwithpython34
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
