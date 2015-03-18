@@ -81,10 +81,11 @@ installwithpython277() {
     python --version 
     echo "Installing pip"
     #wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
-#    python get-pip.py --user &> /dev/null
+    #python get-pip.py --user &> /dev/null
     debugme pwd 
     debugme ls 
     python get-pip.py --user
+    popd 
     pip remove requests
     pip install --user -U requests 
     pip install --user -U pip
@@ -93,7 +94,6 @@ installwithpython277() {
     echo "Installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip
-    popd
 }
 installwithpython3() {
     pushd . 
