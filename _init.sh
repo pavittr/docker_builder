@@ -31,6 +31,48 @@ debugme() {
 }
 export -f debugme 
 
+installwithpython273() {
+    pushd . 
+    cd $EXT_DIR
+    sudo apt-get update &> /dev/null
+    sudo apt-get -y install python2.7 &> /dev/null
+    python --version 
+    python get-pip.py --user &> /dev/null
+    export PATH=$PATH:~/.local/bin
+    pip install --user icecli-2.0.zip
+    popd
+}
+installwithpython279() {
+    curl -kL http://xrl.us/pythonbrewinstall | bash
+    source $HOME/.pythonbrew/etc/bashrc
+    pythonbrew list -k
+    pythonbrew install 2.7.9
+    pythonbrew switch 2.7.9
+    python -V
+    echo "installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    python3 get-pip.py --user &> /dev/null
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "installing ice cli"
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip
+}
+installwithpython3() {
+    sudo apt-get update &> /dev/null
+    sudo apt-get upgrade &> /dev/null 
+    sudo apt-get -y install python3 &> /dev/null
+    python3 --version 
+    echo "installing pip"
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    python3 get-pip.py --user &> /dev/null
+    export PATH=$PATH:~/.local/bin
+    which pip 
+    echo "installing ice cli"
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip
+}
+
 if [ $DEBUG -eq 1 ]; then 
     export ICE_ARGS="--verbose"
 else
@@ -143,31 +185,9 @@ echo "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    pushd . 
-    cd $EXT_DIR
-    sudo apt-get update &> /dev/null
-    sudo apt-get upgrade &> /dev/null 
-    #sudo apt-get -y install python2.7 &> /dev/null
-    sudo apt-get -y install python3 &> /dev/null
-    #python --version 
-    python3 --version 
-    echo "installing pip"
-    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
-    python3 get-pip.py --user &> /dev/null
-    export PATH=$PATH:~/.local/bin
-    which pip 
-    echo "installing ice cli"
-    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
-    pip install --user icecli-2.0.zip
-
-#    echo "Installing pip"
-#    apt-get install -y python-pip
-#    echo "Installing pip"
-
-#    wget https://bootstrap.pypa.io/ez_setup.py -O -| python
-#    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
-#    pip install --user icecli-2.0.zip
-
+#    installwithpython3
+#    installwithpython273
+    installwithpython279
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
@@ -175,7 +195,6 @@ if [ $RESULT -ne 0 ]; then
         debugme python --version
         exit $RESULT
     fi
-    popd 
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
 fi 
 
