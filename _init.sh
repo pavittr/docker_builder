@@ -46,8 +46,8 @@ installwithpython279() {
     curl -kL http://xrl.us/pythonbrewinstall | bash
     source $HOME/.pythonbrew/etc/bashrc
     pythonbrew list -k
-    pythonbrew install 2.7.9
-    pythonbrew switch 2.7.9
+    pythonbrew install 2.7.7
+    pythonbrew switch 2.7.7
     python -V
     echo "installing pip"
     wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
