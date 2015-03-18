@@ -52,7 +52,6 @@ installwithpython277() {
     sudo apt-get update &> /dev/null
     sudo apt-get build-dep python2.7
     sudo apt-get install zlib1g-dev
-
     debugme pythonbrew list -k
     echo "Installing Python 2.7.7"
     pythonbrew install 2.7.7 --no-setuptools &> /dev/null
@@ -65,6 +64,9 @@ installwithpython277() {
     debugme pwd 
     debugme ls 
     python get-pip.py --user
+    pip remove requests
+    pip install --user -U requests 
+    pip install --user -U pip
     export PATH=$PATH:~/.local/bin
     which pip 
     echo "Installing ice cli"
