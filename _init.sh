@@ -227,9 +227,9 @@ ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
 #    installwithpython3
-#    installwithpython27
+    installwithpython27
 #    installwithpython277
-    installwithpython34
+#    installwithpython34
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
