@@ -151,8 +151,8 @@ if [ $RESULT -ne 0 ]; then
     sudo apt-get -y install python3 &> /dev/null
     #python --version 
     python3 --version 
-    #python3 get-pip.py --user &> /dev/null
-    # pip install --user icecli-2.0.zip
+    python3 get-pip.py --user &> /dev/null
+    pip install --user icecli-2.0.zip
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip
     export PATH=$PATH:~/.local/bin
