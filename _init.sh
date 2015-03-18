@@ -191,7 +191,7 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
 #    installwithpython3
 #    installwithpython273
-    installwithpython279
+    installwithpython277
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
