@@ -31,7 +31,7 @@ debugme() {
 }
 export -f debugme 
 
-installwithpython273() {
+installwithpython27() {
     pushd . 
     cd $EXT_DIR
     sudo apt-get update &> /dev/null
@@ -75,6 +75,8 @@ installwithpython277() {
     popd
 }
 installwithpython3() {
+    pushd . 
+    cd $EXT_DIR
     sudo apt-get update &> /dev/null
     sudo apt-get upgrade &> /dev/null 
     sudo apt-get -y install python3 &> /dev/null
@@ -85,8 +87,10 @@ installwithpython3() {
     export PATH=$PATH:~/.local/bin
     which pip 
     echo "installing ice cli"
-    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
-    pip install --user icecli-2.0.zip
+
+    #wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-patch.zip
+    popd
 }
 
 if [ $DEBUG -eq 1 ]; then 
@@ -202,8 +206,8 @@ ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
 #    installwithpython3
-#    installwithpython273
-    installwithpython277
+    installwithpython27
+#    installwithpython277
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
