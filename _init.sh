@@ -42,19 +42,23 @@ installwithpython273() {
     pip install --user icecli-2.0.zip
     popd
 }
-installwithpython279() {
+installwithpython277() {
+    echo "Installing Python 2.7.7"
     curl -kL http://xrl.us/pythonbrewinstall | bash
     source $HOME/.pythonbrew/etc/bashrc
-    pythonbrew list -k
-    pythonbrew install 2.7.7
+    
+    debugme pythonbrew list -k
+    echo "Installing Python 2.7.7"
+    pythonbrew install 2.7.7 > /dev/null
+    debugme cat /home/jenkins/.pythonbrew/log/build.log 
     pythonbrew switch 2.7.7
-    python -V
-    echo "installing pip"
+    python --version 
+    echo "Installing pip"
     wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
-    python3 get-pip.py --user &> /dev/null
+    python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
     which pip 
-    echo "installing ice cli"
+    echo "Installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip
 }
