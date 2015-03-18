@@ -146,11 +146,17 @@ if [ $RESULT -ne 0 ]; then
     pushd . 
     cd $EXT_DIR
     sudo apt-get update &> /dev/null
-    sudo apt-get -y install python2.7 &> /dev/null
-    python --version 
-    python get-pip.py --user &> /dev/null
-    export PATH=$PATH:~/.local/bin
-    pip install --user icecli-2.0.zip
+#    sudo apt-get -y install python2.7 &> /dev/null
+#    python --version 
+#    python get-pip.py --user &> /dev/null
+#    export PATH=$PATH:~/.local/bin
+#    pip install --user icecli-2.0.zip
+    echo "Installing python, pip, ice"
+    apt-get install -y python-pip
+    wget https://bootstrap.pypa.io/ez_setup.py -O -| python
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install icecli-2.0.zip
+
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
@@ -261,7 +267,7 @@ else
     debugme echo "testing ice login via ice info command"
     ice --verbose info > info.log 
     RESULT=$?
-    debugme cat ps.log 
+    debugme cat info.log 
     if [ $RESULT -eq 0 ]; then
         echo "ice info was successful.  Checking login to registry server" 
         ice images &> /dev/null
