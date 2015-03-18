@@ -48,10 +48,14 @@ installwithpython277() {
     echo "Installing Python 2.7.7"
     curl -kL http://xrl.us/pythonbrewinstall | bash
     source $HOME/.pythonbrew/etc/bashrc
-    
+
+    sudo apt-get update &> /dev/null
+    sudo apt-get build-dep python2.7
+    sudo apt-get install zlib1g-dev
+
     debugme pythonbrew list -k
     echo "Installing Python 2.7.7"
-    pythonbrew install 2.7.7 &> /dev/null
+    pythonbrew install 2.7.7 --no-setuptools &> /dev/null
     debugme cat /home/jenkins/.pythonbrew/log/build.log 
     pythonbrew switch 2.7.7
     python --version 
