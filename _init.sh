@@ -45,7 +45,7 @@ installwithpython27() {
 installwithpython34() {
     curl -kL http://xrl.us/pythonbrewinstall | bash
     source $HOME/.pythonbrew/etc/bashrc
-
+    sudo apt-get install zlib1g-dev libexpat1-dev libdb4.8-dev libncurses5-dev libreadline6-dev
     sudo apt-get update &> /dev/null
     debugme pythonbrew list -k
     echo "Installing Python 3.4.1"
