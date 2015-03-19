@@ -112,8 +112,7 @@ installwithpython3() {
     pip install --user icecli-patch.zip
     popd
 }
-
-if [ $DEBUG -eq 1 ]; then 
+if [[ $DEBUG = 1 ]]; then 
     export ICE_ARGS="--verbose"
 else
     export ICE_ARGS=""
@@ -175,7 +174,9 @@ if [ -z "$APPLICATION_VERSION" ]; then
         export APPLICATION_VERSION=$SELECTED_BUILD
     fi 
 fi 
-sudo apt-get install bc > /dev/null 
+debugme echo "installing bc"
+sudo apt-get install bc >/dev/null 
+debugme echo "done installing bc"
 if [ -n "$BUILD_OFFSET" ]; then 
     echo "Using BUILD_OFFSET of $BUILD_OFFSET"
     export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
