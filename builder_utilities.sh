@@ -53,18 +53,24 @@ REPOSPECIAL="repo"
 # vars REGISTRY, IMAGENAME, and IMAGEVER, respectively.  If a piece is
 # null, the respective env var will be as well. 
 pipeline_parsefull() {
-        if [ -z "$1" ]; then
+    if [ -z "$1" ]; then
                 # nothing to parse, clear vars and return
+        HOST=""
 		REGISTRY=""
 		IMAGENAME=""
 		IMAGEVER=""
                 return 1
 	fi
-	if [[ $1 =~ (.*)/(.*):(.*) ]]; then
-		REGISTRY=${BASH_REMATCH[1]}
-		IMAGENAME=${BASH_REMATCH[2]}
-		IMAGEVER=${BASH_REMATCH[3]}
-	elif [[ $1 =~ (.*)/(.*) ]]; then
+	if [[ $1 =~ (.*)/(.*)/(.*):(.*) ]]; then
+        HOST=${BASH_REMATCH[1]}
+		REGISTRY=${BASH_REMATCH[2]}
+		IMAGENAME=${BASH_REMATCH[3]}
+		IMAGEVER=${BASH_REMATCH[4]}
+	elif [[ $1 =~ (.*)/(.*):(.*) ]]; then
+        REGISTRY=${BASH_REMATCH[1]}
+        IMAGENAME=${BASH_REMATCH[2]}
+        IMAGEVER=${BASH_REMATCH[3]}
+    elif [[ $1 =~ (.*)/(.*) ]]; then
 		REGISTRY=${BASH_REMATCH[1]}
 		IMAGENAME=${BASH_REMATCH[2]}
 		IMAGEVER=""
@@ -78,13 +84,13 @@ pipeline_parsefull() {
 		IMAGEVER=""
 	fi
 
-	# may have to parse host out of registry - check that
-	if [[ ! -z $REGISTRY ]]; then
-	        if [[ $REGISTRY =~ (.*)/(.*) ]]; then
-	                REGISTRY_HOST=${BASH_REMATCH[1]}
-                        REGISTRY=${BASH_REMATCH[2]}
-		fi
-	fi
+# may have to parse host out of registry - check that
+#	if [[ ! -z $REGISTRY ]]; then
+#	        if [[ $REGISTRY =~ (.*)/(.*) ]]; then
+#	                REGISTRY_HOST=${BASH_REMATCH[1]}
+#                        REGISTRY=${BASH_REMATCH[2]}
+#		fi
+#	fi
 
 	return 0
 }
@@ -487,7 +493,8 @@ unittest() {
                 echo "ut fail (incorrect pass) on validate n/r:!v test (tag too long)"
                 return 63
         fi
-        pipeline_validate_full "host.example.com/t-e_s.t/T-e_s.t:T-e_s.t" >/dev/null
+
+        pipeline_validate_full "host.example.com/t-e_s.t/t-e_s.t:T-e_s.t" > /dev/null
         if [ ! $? -eq 0 ]; then
                 echo "ut fail (incorrect fail) on validate h/n/!r:v test"
                 return 55
