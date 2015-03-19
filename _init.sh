@@ -195,7 +195,7 @@ if [ -f ${EXT_DIR}/pipeline_validate.sh ]
     debugme echo "Validating image name"
     pipeline_validate_full ${IMAGE_NAME} >validate.log 2>&1 
     VALID_NAME=$?
-    if [ ${VALID_NAME} -ne 0 ]    
+    if [ ${VALID_NAME} -ne 0 ]; then     
         echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}"
         cat validate.log 
     else 
@@ -407,7 +407,7 @@ echo -e "${label_color}The desired image repository name will be ${FULL_REPOSITO
 debugme echo "Validating full repository name"
 pipeline_validate_full  ${FULL_REPOSITORY_NAME} >validate.log 2>&1 
 VALID_NAME=$?
-if [ ${VALID_NAME} -ne 0 ]    
+if [ ${VALID_NAME} -ne 0 ]; then    
     echo -e "${red} ${FULL_REPOSITORY_NAME} is not a valid repository name${no_color}"
     cat validate.log 
     exit ${VALID_NAME}

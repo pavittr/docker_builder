@@ -83,7 +83,6 @@ pipeline_parsefull() {
 		IMAGENAME=$1
 		IMAGEVER=""
 	fi
-
 	return 0
 }
 
