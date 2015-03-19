@@ -185,8 +185,8 @@ fi
 
 echo "APPLICATION_VERSION: $APPLICATION_VERSION"
 
-if [ -z $APPLICATION_NAME ]; then 
-    echo -e "${red}setting application name to helloworld, please set APPLICATION_NAME in the environment to desired name ${no_color}"
+if [ -z $IMAGE_NAME ]; then 
+    echo -e "${red}Please set IMAGE_NAME in the environment to desired name ${no_color}"
     exit 1
 fi 
 
