@@ -190,7 +190,7 @@ if [ -z $IMAGE_NAME ]; then
     exit 1
 fi 
 
-if [ -f ${EXT_DIR}/pipeline_validate.sh ]
+if [ -f ${EXT_DIR}/pipeline_validate.sh ]; then
     source ${EXT_DIR}/pipeline_validate.sh 
     debugme echo "Validating image name"
     pipeline_validate_full ${IMAGE_NAME} >validate.log 2>&1 
