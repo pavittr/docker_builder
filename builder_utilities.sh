@@ -15,6 +15,11 @@
 #   See the License for the specific language governing permissions and
 #*******************************************************************************
 
+# preferred method for using this code is to source this file, then call the
+# pipeline_validate_full function.  To manually test, this script can be
+# called as "pipeline_validate.sh --test myteststring".  Do not use the
+# --test parameter in a source call, as it will exit() when done.
+
 # predefined empty objects (no reserved words, no special handling case, etc)
 NOSPECIAL="none"
 NORESERVED=("")
@@ -44,9 +49,9 @@ DEFREPOCHARS="a-z0-9._-"
 REPOSPECIAL="repo"
 
 # parse a potentially full pipeline, of the form
-# "namespace/repository:version"  Parsed values will be returned in env
+# "host/namespace/repository:version"  Parsed values will be returned in env
 # vars REGISTRY, IMAGENAME, and IMAGEVER, respectively.  If a piece is
-# null, the respective env var will be as well
+# null, the respective env var will be as well. 
 pipeline_parsefull() {
         if [ -z "$1" ]; then
                 # nothing to parse, clear vars and return
@@ -72,6 +77,15 @@ pipeline_parsefull() {
 		IMAGENAME=$1
 		IMAGEVER=""
 	fi
+
+	# may have to parse host out of registry - check that
+	if [[ ! -z $REGISTRY ]]; then
+	        if [[ $REGISTRY =~ (.*)/(.*) ]]; then
+	                REGISTRY_HOST=${BASH_REMATCH[1]}
+                        REGISTRY=${BASH_REMATCH[2]}
+		fi
+	fi
+
 	return 0
 }
 
@@ -473,6 +487,11 @@ unittest() {
                 echo "ut fail (incorrect pass) on validate n/r:!v test (tag too long)"
                 return 63
         fi
+        pipeline_validate_full "host.example.com/t-e_s.t/T-e_s.t:T-e_s.t" >/dev/null
+        if [ ! $? -eq 0 ]; then
+                echo "ut fail (incorrect fail) on validate h/n/!r:v test"
+                return 55
+        fi
 
 	return 0
 }
@@ -480,14 +499,24 @@ unittest() {
 unittest
 if [ ! $? -eq 0 ]; then
 	echo "Unit test failed, aborting"
-fi
-
-if [ "$1" == "--test" ]; then
-	shift
-	for i in $@
-	do
-		echo parsing $i
-		pipeline_validate_full $i
+else
+	# allow run the script with --test parameter to check script directly
+	if [ "$1" == "--test" ]; then
 		shift
-	done
+		rc=0
+		for i in $@
+		do
+			echo parsing $i
+			pipeline_validate_full $i
+			rcc=$?
+	                if [ $rc -eq 0 ]; then
+	                        rc=$rcc
+	                fi
+			shift
+		done
+		# only exit if running directly, if done in source will
+		# kill the parent shell
+		echo "Return code is $rc"
+		exit $rc
+	fi
 fi
