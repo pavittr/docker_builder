@@ -36,10 +36,10 @@ installwithpython27() {
     sudo apt-get update &> /dev/null
     sudo apt-get -y install python2.7 &> /dev/null
     python --version 
-    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py &> /dev/null
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
-    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
     pip install --user icecli-2.0.zip
 }
 installwithpython34() {
@@ -54,12 +54,12 @@ installwithpython34() {
     pythonbrew switch 3.4.1
     python --version 
     echo "Installing pip"
-    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py &> /dev/null
     python get-pip.py --user
     export PATH=$PATH:~/.local/bin
     which pip 
     echo "Installing ice cli"
-    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
     pip install --user icecli-2.0.zip
 }
 
@@ -80,7 +80,7 @@ installwithpython277() {
     pythonbrew switch 2.7.7
     python --version 
     echo "Installing pip"
-    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py &> /dev/null
     python get-pip.py --user &> /dev/null
     debugme pwd 
     debugme ls 
@@ -91,12 +91,12 @@ installwithpython277() {
     export PATH=$PATH:~/.local/bin
     which pip 
     echo "Installing ice cli"
-    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
-    pip install --user icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme echo cli_install.log 
 }
 installwithpython3() {
-    pushd . 
-    cd $EXT_DIR
+
     sudo apt-get update &> /dev/null
     sudo apt-get upgrade &> /dev/null 
     sudo apt-get -y install python3 &> /dev/null
@@ -109,8 +109,8 @@ installwithpython3() {
     echo "installing ice cli"
 
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
-    pip install --user icecli-patch.zip
-    popd
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme echo cli_install.log 
 }
 if [[ $DEBUG = 1 ]]; then 
     export ICE_ARGS="--verbose"
