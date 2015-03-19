@@ -175,7 +175,7 @@ if [ -z "$APPLICATION_VERSION" ]; then
     fi 
 fi 
 debugme echo "installing bc"
-sudo apt-get install bc >/dev/null 
+sudo apt-get install bc >/dev/null 2>&1
 debugme echo "done installing bc"
 if [ -n "$BUILD_OFFSET" ]; then 
     echo "Using BUILD_OFFSET of $BUILD_OFFSET"
