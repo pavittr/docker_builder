@@ -55,30 +55,39 @@ REPOSPECIAL="repo"
 pipeline_parsefull() {
     if [ -z "$1" ]; then
                 # nothing to parse, clear vars and return
-        HOST=""
+		HOST=""
 		REGISTRY=""
 		IMAGENAME=""
 		IMAGEVER=""
                 return 1
 	fi
 	if [[ $1 =~ (.*)/(.*)/(.*):(.*) ]]; then
-        HOST=${BASH_REMATCH[1]}
+		HOST=${BASH_REMATCH[1]}
 		REGISTRY=${BASH_REMATCH[2]}
 		IMAGENAME=${BASH_REMATCH[3]}
 		IMAGEVER=${BASH_REMATCH[4]}
 	elif [[ $1 =~ (.*)/(.*):(.*) ]]; then
-        REGISTRY=${BASH_REMATCH[1]}
-        IMAGENAME=${BASH_REMATCH[2]}
-        IMAGEVER=${BASH_REMATCH[3]}
-    elif [[ $1 =~ (.*)/(.*) ]]; then
+		HOST=""
+		REGISTRY=${BASH_REMATCH[1]}
+		IMAGENAME=${BASH_REMATCH[2]}
+		IMAGEVER=${BASH_REMATCH[3]}
+        elif [[ $1 =~ (.*)/(.*)/(.*) ]]; then
+		HOST=${BASH_REMATCH[1]}
+                REGISTRY=${BASH_REMATCH[2]}
+                IMAGENAME=${BASH_REMATCH[3]}
+                IMAGEVER=""
+	elif [[ $1 =~ (.*)/(.*) ]]; then
+		HOST=""
 		REGISTRY=${BASH_REMATCH[1]}
 		IMAGENAME=${BASH_REMATCH[2]}
 		IMAGEVER=""
 	elif [[ $1 =~ (.*):(.*) ]]; then
+		HOST=""
 		REGISTRY=""
 		IMAGENAME=${BASH_REMATCH[1]}
 		IMAGEVER=${BASH_REMATCH[2]}
 	else
+		HOST=""
 		REGISTRY=""
 		IMAGENAME=$1
 		IMAGEVER=""
@@ -248,13 +257,16 @@ pipeline_validate_imagever() {
 }
 
 # main function to call - first parses passed string into parts, then
-# validates those parts appropriately for 
-# "namespace/repository:version" format.
+# validates those parts appropriately for "host/namespace/repo:version"
+# format.  the "host" piece is NOT validated.
 pipeline_validate_full() {
 	local rc=0
 	local rcc
 	local outstr
         pipeline_parsefull $1
+        if [ ! -z "$HOST" ]; then
+                echo "Host \"$HOST\" unchecked"
+        fi
         if [ ! -z "$REGISTRY" ]; then
 		outstr=$(pipeline_validate_namespace $REGISTRY)
 		rcc=$?
