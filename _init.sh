@@ -109,7 +109,7 @@ installwithpython3() {
     which pip 
     echo "installing ice cli"
 
-    #wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-patch.zip
     popd
 }
@@ -129,14 +129,6 @@ set +x
 if [ -n $EXT_DIR ]; then 
     export PATH=$EXT_DIR:$PATH
 fi 
-
-########################
-# REGISTRY INFORMATION #
-########################
-if [ -z $REGISTRY_URL ]; then
-    echo -e "${red}Please set REGISTRY_URL in the environment${no_color}"
-    exit 1
-fi
 
 ########################################################################
 # Fix timestamps so that caching will be leveraged on the remove host  #
@@ -201,10 +193,10 @@ fi
 if [ -f ${EXT_DIR}/pipeline_validate.sh ]
     source ${EXT_DIR}/pipeline_validate.sh 
     debugme echo "Validating image name"
-    pipeline_validate_full ${APPLICATION_NAME} >validate.log 2>&1 
+    pipeline_validate_full ${IMAGE_NAME} >validate.log 2>&1 
     VALID_NAME=$?
     if [ ${VALID_NAME} -ne 0 ]    
-        echo -e "${red}${APPLICATION_NAME} is not a valid image name for Docker${no_color}"
+        echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}"
         cat validate.log 
     else 
         debugme cat validate.log 
@@ -364,25 +356,63 @@ else
     fi 
 fi 
 
+printEnablementInfo() {
+    echo -e "${label_color}No namespace has been defined for this user ${no_color}"
+    echo -e "${label_color}A common cause of this is when the user has not been enabled for IBM Containers on Bluemix${no_color}"
+    echo -e "Please check the following: "
+    echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
+    echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
+    echo -e "   - Select 'Create a Container'"
+    echo -e "" 
+    echo -e "If there is a message indicating that your account needs to be enabled for IBM Containers, confirm that you would like to do so, and wait for confirmation that your account has been enabled"
+}
+
+
 # check login result 
 if [ $RESULT -eq 1 ]; then
     echo -e "${red}Failed to login to IBM Container Service${no_color}"
     ice namespace get 
     HAS_NAMESPACE=$?
     if [ $HAS_NAMESPACE -eq 1 ]; then 
-        echo -e "${label_color}No namespace has been defined for this user ${no_color}"
-        echo -e "${label_color}A common cause of this is when the user has not been enabled for IBM Containers on Bluemix${no_color}"
-        echo -e "Please check the following: "
-        echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
-        echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
-        echo -e "   - Select 'Create a Container'"
-        echo -e "" 
-        echo -e "If there is a message indicating that your account needs to be enabled for IBM Containers, confirm that you would like to do so, and wait for confirmation that your account has been enabled"
+        printEnablementInfo        
     fi 
     exit $RESULT
 else 
     echo -e "${green}Successfully logged into IBM Container Service${no_color}"
     ice info 
+fi 
+
+########################
+# REGISTRY INFORMATION #
+########################
+export NAMESPACE=$(ice namespace get)
+RESULT=$?
+if [ $RESULT -eq 0 ]; then
+    if [ -z $NAMESPACE ]; then
+        echo -e "${red}Did not discover namespace using ice namespace get, but no error was returned${no_color}"
+        printEnablementInfo
+        exit $RESULT
+    fi
+else 
+    echo -e "${red}'ice namespace get' returned an error ${no_color}"
+    printEnablementInfo
+    exit 1
+fi 
+
+echo -e "${label_color}Users namespace is $NAMESPACE ${no_color}"
+export REGISTRY_URL=${CCS_REGISTRY_HOST}/${NAMESPACE}
+export FULL_REPOSITORY_NAME=${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION}
+echo -e "${label_color}The desired image repository name will be ${FULL_REPOSITORY_NAME} ${no_color}"
+
+debugme echo "Validating full repository name"
+pipeline_validate_full  ${FULL_REPOSITORY_NAME} >validate.log 2>&1 
+VALID_NAME=$?
+if [ ${VALID_NAME} -ne 0 ]    
+    echo -e "${red} ${FULL_REPOSITORY_NAME} is not a valid repository name${no_color}"
+    cat validate.log 
+    exit ${VALID_NAME}
+else 
+    debugme cat validate.log 
 fi 
 
 echo -e "${label_color}Initialization complete${no_color}"

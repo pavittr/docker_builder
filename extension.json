@@ -44,24 +44,27 @@ echo \"${label_color}No unit tests cases have been checked in ${no_color}\"
 ######################################
 # Build Container via Dockerfile     #
 ######################################
+
+# FULL_REPOSITORY_NAME={CONTAINER_SERVICE_HOST}/{USER_NAMESPACE}/{IMAGE_NAME}:{VERSION}
+
 if [ -f Dockerfile ]; then 
-    echo -e \"${label_color}Building ${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION} ${no_color}\"
+    echo -e \"${label_color}Building ${FULL_REPOSITORY_NAME} ${no_color}\"
     if [ \"${USE_CACHED_LAYERS}\" == \"true\" ]; then 
-        ice build --tag ${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
+        ice build --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}
         RESULT=$?
     else 
-        ice build --no-cache --tag ${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION} ${WORKSPACE}
+        ice build --no-cache --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}
         RESULT=$?
     fi 
 
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\"
-        echo \"Build command: ice build --tag ${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION} ${WORKSPACE}\"
+        echo \"Build command: ice build --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}\"
         ice info 
         ice images
         exit 1
     else
-        echo -e \"${green}Container build of ${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION} was successful ${no_color}\"
+        echo -e \"${green}Container build of ${FULL_REPOSITORY_NAME} was successful ${no_color}\"
     fi  
 else 
     echo -e \"${red}Dockerfile not found in project${no_color}\"
@@ -71,7 +74,7 @@ fi
 ########################################################################################
 # Copy any artifacts that will be needed for deployment and testing to $archive_dir    #
 ########################################################################################
-echo \"IMAGE_NAME=${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION}\" >> ${ARCHIVE_DIR}/build.properties",
+echo \"IMAGE_NAME=${FULL_REPOSITORY_NAME}\" >> ${ARCHIVE_DIR}/build.properties",
             "label_key": "COMMAND_KEY",
             "desc_key": "COMMAND_DESC"
         }
