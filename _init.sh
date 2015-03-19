@@ -198,6 +198,7 @@ if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
     if [ ${VALID_NAME} -ne 0 ]; then     
         echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}"
         cat validate.log 
+        exit ${VALID_NAME}
     else 
         debugme cat validate.log 
     fi 
