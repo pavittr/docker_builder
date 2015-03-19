@@ -189,8 +189,8 @@ if [ -z $IMAGE_NAME ]; then
     exit 1
 fi 
 
-if [ -f ${EXT_DIR}/build_utilities.sh ]; then
-    source ${EXT_DIR}/build_utilities.sh 
+if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
+    source ${EXT_DIR}/builder_utilities.sh 
     debugme echo "Validating image name"
     pipeline_validate_full ${IMAGE_NAME} >validate.log 2>&1 
     VALID_NAME=$?
@@ -201,7 +201,7 @@ if [ -f ${EXT_DIR}/build_utilities.sh ]; then
         debugme cat validate.log 
     fi 
 else 
-    debugme echo -e "${red}Warning could not find utilities in ${EXT_DIR}"
+    echo -e "${red}Warning could not find utilities in ${EXT_DIR}${no_color}"
 fi 
 
 ################################
