@@ -84,14 +84,6 @@ pipeline_parsefull() {
 		IMAGEVER=""
 	fi
 
-# may have to parse host out of registry - check that
-#	if [[ ! -z $REGISTRY ]]; then
-#	        if [[ $REGISTRY =~ (.*)/(.*) ]]; then
-#	                REGISTRY_HOST=${BASH_REMATCH[1]}
-#                        REGISTRY=${BASH_REMATCH[2]}
-#		fi
-#	fi
-
 	return 0
 }
 
