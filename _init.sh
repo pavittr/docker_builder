@@ -32,15 +32,15 @@ debugme() {
 export -f debugme 
 
 installwithpython27() {
-    pushd . 
-    cd $EXT_DIR
+    echo "Installing Python 2.7"
     sudo apt-get update &> /dev/null
     sudo apt-get -y install python2.7 &> /dev/null
     python --version 
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip
-    popd
 }
 installwithpython34() {
     curl -kL http://xrl.us/pythonbrewinstall | bash
@@ -80,11 +80,10 @@ installwithpython277() {
     pythonbrew switch 2.7.7
     python --version 
     echo "Installing pip"
-    #wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
-    #python get-pip.py --user &> /dev/null
+    wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py 
+    python get-pip.py --user &> /dev/null
     debugme pwd 
     debugme ls 
-    python get-pip.py --user
     popd 
     pip remove requests
     pip install --user -U requests 
