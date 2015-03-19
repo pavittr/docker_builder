@@ -198,6 +198,21 @@ if [ -z $APPLICATION_NAME ]; then
     exit 1
 fi 
 
+if [ -f ${EXT_DIR}/pipeline_validate.sh ]
+    source ${EXT_DIR}/pipeline_validate.sh 
+    debugme echo "Validating image name"
+    pipeline_validate_full ${APPLICATION_NAME} >validate.log 2>&1 
+    VALID_NAME=$?
+    if [ ${VALID_NAME} -ne 0 ]    
+        echo -e "${red}${APPLICATION_NAME} is not a valid image name for Docker${no_color}"
+        cat validate.log 
+    else 
+        debugme cat validate.log 
+    fi 
+else 
+    debugme echo -e "${red}Warning could not find utilities in ${EXT_DIR}"
+fi 
+
 ################################
 # Setup archive information    #
 ################################
