@@ -4,7 +4,7 @@
     "name_key": "ExtName",
     "desc_key": "ExtDesc",
     "extension_type": "Build",
-    "message_key": "ExtMessage"
+    "message_key": "ExtMessage",
     "inputs": [
         {
             "type": "Bluemix",
