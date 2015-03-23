@@ -30,7 +30,6 @@ debugme() {
   [[ $DEBUG = 1 ]] && "$@" || :
 }
 export -f debugme 
-
 installwithpython27() {
     echo "Installing Python 2.7"
     sudo apt-get update &> /dev/null
@@ -40,7 +39,9 @@ installwithpython27() {
     python get-pip.py --user &> /dev/null
     export PATH=$PATH:~/.local/bin
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
-    pip install --user icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme cat cli_install.log 
 }
 installwithpython34() {
     curl -kL http://xrl.us/pythonbrewinstall | bash
@@ -60,7 +61,9 @@ installwithpython34() {
     which pip 
     echo "Installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
-    pip install --user icecli-2.0.zip
+    wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
+    pip install --user icecli-2.0.zip > cli_install.log 2>&1 
+    debugme cat cli_install.log 
 }
 
 installwithpython277() {
@@ -93,7 +96,7 @@ installwithpython277() {
     echo "Installing ice cli"
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip &> /dev/null
     pip install --user icecli-2.0.zip > cli_install.log 2>&1 
-    debugme echo cli_install.log 
+    debugme cat cli_install.log 
 }
 installwithpython3() {
 
@@ -110,8 +113,9 @@ installwithpython3() {
 
     wget https://static-ice.ng.bluemix.net/icecli-2.0.zip
     pip install --user icecli-2.0.zip > cli_install.log 2>&1 
-    debugme echo cli_install.log 
+    debugme cat cli_install.log 
 }
+
 if [[ $DEBUG = 1 ]]; then 
     export ICE_ARGS="--verbose"
 else
