@@ -50,7 +50,7 @@ echo \"${label_color}No unit tests cases have been checked in ${no_color}\"
 
 if [ -f Dockerfile ]; then 
     echo -e \"${label_color}Building ${FULL_REPOSITORY_NAME} ${no_color}\"
-    local BUILD_COMMAND=\"\"
+    BUILD_COMMAND=\"\"
     if [ \"${USE_CACHED_LAYERS}\" == \"true\" ]; then 
         BUILD_COMMAND=\"ice build --pull --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}\"
         ${BUILD_COMMAND}
