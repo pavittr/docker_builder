@@ -14,9 +14,11 @@ def step_impl(context):
     os.environ["IMAGE_LIMIT"]="3"
 
 def get_image_count(context):
-    wcOutput = subprocess.check_output("ice images | grep "+context.appName+" | wc", shell=True)
-    print (wcOutput)
-    Count = int(wcOutput.split()[0])
+    imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+    print(imageList)
+    print
+    lines = imageList.splitlines()
+    Count = int(len(lines))
     print (Count)
     print
     return Count
@@ -48,7 +50,7 @@ def step_impl(context):
         postCount = get_image_count(context)
         if (postCount == context.preCount + 1):
             break
-    assert postCount == context.preCount + 1
+    assert (postCount == context.preCount + 1)
             
 
 @given(u'I have less than the image limit in used images')
