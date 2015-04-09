@@ -14,7 +14,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
 	    if [ $NUMBER_IMAGES -gt $IMAGE_LIMIT ]; then
 	    	# create array of images name
-	        ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g)
+	        ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL} inspect.log | awk '/Image/ {printf "%s\\n", $2}' | sed 's/"//'g)
             ice ps > inspect.log 2> /dev/null
             RESULT=$?
             if [ $RESULT -eq 0 ]; then
