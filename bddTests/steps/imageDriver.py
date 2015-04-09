@@ -14,7 +14,13 @@ def step_impl(context):
     os.environ["IMAGE_LIMIT"]="3"
 
 def get_image_count(context):
-    imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+    try:
+        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
+        raise e
     print(imageList)
     print
     lines = imageList.splitlines()
