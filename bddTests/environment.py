@@ -26,14 +26,14 @@ def before_tag(context, tag):
     m = setMatcher.search(tag)
     if m:
         count = int(m.group(1))
-        version = int(os.getenv("APPLICATION_VERSION"))-1
+        version = int(os.getenv("APPLICATION_VERSION"))-count
         appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("APPLICATION_NAME")+":"
         while count > 0:
             print("\n=================pwd===============")
             print(subprocess.check_output("pwd", shell=True));
             print(subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True))
             print
-            version = version - 1
+            version = version + 1
             count = count - 1
         time.sleep(10)
 
