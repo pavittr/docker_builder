@@ -54,7 +54,7 @@ def step_impl(context):
         imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
         print(imageList)
         matcher = re.compile(context.appName+":"+os.getenv("APPLICATION_VERSION"))
-        m = matcher.search(imagelist)
+        m = matcher.search(imageList)
         if (m):
             break
         time.sleep(10)
