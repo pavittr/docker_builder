@@ -51,12 +51,14 @@ def step_impl(context):
 def step_impl(context):
     tries = 0
     while tries < 3:
-        time.sleep(10)
-        tries = tries + 1;
-        postCount = get_image_count(context)
-        if (postCount == context.preCount + 1):
+        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+        print(imageList)
+        matcher = re.compile(context.appName+":"+os.getenv("APPLICATION_VERSION"))
+        m = matcher.search(imagelist)
+        if (m):
             break
-    assert (postCount == context.preCount + 1)
+        time.sleep(10)
+    assert (m)
             
 
 @given(u'I have less than the image limit in used images')
