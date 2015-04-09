@@ -6,7 +6,7 @@ import re
 def before_feature(context, feature):
     #os.environ["REGISTRY_URL"] = "registry-ice.ng.bluemix.net/jgarcows"
     #os.mkdir("workspace")
-    #os.environ["WORKSPACE"] = "."
+    os.environ["WORKSPACE"] = "."
     os.chdir("simpleDocker")
     #os.mkdir("archive")
     #os.environ["ARCHIVE_DIR"] = "archive"
