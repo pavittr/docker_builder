@@ -35,7 +35,7 @@ def before_tag(context, tag):
             print
             version = version - 1
             count = count - 1
-        sleep(10)
+        time.sleep(10)
 
 def after_tag(context, tag):
     setMatcher = re.compile("set(.)images")
