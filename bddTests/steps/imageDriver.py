@@ -81,7 +81,7 @@ def step_impl(context):
     ver = int(os.getenv("APPLICATION_VERSION"))
     count = 0
     while (count < 3):
-        matcher = re.compile(context.appNam+":"+str(ver))
+        matcher = re.compile(context.appName+":"+str(ver))
         m = matcher.search(imageList)
         assert (m)
         ver = ver - 1
