@@ -29,6 +29,7 @@ def step_impl(context):
 @when(u'The container Image Build job is run')
 def step_impl(context):
     try:
+        print(subprocess.check_output("../../image_utilities.sh", shell=True))
         print(subprocess.check_output("../../sample_build_script.sh", shell=True))
         print
     except subprocess.CalledProcessError as e:
