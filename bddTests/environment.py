@@ -31,7 +31,8 @@ def before_tag(context, tag):
         while count > 0:
             print("\n=================pwd===============")
             print(subprocess.check_output("pwd", shell=True));
-            print(subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True))
+            print("ice build -t "+appPrefix+str(version) +" .")
+            subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
             print
             version = version + 1
             count = count - 1
