@@ -15,6 +15,11 @@
 #   See the License for the specific language governing permissions and
 #********************************************************************************
 
+if [ "${NAMESPACE}X" == "X" ]; then
+    echo "NAMESPACE must be set in the environment before calling this script."
+    exit 1
+fi
+
 if [ -z $IMAGE_LIMIT ]; then
     IMAGE_LIMIT=5
 fi
@@ -57,7 +62,6 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 done
                 # restore my old space
                 cf target -s ${CURRENT_SPACE} 2> /dev/null
-                cf ${NAMESPACE}
                 i=0
                 j=0
                 #echo $ICE_IMAGES_ARRAY
