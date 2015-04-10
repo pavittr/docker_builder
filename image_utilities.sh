@@ -52,11 +52,11 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     else
                         cf target -s ${space} 2> /dev/null
                         if [ $? -eq 0 ]; then
-                            ice ps > inspect.log 2> /dev/null
-                            RESULT=$?
-                            if [ $RESULT -eq 0 ]; then
-                                ICE_PS_IMAGES_ARRAY+=$(grep -oh -e ${NAMESPACE}'\S*' inspect.log)
-                            fi
+
+                            ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect | grep "Image" | grep -oh -e nfritz_alchemy'\S*' | while read line
+                            do
+                                ICE_PS_IMAGES_ARRAY+="${line%\",}"
+                            done
                         fi
                     fi
                 done
