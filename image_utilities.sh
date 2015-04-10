@@ -9,16 +9,32 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
     ice inspect images > inspect.log 2> /dev/null
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
-    	# find the number of images and check if greater then image limit
-	    NUMBER_IMAGES=$(grep ${REGISTRY_URL} inspect.log | wc -l)
-            echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
-	    if [ $NUMBER_IMAGES -gt $IMAGE_LIMIT ]; then
-	    	# create array of images name
-	        ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL} inspect.log | awk '/Image/ {printf "%s\\n", $2}' | sed 's/"//'g)
-            ice ps > inspect.log 2> /dev/null
+        # find the number of images and check if greater then image limit
+        NUMBER_IMAGES=$(grep ${REGISTRY_URL} inspect.log | wc -l)
+        echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
+        if [ $NUMBER_IMAGES -gt $IMAGE_LIMIT ]; then
+            # create array of images name
+            ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g)
+            # loop the list of spaces under the org and find the name of the images that are in used
+            cf spaces > inspect.log 2> /dev/null
             RESULT=$?
             if [ $RESULT -eq 0 ]; then
-                ICE_PS_IMAGES_ARRAY=$(grep -oh -e ${NAMESPACE}'\S*' inspect.log)
+                SPACES_ARRAY=$(cat inspect.log) 
+                for space in ${SPACES_ARRAY[@]}
+                do
+                    # start getting the space name from line 4 of the output of cf spaces
+                    if [ space -lt 3 ]; then
+                        continue
+                    else
+                        cf target -s ${space}       
+                        ice ps > inspect.log 2> /dev/null
+                        RESULT=$?
+                        if [ $RESULT -eq 0 ]; then
+                            ICE_PS_IMAGES_ARRAY+=$(grep -oh -e ${NAMESPACE}'\S*' inspect.log)
+                        fi
+                    fi
+                done
+                cf ${NAMESPACE}
                 i=0
                 j=0
                 #echo $ICE_IMAGES_ARRAY
