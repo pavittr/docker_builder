@@ -32,7 +32,7 @@ def get_image_count(context):
 @given(u'I have less than the image limit in images (used and unused)')
 def step_impl(context):
     context.preCount =  get_image_count(context)
-    assert (context.preCount < 3)
+    assert (context.preCount < int(os.environ["IMAGE_LIMIT"]))
 
 @when(u'The container Image Build job is run')
 def step_impl(context):
@@ -69,7 +69,7 @@ def step_impl(context):
 @given(u'I have more than the image limit in used and unused images')
 def step_impl(context):
     context.preCount = get_image_count(context)
-    assert (context.preCount > 3)
+    assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
 
 @then(u'unused images will be deleted from oldest to newest until we are under the limit')
 def step_impl(context):
@@ -77,10 +77,10 @@ def step_impl(context):
     print(imageList)
     print
     lines = imageList.splitlines()
-    assert (len(lines) == 3)
+    assert (len(lines) == int(os.environ["IMAGE_LIMIT"]))
     ver = int(os.getenv("APPLICATION_VERSION"))
     count = 0
-    while (count < 3):
+    while (count < int(os.environ["IMAGE_LIMIT"])):
         matcher = re.compile(context.appName+":"+str(ver))
         m = matcher.search(imageList)
         assert (m)

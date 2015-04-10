@@ -5,6 +5,9 @@ import re
 import time
 
 def before_feature(context, feature):
+    #Before running outside of the pipeline you must:
+    ###Set a environment variable for REGISTRY_URL and login to ice
+    
     #os.environ["REGISTRY_URL"] = "registry-ice.ng.bluemix.net/jgarcows"
     #os.mkdir("workspace")
     os.environ["WORKSPACE"] = "."
