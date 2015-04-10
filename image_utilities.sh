@@ -32,21 +32,31 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             cf spaces > inspect.log 2> /dev/null
             RESULT=$?
             if [ $RESULT -eq 0 ]; then
-                SPACES_ARRAY=$(cat inspect.log) 
-                for space in ${SPACES_ARRAY[@]}
+                # save current space first
+                CURRENT_SPACE=`cf target | grep "Space:" | awk '{printf "%s", $2}'`
+                FOUND=""
+                cat inspect.log | while read space
                 do
-                    # start getting the space name from line 4 of the output of cf spaces
-                    if [ space -lt 3 ]; then
+                    # cf spaces gives a couple lines of headers.  skip those until we find the line
+                    # 'name', then read the rest of the lines as space names
+                    if [ "${FOUND}x" == "x" ]; then
+                        if [ "${space}X" == "nameX" ]; then
+                            FOUND="y"
+                        fi
                         continue
                     else
-                        cf target -s ${space}       
-                        ice ps > inspect.log 2> /dev/null
-                        RESULT=$?
-                        if [ $RESULT -eq 0 ]; then
-                            ICE_PS_IMAGES_ARRAY+=$(grep -oh -e ${NAMESPACE}'\S*' inspect.log)
+                        cf target -s ${space} 2> /dev/null
+                        if [ $? -eq 0 ]; then
+                            ice ps > inspect.log 2> /dev/null
+                            RESULT=$?
+                            if [ $RESULT -eq 0 ]; then
+                                ICE_PS_IMAGES_ARRAY+=$(grep -oh -e ${NAMESPACE}'\S*' inspect.log)
+                            fi
                         fi
                     fi
                 done
+                # restore my old space
+                cf target -s ${CURRENT_SPACE} 2> /dev/null
                 cf ${NAMESPACE}
                 i=0
                 j=0
