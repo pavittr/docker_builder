@@ -40,6 +40,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 # save current space first
                 CURRENT_SPACE=`cf target | grep "Space:" | awk '{printf "%s", $2}'`
                 FOUND=""
+                ps_image_count=0
                 cat inspect.log | while read space
                 do
                     # cf spaces gives a couple lines of headers.  skip those until we find the line
@@ -55,7 +56,8 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
 
                             ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect | grep "Image" | grep -oh -e ${NAMESPACE}'\S*' | while read line
                             do
-                                ICE_PS_IMAGES_ARRAY+="${line%\",}"
+                                ICE_PS_IMAGES_ARRAY[ps_image_count]="${line%\",}"
+                                (( ps_image_count=ps_image_count + 1 ))
                             done
                         fi
                     fi
