@@ -25,21 +25,24 @@ def after_feature(context, feature):
     print()
     
 def before_tag(context, tag):
-    setMatcher = re.compile("set(.)images")
-    m = setMatcher.search(tag)
+    #matches tags to "command"+"count"
+    matcher = re.compile("(\D*)(\d*)")
+    m = matcher.search(tag)
     if m:
-        count = int(m.group(1))
-        version = int(os.getenv("APPLICATION_VERSION"))-count
-        appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("APPLICATION_NAME")+":"
-        while count > 0:
-            print("\n=================pwd===============")
-            print(subprocess.check_output("pwd", shell=True));
-            print("ice build -t "+appPrefix+str(version) +" .")
-            subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
-            print
-            version = version + 1
-            count = count - 1
-        time.sleep(10)
+        command = m.group(1)
+        count = int(m.group(2))
+        if command == "createimages":
+            version = int(os.getenv("APPLICATION_VERSION"))-count
+            appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("APPLICATION_NAME")+":"
+            while count > 0:
+                print("\n=================pwd===============")
+                print(subprocess.check_output("pwd", shell=True));
+                print("ice build -t "+appPrefix+str(version) +" .")
+                subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
+                print
+                version = version + 1
+                count = count - 1
+            time.sleep(10)
 
 def after_tag(context, tag):
     setMatcher = re.compile("set(.)images")
