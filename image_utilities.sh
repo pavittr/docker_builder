@@ -27,10 +27,10 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
     ice inspect images > inspect.log 2> /dev/null
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
-        # find the number of images and check if greater then image limit
+        # find the number of images and check if greater than or equal to image limit
         NUMBER_IMAGES=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | wc -l)
         echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
-        if [ $NUMBER_IMAGES -gt $IMAGE_LIMIT ]; then
+        if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name
             ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g)
             # loop the list of spaces under the org and find the name of the images that are in used
@@ -95,7 +95,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
                 echo "used images: ${IMAGES_ARRAY_USED[@]}"
                 if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
-                    if [ $len_not_used -ge 0 ]; then
+                    if [ $len_not_used -gt 0 ]; then
                         while [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]
                         do
                             ((len_not_used--))
@@ -115,7 +115,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         echo -e "${label_color}No unused images found.${no_color}"
                     fi
                     if [ $len_used -ge $IMAGE_LIMIT ]; then
-                        echo -e "${label_color}Warning: More than ${IMAGE_LIMIT} images are currently in use.  Consider increasing IMAGE_LIMIT.${no_color}"
+                        echo -e "${label_color}Warning: Too many images in use.  Unable to meet ${IMAGE_LIMIT} image limit.  Consider increasing IMAGE_LIMIT.${no_color}"
                     fi
                 fi
             else
