@@ -21,6 +21,7 @@ And unused images will be deleted from oldest to newest until we are under the l
 
 @createimages5
 @useimages4
+@wip
 Scenario: Too many used images
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a value below the ICS container limit
@@ -30,6 +31,7 @@ Then The new image is built
 And all unused images will be deleted
 And A warning will be issued that the images in use could not be deleted
 
+@wip
 Scenario: At ICS container limit
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a value equal to or greater than the ICS container limit
@@ -37,6 +39,7 @@ And I am currently at the ICS container limit
 When The container Image Build job is run
 Then The job will fail because the ICS container limit is reached
 
+@wip
 Scenario: Negative number set
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a negative number
@@ -44,6 +47,7 @@ When The container Image Build job is run
 Then The new image is built
 And no images will be deleted
 
+@wip
 Scenario: Default value with extra unused images
 Given I have a setup pipeline with a Container Image Build Stage
 And There is no user-defined image limit
@@ -52,6 +56,7 @@ When The container Image Build job is run
 Then The new image is built
 And unused images will be deleted from oldest to newest until we are under the limit
 
+@wip
 Scenario: Default value with extra used images
 Given I have a setup pipeline with a Container Image Build Stage
 And There is no user-defined image limit

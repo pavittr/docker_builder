@@ -37,7 +37,8 @@ def step_impl(context):
 @when(u'The container Image Build job is run')
 def step_impl(context):
     try:
-        print(subprocess.check_output("../../image_utilities.sh", shell=True))
+        context.utilOutput = subprocess.check_output("../../image_utilities.sh", shell=True)
+        print (context.utilOutput)
         print(subprocess.check_output("../../sample_build_script.sh", shell=True))
         print
     except subprocess.CalledProcessError as e:
@@ -89,16 +90,52 @@ def step_impl(context):
 
 @given(u'I have as many or more than the image limit in currently used images')
 def step_impl(context):
-    assert False
+    #This will be true if useimages* is set to an appropriate number
+    print(context.tags)
+    usedCount = 0
+    createdCount = 0
+    for tag in tags:
+        matcher = re.compile("(\D*)(\d+)")
+        m = matcher.search(tag)
+        if m:
+            command = m.group(1)
+            count = int(m.group(2))
+            if (command == "createimages"):
+                createdCount = count
+            elif (command == "useimages"):
+                usedCount = count
+    assert (usedCount > int(os.environ["IMAGE_LIMIT"]))
 
 @then(u'all unused images will be deleted')
 def step_impl(context):
+    print(context.tags)
+    usedCount = 0
+    createdCount = 0
+    appVer = int(os.getenv("APPLICATION_VERSION"))
+    for tag in tags:
+        matcher = re.compile("(\D*)(\d+)")
+        m = matcher.search(tag)
+        if m:
+            command = m.group(1)
+            count = int(m.group(2))
+            if (command == "createimages"):
+                createdCount = count
+            elif (command == "useimages"):
+                usedCount = count
+    #TODO: figure out what images shouldn't be used (if any)
+    if (createdCount > usedCount):
+        unusedVersions = range(appVer - createdCount, appVer - usedCount)
+        print (unusedVersions)
+        print
+    #TODO: confirm images were deleted
     assert False
 
 @then(u'A warning will be issued that the images in use could not be deleted')
 def step_impl(context):
-    assert False
-
+    matcher = re.conmpile("Warning: Too many images in use.")
+    m = matcher.search(context.utilOutput)
+    assert m
+    
 @given(u'I have set the number images to keep to a value equal to or greater than the ICS container limit')
 def step_impl(context):
     assert False
