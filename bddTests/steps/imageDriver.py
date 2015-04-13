@@ -94,7 +94,7 @@ def step_impl(context):
     print(context.tags)
     usedCount = 0
     createdCount = 0
-    for tag in tags:
+    for tag in context.tags:
         matcher = re.compile("(\D*)(\d+)")
         m = matcher.search(tag)
         if m:
@@ -112,7 +112,7 @@ def step_impl(context):
     usedCount = 0
     createdCount = 0
     appVer = int(os.getenv("APPLICATION_VERSION"))
-    for tag in tags:
+    for tag in context.tags:
         matcher = re.compile("(\D*)(\d+)")
         m = matcher.search(tag)
         if m:
