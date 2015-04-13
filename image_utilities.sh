@@ -28,11 +28,11 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater then image limit
-        NUMBER_IMAGES=$(grep ${REGISTRY_URL} inspect.log | wc -l)
+        NUMBER_IMAGES=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | wc -l)
         echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -gt $IMAGE_LIMIT ]; then
             # create array of images name
-            ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g)
+            ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g)
             # loop the list of spaces under the org and find the name of the images that are in used
             cf spaces > inspect.log 2> /dev/null
             RESULT=$?
@@ -53,12 +53,8 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     else
                         cf target -s ${space} 2> /dev/null
                         if [ $? -eq 0 ]; then
-
-                            ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect | grep "Image" | grep -oh -e ${NAMESPACE}'\S*' | while read line
-                            do
-                                ICE_PS_IMAGES_ARRAY[ps_image_count]="${line%\",}"
-                                (( ps_image_count=ps_image_count + 1 ))
-                            done
+                            ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect | grep "Image" | grep -oh -e ${NAMESPACE}/${IMAGE_NAME}:[0-9]*)
+                            ICE_PS_IMAGES_ARRAY+=" "
                         fi
                     fi
                 done
@@ -66,15 +62,17 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 cf target -s ${CURRENT_SPACE} 2> /dev/null
                 i=0
                 j=0
-                #echo $ICE_IMAGES_ARRAY
-                #echo $ICE_PS_IMAGES_ARRAY
+                echo "images array:"
+                echo $ICE_IMAGES_ARRAY
+                echo "ps images array"
+                echo $ICE_PS_IMAGES_ARRAY
                 for image in ${ICE_IMAGES_ARRAY[@]}
                 do
                     #echo "IMAGES_ARRAY_NOT_USED-1: ${image}"
                     in_used=0
                     for image_used in ${ICE_PS_IMAGES_ARRAY[@]}
                     do
-                        image_used=${REGISTRY_URL}/${image_used}
+                        image_used=${CCS_REGISTRY_HOST}/${image_used}
                         #echo "IMAGES_ARRAY_USED-2: ${image_used}"
                         if [ $image == $image_used ]; then
                             #echo "IMAGES_ARRAY_USED: ${image}"
