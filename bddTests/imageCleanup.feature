@@ -57,7 +57,7 @@ And I have less than the default image limit in currently used images
 And I have as many or more than the default image limit in used and unused images
 When The container Image Build job is run
 Then The new image is built
-And unused images will be deleted from oldest to newest until we are under the limit
+And unused images will be deleted from oldest to newest until we are under the default limit
 
 @createimages8
 @useimages5

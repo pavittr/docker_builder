@@ -105,22 +105,30 @@ def step_impl(context):
 def step_impl(context):
     context.preCount = get_appImage_count(context)
     assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
-
-@then(u'unused images will be deleted from oldest to newest until we are under the limit')
-def step_impl(context):
+    
+def check_images_deleted_until_under_limit(context, limit):
     imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
     print(imageList)
     print
     lines = imageList.splitlines()
-    assert (len(lines) == int(os.environ["IMAGE_LIMIT"]))
+    assert (len(lines) == limit)
     ver = int(os.getenv("APPLICATION_VERSION"))
     count = 0
-    while (count < int(os.environ["IMAGE_LIMIT"])):
+    while (count < limit):
         matcher = re.compile(context.appName+":"+str(ver))
         m = matcher.search(imageList)
         assert (m)
         ver = ver - 1
         count = count + 1
+    
+
+@then(u'unused images will be deleted from oldest to newest until we are under the limit')
+def step_impl(context):
+    check_images_deleted_until_under_limit(context, int(os.environ["IMAGE_LIMIT"]))
+    
+@then(u'unused images will be deleted from oldest to newest until we are under the default limit')
+def step_impl(context):
+    check_images_deleted_until_under_limit(context, 5)
         
 
 @given(u'I have as many or more than the image limit in currently used images')
