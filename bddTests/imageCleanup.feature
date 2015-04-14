@@ -40,7 +40,6 @@ When The container Image Build job is run
 Then The new image will not be built
 
 @createimages5
-@wip
 Scenario: Negative number set
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a negative number
@@ -51,7 +50,6 @@ And no images will be deleted
 
 @createimages6
 @useimages3
-@wip
 Scenario: Default value with extra unused images
 Given I have a setup pipeline with a Container Image Build Stage
 And There is no user-defined image limit
@@ -63,7 +61,6 @@ And unused images will be deleted from oldest to newest until we are under the l
 
 @createimages8
 @useimages5
-@wip
 Scenario: Default value with extra used images
 Given I have a setup pipeline with a Container Image Build Stage
 And There is no user-defined image limit
