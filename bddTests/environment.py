@@ -81,9 +81,14 @@ def before_tag(context, tag):
             while count > 0:
                 print("\n=================pwd===============")
                 print(subprocess.check_output("pwd", shell=True));
-                print("ice build -t "+appPrefix+str(version) +" .")
-                print(subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True))
-                print
+                try:
+                    print("ice build -t "+appPrefix+str(version) +" .")
+                    print(subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True))
+                    print
+                except subprocess.CalledProcessError as e:
+                    print (e.cmd)
+                    print (e.output)
+                    raise e
                 version = version + 1
                 count = count - 1
             time.sleep(10)
