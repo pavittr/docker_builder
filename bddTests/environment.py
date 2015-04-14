@@ -116,12 +116,15 @@ def after_scenario(context, scenario):
     matcher = re.compile("(\D*)(\d+)")
     useCount = 0
     createCount = 0
+    removeImages = False
     for tag in scenario.tags:
         m = matcher.search(tag)
         if (m and m.group(1) == "createimages"):
             createCount = int(m.group(2))
         elif (m and m.group(1) == "useimages"):
             useCount = int(m.group(2))
+        elif (tag == "removeimages"):
+            removeImages = True
     if (useCount > 0):
         #make sure I clean-up containers
         version = int(os.getenv("APPLICATION_VERSION"))-useCount
@@ -153,10 +156,11 @@ def after_scenario(context, scenario):
                 print
             version = version + 1
             useCount = useCount - 1
-    if (createCount > 0):
+    if (createCount > 0 or removeImages):
         #cleanup images
         print(subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME")+" | awk '{print $6}' | xargs -n 1 ice rmi", shell=True))
-        print
+        print("Pausing for 60 seconds to allow images to fully delete")
+        time.sleep(60)
     
 #def after_tag(context, tag):
 #    matcher = re.compile("(\D*)(\d+)")
