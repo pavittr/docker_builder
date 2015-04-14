@@ -9,11 +9,11 @@ import re
 def step_impl(context):
     assert True
     
-@given(u'I have set the number images to keep to a value below the ICS container limit')
+@given(u'I have set the number images to keep to a value below the ICS image limit')
 def step_impl(context):
     os.environ["IMAGE_LIMIT"]="3"
-
-def get_image_count(context):
+    
+def get_appImage_count(context):
     try:
         imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
     except subprocess.CalledProcessError as e:
@@ -29,9 +29,27 @@ def get_image_count(context):
     print
     return Count
 
+def get_totImage_count():
+    try:
+        images = subprocess.check_output("ice inspect images", shell=True)
+        imageList = re.findall("\"Image\": \"\\S+\"", images)
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
+        raise e
+    print(imageList)
+    print
+    Count = int(len(imageList))
+    print (Count)
+    print
+    return Count
+    
+    
+
 @given(u'I have less than the image limit in images (used and unused)')
 def step_impl(context):
-    context.preCount =  get_image_count(context)
+    context.preCount =  get_appImage_count(context)
     assert (context.preCount < int(os.environ["IMAGE_LIMIT"]))
 
 @when(u'The container Image Build job is run')
@@ -69,7 +87,7 @@ def step_impl(context):
 
 @given(u'I have more than the image limit in used and unused images')
 def step_impl(context):
-    context.preCount = get_image_count(context)
+    context.preCount = get_appImage_count(context)
     assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
 
 @then(u'unused images will be deleted from oldest to newest until we are under the limit')
@@ -104,7 +122,7 @@ def step_impl(context):
                 createdCount = count
             elif (command == "useimages"):
                 usedCount = count
-    assert (usedCount > int(os.environ["IMAGE_LIMIT"]))
+    assert (usedCount >= int(os.environ["IMAGE_LIMIT"]))
 
 @then(u'all unused images will be deleted')
 def step_impl(context):
@@ -122,29 +140,69 @@ def step_impl(context):
                 createdCount = count
             elif (command == "useimages"):
                 usedCount = count
-    #TODO: figure out what images shouldn't be used (if any)
+    #figure out what images shouldn't be used (if any) and check they are gone
     if (createdCount > usedCount):
         unusedVersions = range(appVer - createdCount, appVer - usedCount)
         print (unusedVersions)
         print
-    #TODO: confirm images were deleted
-    assert False
+        assert (unusedVersions)
+        for ver in unusedVersions:
+            imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+            print(imageList)
+            matcher = re.compile(context.appName+":"+str(ver))
+            m = matcher.search(imageList)
+            assert m is None
+            
+@then(u'no used images will be deleted')
+def step_impl(context):
+    usedCount = 0
+    for tag in context.tags:
+        matcher = re.compile("useimages(\d+)")
+        m = matcher.search(tag)
+        if m:
+            usedCount = int(m.group(1))
+    assert usedCount > 0
+    try:
+        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
+        raise e
+    print(imageList)
+    print
+    version = int(os.getenv("APPLICATION_VERSION"))-usedCount
+    while usedCount > 0:
+        matcher = re.compile(context.appName+":"+str(version))
+        assert matcher.search(imageList)
+        version = version + 1
+        usedCount = usedCount - 1
+
 
 @then(u'A warning will be issued that the images in use could not be deleted')
 def step_impl(context):
-    matcher = re.conmpile("Warning: Too many images in use.")
+    matcher = re.compile("Warning: Too many images in use.")
     m = matcher.search(context.utilOutput)
     assert m
     
-@given(u'I have set the number images to keep to a value equal to or greater than the ICS container limit')
+@given(u'I have set the number images to keep to a value equal to or greater than the ICS image limit')
 def step_impl(context):
-    assert False
+    os.environ["IMAGE_LIMIT"]="30"
 
-@given(u'I am currently at the ICS container limit')
+@given(u'I am currently at the ICS image limit')
 def step_impl(context):
-    assert False
+    #I need to create images until the number of images is equal to 25
+    #This code assumes that there are no images of name IMAGE_NAME:##
+    appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":"
+    count = get_totImage_count()
+    while (count < 25):
+        #create image at count
+        print("ice build -t "+appPrefix+str(count) +" .")
+        print(subprocess.check_output("ice build -t "+appPrefix+str(count) +" .", shell=True))
+        count = count + 1
 
-@then(u'The job will fail because the ICS container limit is reached')
+
+@then(u'The job will fail because the ICS image limit is reached')
 def step_impl(context):
     assert False
 
