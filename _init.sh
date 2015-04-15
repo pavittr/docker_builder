@@ -436,3 +436,6 @@ else
 fi 
 
 echo -e "${label_color}Initialization complete${no_color}"
+
+# run image cleanup if necessary
+. $EXT_DIR/image_utilities.sh
