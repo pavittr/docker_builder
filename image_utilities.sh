@@ -53,7 +53,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     else
                         cf target -s ${space} > /dev/null
                         if [ $? -eq 0 ]; then
-                            ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect | grep "Image" | grep -oh -e ${NAMESPACE}/${IMAGE_NAME}:[0-9]*)
+                            ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e ${NAMESPACE}/${IMAGE_NAME}:[0-9]*)
                             ICE_PS_IMAGES_ARRAY+=" "
                         fi
                     fi

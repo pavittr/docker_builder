@@ -42,6 +42,11 @@ echo -e \"${label_color}Starting build script${no_color}\"
 #####################
 echo \"${label_color}No unit tests cases have been checked in ${no_color}\"
 
+#########################################################
+# Check image quota and clean up to make room if needed #
+#########################################################
+. $EXT_DIR/image_utilities.sh
+
 ######################################
 # Build Container via Dockerfile     #
 ######################################
@@ -98,7 +103,6 @@ export USE_CACHED_LAYERS=#USE_CACHED_LAYERS#
 set +x 
 set +e 
 . $EXT_DIR/_init.sh
-. $EXT_DIR/image_utilities.sh
 /bin/bash -e #COMMAND#"
     }
     },
