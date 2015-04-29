@@ -161,20 +161,22 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
     do
         update_file_timestamp "${file}"
         FILE_COUNTER=$((FILE_COUNTER+1));
-        if ! ((FILE_COUNTER % 100)); then
+        if ! ((FILE_COUNTER % 50)); then
             echo -n "."
         fi
-        if ! ((FILE_COUNTER % 1000)); then
-            echo "$FILE_COUNTER files processed"
+        if ! ((FILE_COUNTER % 500)); then
+            tsadj_end_time=$(date +"%s")
+            tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
+            echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
         fi
     done
     IFS=$old_ifs
-    if ((FILE_COUNTER % 1000)); then
-        echo "$FILE_COUNTER files processed"
+    if ((FILE_COUNTER % 500)); then
+        tsadj_end_time=$(date +"%s")
+        tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
+        echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
     fi
-    tsadj_end_time=$(date +"%s")
-    tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
-    echo "Timestamps adjusted in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+    echo "Timestamps adjusted"
 fi 
 
 ################################
