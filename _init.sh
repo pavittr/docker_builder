@@ -143,7 +143,7 @@ if [ -z "${USE_CACHED_LAYERS}" ]; then
     export USE_CACHED_LAYERS="true"
 fi 
 if [ "${USE_CACHED_LAYERS}" == "true" ]; then 
-    debugme echo "Current working directory:"
+    echo "Adjusting timestamps for files to allow cached layers"
     get_file_rev() {
         git rev-list -n 1 HEAD "$1"
     }
@@ -155,12 +155,23 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
 
     old_ifs=$IFS
     IFS=$'\n' 
+    FILE_COUNTER=0
     for file in $(git ls-files)
     do
         update_file_timestamp "${file}"
+        FILE_COUNTER=$((FILE_COUNTER+1));
+        if ! ((FILE_COUNTER % 100)); then
+            echo -n "."
+        fi
+        if ! ((FILE_COUNTER % 1000)); then
+            echo "$FILE_COUNTER files processed"
+        fi
     done
     IFS=$old_ifs
-    debugme echo "updated files"
+    if ((FILE_COUNTER % 1000)); then
+        echo "$FILE_COUNTER files processed"
+    fi
+    echo "Timestamps adjusted"
 fi 
 
 ################################
