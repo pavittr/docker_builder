@@ -185,7 +185,7 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
             fi
             echo -n "."
         fi
-        if ! ((FILE_COUNTER % 500)); then
+        if ! ((FILE_COUNTER % 1000)); then
             tsadj_end_time=$(date +"%s")
             tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
             echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
@@ -193,7 +193,7 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
     done
     IFS=$old_ifs
     if [ $eta_total -ge 0 ]; then
-        if ((FILE_COUNTER % 500)); then
+        if ((FILE_COUNTER % 1000)); then
             tsadj_end_time=$(date +"%s")
             tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
             echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
