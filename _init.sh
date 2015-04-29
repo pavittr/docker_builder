@@ -143,6 +143,12 @@ if [ -z "${USE_CACHED_LAYERS}" ]; then
     export USE_CACHED_LAYERS="true"
 fi 
 if [ "${USE_CACHED_LAYERS}" == "true" ]; then 
+    if [ "${MAX_CACHING_TIME}x" == "x" ]; then
+        MAX_CACHING_TIME=300
+    fi
+    if [ "${MAX_CACHING_TIME_LEFT}x" == "x" ]; then
+        MAX_CACHING_TIME_LEFT=120
+    fi
     echo "Adjusting timestamps for files to allow cached layers"
     tsadj_start_time=$(date +"%s")
     get_file_rev() {
@@ -157,11 +163,29 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
     old_ifs=$IFS
     IFS=$'\n' 
     FILE_COUNTER=0
+    all_file_count=`git ls-files | wc | awk '{print $1}'`
+    eta_total=0
+    eta_remaining=0
     for file in $(git ls-files)
     do
         update_file_timestamp "${file}"
         FILE_COUNTER=$((FILE_COUNTER+1));
         if ! ((FILE_COUNTER % 50)); then
+            # check if we're timeboxed
+            if [ $MAX_CACHING_TIME -gt 0 ]; then
+                # calculate roughly how much time left
+                tsadj_end_time=$(date +"%s")
+                tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
+                (( eta_total = all_file_count * tsadj_diff / FILE_COUNTER ));
+                (( eta_remaining = eta_total - tsadj_diff ));
+                debugme echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+                debugme echo "eta total ( `date -u -d @"$eta_total" +'%-Mm %-Ss'` ) and remaining ( `date -u -d @"$eta_remaining" +'%-Mm %-Ss'` )"
+                if [ $eta_total -gt $MAX_CACHING_TIME ] && [ $eta_remaining -gt $MAX_CACHING_TIME_LEFT ]; then
+                    debugme echo "Would take too much time to adjust timestamps, skipping"
+                    eta_total=-1
+                    break;
+                fi 
+            fi
             echo -n "."
         fi
         if ! ((FILE_COUNTER % 500)); then
@@ -171,10 +195,12 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
         fi
     done
     IFS=$old_ifs
-    if ((FILE_COUNTER % 500)); then
-        tsadj_end_time=$(date +"%s")
-        tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
-        echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+    if [ $eta_total -ge 0 ]; then
+        if ((FILE_COUNTER % 500)); then
+            tsadj_end_time=$(date +"%s")
+            tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
+            echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+        fi
     fi
     echo "Timestamps adjusted"
 fi 
