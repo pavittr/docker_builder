@@ -175,9 +175,9 @@ if [ "${USE_CACHED_LAYERS}" == "true" ]; then
                 tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
                 (( eta_total = all_file_count * tsadj_diff / FILE_COUNTER ));
                 (( eta_remaining = eta_total - tsadj_diff ));
-                debugme echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
-                debugme echo "eta total ( `date -u -d @"$eta_total" +'%-Mm %-Ss'` ) and remaining ( `date -u -d @"$eta_remaining" +'%-Mm %-Ss'` )"
                 if [ $eta_total -gt $MAX_CACHING_TIME ] && [ $eta_remaining -gt $MAX_CACHING_TIME_LEFT ]; then
+                    debugme echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+                    debugme echo "eta total ( `date -u -d @"$eta_total" +'%-Mm %-Ss'` ) and remaining ( `date -u -d @"$eta_remaining" +'%-Mm %-Ss'` )"
                     debugme echo "Would take too much time to adjust timestamps, skipping"
                     eta_total=-1
                     break;
