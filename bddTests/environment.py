@@ -21,34 +21,7 @@ def before_feature(context, feature):
     context.appVer = os.environ["APPLICATION_VERSION"]
     os.environ["FULL_REPOSITORY_NAME"] = os.environ["REGISTRY_URL"]+"/"+os.environ["IMAGE_NAME"]+":"+os.environ["APPLICATION_VERSION"]
     #Cleaning up any hanging on containers
-    psOutput = subprocess.check_output("ice ps", shell=True)
-    for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+Container", psOutput):
-        print("Removing container: "+m.group(0))
-        try:
-            print(subprocess.check_output("ice stop "+m.group(0), shell=True))
-            print
-        except subprocess.CalledProcessError as e:
-            print (e.cmd)
-            print (e.output)
-            print
-        for i in range(10):
-            inspectOutput = subprocess.check_output("ice inspect " + m.group(0), shell=True)
-            statusMatcher = re.compile("\"Status\": \"(\S*)\"")
-            mInspect = statusMatcher.search(inspectOutput)
-            if mInspect:
-                print (mInspect.group(0))
-                print
-                status = mInspect.group(1)
-                if (status != "Running"):
-                    break
-            time.sleep(6)
-        try:
-            print(subprocess.check_output("ice rm "+m.group(0), shell=True))
-            print
-        except subprocess.CalledProcessError as e:
-            print (e.cmd)
-            print (e.output)
-            print
+    cleanupContainers()
         
     #Cleaning up any hanging on images
     try:
@@ -116,6 +89,36 @@ def before_tag(context, tag):
             
 def containerName(version):
     return os.getenv("IMAGE_NAME")+str(version) +"C"
+    
+def cleanupContainers():
+    psOutput = subprocess.check_output("ice ps", shell=True)
+    for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
+        print("Removing container: "+m.group(0))
+        try:
+            print(subprocess.check_output("ice stop "+m.group(0), shell=True))
+            print
+        except subprocess.CalledProcessError as e:
+            print (e.cmd)
+            print (e.output)
+            print
+        for i in range(10):
+            inspectOutput = subprocess.check_output("ice inspect " + m.group(0), shell=True)
+            statusMatcher = re.compile("\"Status\": \"(\S*)\"")
+            mInspect = statusMatcher.search(inspectOutput)
+            if mInspect:
+                print (mInspect.group(0))
+                print
+                status = mInspect.group(1)
+                if (status != "Running"):
+                    break
+            time.sleep(6)
+        try:
+            print(subprocess.check_output("ice rm "+m.group(0), shell=True))
+            print
+        except subprocess.CalledProcessError as e:
+            print (e.cmd)
+            print (e.output)
+            print
 
 def after_scenario(context, scenario):
     matcher = re.compile("(\D*)(\d+)")
