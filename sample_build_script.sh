@@ -49,7 +49,7 @@ if [ -f Dockerfile ]; then
         echo "Build command: ${BUILD_COMMAND}"
         ice info 
         ice images
-        ${EXT_DIR}/print_help.sh
+        "${EXT_DIR}"/print_help.sh
         exit 1
     else
         echo -e "${green}Container build of ${FULL_REPOSITORY_NAME} was successful ${no_color}"
