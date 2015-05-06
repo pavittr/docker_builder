@@ -79,7 +79,10 @@ def step_impl(context):
         print (e.cmd)
         print (e.output)
         print
-        raise e
+        if "ignorebuildfailure" in context.tags:
+            print ("Ignoring build failure condition")
+        else:
+            raise e
     
 
 @then(u'The new image is built')
