@@ -94,11 +94,17 @@ echo \"IMAGE_NAME=${FULL_REPOSITORY_NAME}\" >> ${ARCHIVE_DIR}/build.properties",
     "execution": {
         "type": "JenkinsDocker",
         "shell": "#!/bin/bash
+set +x
+set +e
+export INIT_START_TIME=$(date +\"%s\")
 export IMAGE_NAME=#IMAGE_NAME#
 export USE_CACHED_LAYERS=#USE_CACHED_LAYERS#
-set +x 
-set +e 
+# OSSC line
+dpkg -l | grep '^ii' > $EXT_DIR/pkglist
 . $EXT_DIR/_init.sh
+INIT_END_TIME=$(date +\"%s\")
+INIT_EST_TIME=$(($INIT_END_TIME-$INIT_START_TIME))
+echo -e \"Init runtime of `date -u -d @\"$INIT_EST_TIME\" +\'%-Mm %-Ss\'`\"
 
 /bin/bash -e #COMMAND#"
     }
