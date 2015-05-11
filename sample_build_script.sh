@@ -23,7 +23,7 @@ echo -e "${label_color}Starting build script${no_color}"
 #####################
 # Run unit tests    #
 #####################
-echo "${label_color}No unit tests cases have been checked in ${no_color}"
+echo -e "${label_color}No unit tests cases have been checked in ${no_color}"
 
 ######################################
 # Build Container via Dockerfile     #
