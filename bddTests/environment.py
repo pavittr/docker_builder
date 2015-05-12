@@ -186,8 +186,8 @@ def after_scenario(context, scenario):
                     print (e.cmd)
                     print (e.output)
                     print
-        print("Pausing for 60 seconds to allow images to fully delete")
-        time.sleep(60)
+        print("Pausing for 120 seconds to allow images to fully delete")
+        time.sleep(120)
     
 #def after_tag(context, tag):
 #    matcher = re.compile("(\D*)(\d+)")
