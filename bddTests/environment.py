@@ -166,7 +166,26 @@ def after_scenario(context, scenario):
             useCount = useCount - 1
     if (createCount > 0 or removeImages):
         #cleanup images
-        print(subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME")+" | awk '{print $6}' | xargs -n 1 ice rmi", shell=True))
+        try:
+            imageList = subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME"), shell=True)
+        except subprocess.CalledProcessError as e:
+            print ("ERROR return code "+ str(e.returncode) +" for ice images")
+            print (e.cmd)
+            print (e.output)
+            print
+            return
+        lines = imageList.splitlines()
+        imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":\\d+")
+        for line in lines:
+            m = imageMatcher.search(line)
+            if m:
+                try:
+                    print(subprocess.check_output("ice rmi "+m.group(0), shell=True))
+                except subprocess.CalledProcessError as e:
+                    print ("ERROR return code "+ str(e.returncode) + " for ice rmi "+m.group(0))
+                    print (e.cmd)
+                    print (e.output)
+                    print
         print("Pausing for 60 seconds to allow images to fully delete")
         time.sleep(60)
     
