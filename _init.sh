@@ -456,8 +456,7 @@ source ${EXT_DIR}/git_util.sh
 ################################
 pushd . >/dev/null
 cd $EXT_DIR 
-#git_retry clone https://github.com/Osthanes/utilities.git utilities
-git_retry clone https://github.com/jgarcows/utilities.git utilities
+git_retry clone https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
 
 ############################
