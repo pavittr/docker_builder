@@ -16,7 +16,7 @@
 #********************************************************************************
 
 if [ "${NAMESPACE}X" == "X" ]; then
-    echo "NAMESPACE must be set in the environment before calling this script."
+    log_and_echo "$ERROR" "NAMESPACE must be set in the environment before calling this script."
     exit 1
 fi
 
@@ -29,7 +29,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater than or equal to image limit
         NUMBER_IMAGES=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | wc -l)
-        echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
+        log_and_echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name
             ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g)
@@ -91,9 +91,9 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 # if number of images greater then image limit, then delete unused images from oldest to newest until we are under the limit or out of unused images
                 len_used=${#IMAGES_ARRAY_USED[*]}
                 len_not_used=${#IMAGES_ARRAY_NOT_USED[*]}
-                echo "number of images in use: ${len_used} and number of images not in use: ${len_not_used}"
-                echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
-                echo "used images: ${IMAGES_ARRAY_USED[@]}"
+                log_and_echo "number of images in use: ${len_used} and number of images not in use: ${len_not_used}"
+                log_and_echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
+                log_and_echo "used images: ${IMAGES_ARRAY_USED[@]}"
                 if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
                     if [ $len_not_used -gt 0 ]; then
                         while [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]
@@ -103,28 +103,28 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                             ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
                             RESULT=$?
                             if [ $RESULT -eq 0 ]; then
-                                echo "deleting image success: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                log_and_echo "deleting image success: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
                             else
-                                echo -e "${red}deleting image failed: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}${no_color}"
+                                log_and_echo "$ERROR" "deleting image failed: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
                             fi
                             if [ $len_not_used -le 0 ]; then
                                 break
                             fi
                         done
                     else
-                        echo -e "${label_color}No unused images found.${no_color}"
+                        log_and_echo "$LABEL" "No unused images found."
                     fi
                     if [ $len_used -ge $IMAGE_LIMIT ]; then
-                        echo -e "${label_color}Warning: Too many images in use.  Unable to meet ${IMAGE_LIMIT} image limit.  Consider increasing IMAGE_LIMIT.${no_color}"
+                        log_and_echo "$WARN" "Warning: Too many images in use.  Unable to meet ${IMAGE_LIMIT} image limit.  Consider increasing IMAGE_LIMIT."
                     fi
                 fi
             else
-                echo -e "${red}Unable to read cf spaces.  Could not check for used images.{$no_color}"
+                log_and_echo "$ERROR" "Unable to read cf spaces.  Could not check for used images."
             fi
         else
-            echo "The number of images are less than the image limit"
+            log_and_echo "The number of images are less than the image limit"
         fi
     else
-        echo -e "${red}Failed to get image list from ice.  Check ice login.${no_color}"
+        log_and_echo "$ERROR" "Failed to get image list from ice.  Check ice login."
     fi
 fi
