@@ -136,6 +136,14 @@ if [ -n $EXT_DIR ]; then
     export PATH=$EXT_DIR:$PATH
 fi 
 
+#########################################
+# Configure log file to store errors  #
+#########################################
+if [ -z "$ERROR_LOG_FILE" ]; then
+    ERROR_LOG_FILE="${EXT_DIR}/errors.log"
+    export ERROR_LOG_FILE
+fi
+
 ########################################################################
 # Fix timestamps so that caching will be leveraged on the remove host  #
 ########################################################################
@@ -233,7 +241,7 @@ fi
 echo "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $IMAGE_NAME ]; then 
-    echo -e "${red}Please set IMAGE_NAME in the environment to desired name ${no_color}"
+    echo -e "${red}Please set IMAGE_NAME in the environment to desired name ${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
     exit 1
 fi 
@@ -244,7 +252,7 @@ if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
     pipeline_validate_full ${IMAGE_NAME} >validate.log 2>&1 
     VALID_NAME=$?
     if [ ${VALID_NAME} -ne 0 ]; then     
-        echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}"
+        echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}" | tee -a "$ERROR_LOG_FILE"
         cat validate.log 
         ${EXT_DIR}/print_help.sh
         exit ${VALID_NAME}
@@ -252,14 +260,14 @@ if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
         debugme cat validate.log 
     fi 
 else 
-    echo -e "${red}Warning could not find utilities in ${EXT_DIR}${no_color}"
+    echo -e "${red}Warning could not find utilities in ${EXT_DIR}${no_color}" | tee -a "$ERROR_LOG_FILE"
 fi 
 
 ################################
 # Setup archive information    #
 ################################
 if [ -z $WORKSPACE ]; then 
-    echo -e "${red}Please set WORKSPACE in the environment${no_color}"
+    echo -e "${red}Please set WORKSPACE in the environment${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
     exit 1
 fi 
@@ -291,7 +299,7 @@ if [ $RESULT -ne 0 ]; then
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Failed to install IBM Container Service CLI ${no_color}"
+        echo -e "${red}Failed to install IBM Container Service CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         debugme python --version
         ${EXT_DIR}/print_help.sh
         exit $RESULT
@@ -313,7 +321,7 @@ if [ $RESULT -ne 0 ]; then
     cf help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Could not install the cloud foundry CLI ${no_color}"
+        echo -e "${red}Could not install the cloud foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh    
         exit 1
     fi  
@@ -337,7 +345,7 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
         export ICE_CFG="ice-cfg-prod.ini"
     else 
-        echo -e "${red}Unknown Bluemix environment specified"
+        echo -e "${red}Unknown Bluemix environment specified${no_color}" | tee -a "$ERROR_LOG_FILE"
     fi 
 else 
     echo -e "Targetting production Bluemix"
@@ -361,12 +369,12 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
     # Get the Bluemix user and password information 
     if [ -z "$BLUEMIX_USER" ]; then 
-        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color} "
+        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
         exit 1
     fi 
     if [ -z "$BLUEMIX_PASSWORD" ]; then 
-        echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color} "
+        echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh    
         exit 1 
     fi 
@@ -425,7 +433,7 @@ printEnablementInfo() {
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
-    echo -e "${red}Failed to login to IBM Container Service${no_color}"
+    echo -e "${red}Failed to login to IBM Container Service${no_color}" | tee -a "$ERROR_LOG_FILE"
     ice namespace get 2> /dev/null
     HAS_NAMESPACE=$?
     if [ $HAS_NAMESPACE -eq 1 ]; then 
@@ -439,42 +447,62 @@ else
 fi 
 
 ########################
+# Setup git_retry      #
+########################
+source ${EXT_DIR}/git_util.sh
+
+################################
+# get the extensions utilities #
+################################
+pushd . >/dev/null
+cd $EXT_DIR 
+git_retry clone https://github.com/Osthanes/utilities.git utilities
+popd >/dev/null
+
+############################
+# enable logging to logmet #
+############################
+source $EXT_DIR/utilities/logging_utils.sh
+setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}" "${BLUEMIX_SPACE}" "${BLUEMIX_ORG}" "${BLUEMIX_TARGET}"
+
+
+########################
 # REGISTRY INFORMATION #
 ########################
 export NAMESPACE=$(ice namespace get)
 RESULT=$?
 if [ $RESULT -eq 0 ]; then
     if [ -z $NAMESPACE ]; then
-        echo -e "${red}Did not discover namespace using ice namespace get, but no error was returned${no_color}"
+        log_and_echo "$ERROR" "Did not discover namespace using ice namespace get, but no error was returned"
         printEnablementInfo
         ${EXT_DIR}/print_help.sh
         exit $RESULT
     fi
 else 
-    echo -e "${red}'ice namespace get' returned an error ${no_color}"
+    log_and_echo "$ERROR" "ice namespace get' returned an error"
     printEnablementInfo
     ${EXT_DIR}/print_help.sh    
     exit 1
 fi 
 
-echo -e "${label_color}Users namespace is $NAMESPACE ${no_color}"
+log_and_echo "$LABEL" "Users namespace is $NAMESPACE"
 export REGISTRY_URL=${CCS_REGISTRY_HOST}/${NAMESPACE}
 export FULL_REPOSITORY_NAME=${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION}
-echo -e "${label_color}The desired image repository name will be ${FULL_REPOSITORY_NAME} ${no_color}"
+log_and_echo "$LABEL" "The desired image repository name will be ${FULL_REPOSITORY_NAME}"
 
 debugme echo "Validating full repository name"
 pipeline_validate_full  ${FULL_REPOSITORY_NAME} >validate.log 2>&1 
 VALID_NAME=$?
 if [ ${VALID_NAME} -ne 0 ]; then    
-    echo -e "${red} ${FULL_REPOSITORY_NAME} is not a valid repository name${no_color}"
-    cat validate.log 
+    log_and_echo "$ERROR" " ${FULL_REPOSITORY_NAME} is not a valid repository name"
+    log_and_echo `cat validate.log` 
     ${EXT_DIR}/print_help.sh
     exit ${VALID_NAME}
 else 
     debugme cat validate.log 
 fi 
 
-echo -e "${label_color}Initialization complete${no_color}"
+log_and_echo "$LABEL" "Initialization complete"
 
 # run image cleanup if necessary
 . $EXT_DIR/image_utilities.sh
