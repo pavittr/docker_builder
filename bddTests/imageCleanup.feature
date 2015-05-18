@@ -1,7 +1,8 @@
 Feature: Task 84101 - Build: image cleanup in build extension
 As a pipeline user I want to have an image quota in the build job to limit images so that I can both version images, and maintain an organized image registry that is within the registry limits.
 
-@createimages1 @smalltest
+@createimages1
+@smalltest
 Scenario: Start with less images
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a value below the ICS image limit
