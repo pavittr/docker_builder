@@ -15,7 +15,7 @@ def before_feature(context, feature):
     os.chdir("simpleDocker")
     #os.mkdir("archive")
     os.environ["ARCHIVE_DIR"] = "."
-    os.environ["IMAGE_NAME"] = "fakeapp"
+    os.environ["IMAGE_NAME"] = "bddapp"
     context.appName = os.environ["IMAGE_NAME"]
     os.environ["APPLICATION_VERSION"] = "30"
     context.appVer = os.environ["APPLICATION_VERSION"]
