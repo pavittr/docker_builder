@@ -4,6 +4,21 @@ import shutil
 import re
 import time
 
+
+def get_app_version():
+    return os.environ["APPLICATION_VERSION"]
+    
+def set_app_version(ver):
+    os.environ["APPLICATION_VERSION"] = str(ver)
+    os.environ["FULL_REPOSITORY_NAME"] = os.environ["REGISTRY_URL"]+"/"+os.environ["IMAGE_NAME"]+":"+get_app_version()
+    
+def increment_app_version():
+    #This will increment APPLICATION_VERSION by one
+    #Whenever we build in python, we should call this to make sure our build script is on the right number
+    curVer = int(os.environ["APPLICATION_VERSION"])
+    os.environ["APPLICATION_VERSION"] = str(curVer+1)
+    os.environ["FULL_REPOSITORY_NAME"] = os.environ["REGISTRY_URL"]+"/"+os.environ["IMAGE_NAME"]+":"+get_app_version()
+
 def before_feature(context, feature):
     #Before running outside of the pipeline you must:
     ###Set a environment variables for CCS_REGISTRY_HOST, REGISTRY_URL, NAMESPACE and login to ice
@@ -17,9 +32,7 @@ def before_feature(context, feature):
     os.environ["ARCHIVE_DIR"] = "."
     os.environ["IMAGE_NAME"] = "bddapp"
     context.appName = os.environ["IMAGE_NAME"]
-    os.environ["APPLICATION_VERSION"] = "30"
-    context.appVer = os.environ["APPLICATION_VERSION"]
-    os.environ["FULL_REPOSITORY_NAME"] = os.environ["REGISTRY_URL"]+"/"+os.environ["IMAGE_NAME"]+":"+os.environ["APPLICATION_VERSION"]
+    set_app_ver(context, 31)
     #Cleaning up any hanging on containers
     cleanupContainers()
         
@@ -40,6 +53,7 @@ def after_feature(context, feature):
     #shutil.rmtree("archive")
     os.chdir("..")
     print()
+
     
 def before_tag(context, tag):
     #matches tags to "command"+"count"
@@ -49,9 +63,9 @@ def before_tag(context, tag):
         command = m.group(1)
         count = int(m.group(2))
         if command == "createimages":
-            version = int(os.getenv("APPLICATION_VERSION"))-count
             appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":"
             while count > 0:
+                version = get_app_version()
                 print("\n=================pwd===============")
                 print(subprocess.check_output("pwd", shell=True));
                 try:
@@ -62,13 +76,13 @@ def before_tag(context, tag):
                     print (e.cmd)
                     print (e.output)
                     raise e
-                version = version + 1
+                increment_app_version()
                 count = count - 1
             time.sleep(10)
             print("ice images")
             print(subprocess.check_output("ice images", shell=True))
         if command == "useimages":
-            version = int(os.getenv("APPLICATION_VERSION"))-count
+            version = int(get_app_version())-count
             appPrefix = os.getenv("NAMESPACE")+"/"+os.getenv("IMAGE_NAME")+":"
             while count > 0:
                 print("Starting container: "+containerName(version))
@@ -135,7 +149,7 @@ def after_scenario(context, scenario):
             removeImages = True
     if (useCount > 0):
         #make sure I clean-up containers
-        version = int(os.getenv("APPLICATION_VERSION"))-useCount
+        version = int(get_app_version())-useCount
         while useCount > 0:
             try:
                 print(subprocess.check_output("ice stop "+containerName(version), shell=True))
@@ -188,6 +202,8 @@ def after_scenario(context, scenario):
                     print
         print("Pausing for 120 seconds to allow images to fully delete")
         time.sleep(120)
+    #don't reuse the last app version we used, so move up one always
+    increment_app_version()
     
 #def after_tag(context, tag):
 #    matcher = re.compile("(\D*)(\d+)")
