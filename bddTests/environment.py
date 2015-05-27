@@ -40,8 +40,8 @@ def before_feature(context, feature):
     try:
         print(subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME")+" | awk '{print $6}' | xargs -n 1 ice rmi", shell=True))
         print
-        print("Waiting 60 seconds after removal of images")
-        time.sleep(60)
+        print("Waiting 120 seconds after removal of images")
+        time.sleep(120)
     except subprocess.CalledProcessError as e:
         print ("No images found, continuing with test setup")
         print (e.cmd)
@@ -70,15 +70,15 @@ def before_tag(context, tag):
                 print(subprocess.check_output("pwd", shell=True));
                 try:
                     print("ice build -t "+appPrefix+str(version) +" .")
-                    print(subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True))
                     print
+                    subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
                 except subprocess.CalledProcessError as e:
                     print (e.cmd)
                     print (e.output)
                     raise e
                 increment_app_version()
                 count = count - 1
-            time.sleep(10)
+            time.sleep(20)
             print("ice images")
             print(subprocess.check_output("ice images", shell=True))
         if command == "useimages":
@@ -87,7 +87,7 @@ def before_tag(context, tag):
             while count > 0:
                 print("Starting container: "+containerName(version))
                 try:
-                    print(subprocess.check_output("ice run --name "+containerName(version) +" "+appPrefix+str(version), shell=True))
+                    subprocess.check_output("ice run --name "+containerName(version) +" "+appPrefix+str(version), shell=True)
                     print 
                 except subprocess.CalledProcessError as e:
                     print (e.cmd)
@@ -96,7 +96,7 @@ def before_tag(context, tag):
                     raise e
                 version = version + 1
                 count = count - 1
-            time.sleep(10)
+            time.sleep(20)
             print("ice ps")
             print(subprocess.check_output("ice ps", shell=True))
             
@@ -195,14 +195,15 @@ def after_scenario(context, scenario):
             if m:
                 try:
                     print(subprocess.check_output("ice rmi "+m.group(0), shell=True))
+                    print
                 except subprocess.CalledProcessError as e:
                     print ("ERROR return code "+ str(e.returncode) + " for ice rmi "+m.group(0))
                     print (e.cmd)
                     print (e.output)
                     print
-        print("Pausing for 120 seconds to allow images to fully delete")
-        time.sleep(120)
-    #don't reuse the last app version we used, so move up one always
+        print("Finished cleaning up images.")
+        print
+    #don't reuse the app version created by the build script, so move up one always
     increment_app_version()
     
 #def after_tag(context, tag):
