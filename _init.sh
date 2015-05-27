@@ -277,7 +277,7 @@ if [ -z $ARCHIVE_DIR ]; then
     export ARCHIVE_DIR="${WORKSPACE}"
 fi 
 
-if [ "${ARCHIVE_DIR}" == "./" ] then
+if [ "${ARCHIVE_DIR}" == "./" ]; then
    echo "${label_color}ARCHIVE_DIR set relative, adjusting to WORKSPACE/archive ${no_color}"
    export ARCHIVE_DIR="${WORKSPACE}"
 fi
