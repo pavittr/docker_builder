@@ -39,8 +39,8 @@ def before_feature(context, feature):
     #Cleaning up any hanging on images
     try:
         print(subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME")+" | awk '{print $6}' | xargs -n 1 ice rmi", shell=True))
-        print
         print("Waiting 120 seconds after removal of images")
+        print
         time.sleep(120)
     except subprocess.CalledProcessError as e:
         print ("No images found, continuing with test setup")
