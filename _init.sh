@@ -273,13 +273,13 @@ if [ -z $WORKSPACE ]; then
 fi 
 
 if [ -z $ARCHIVE_DIR ]; then 
-    echo "${label_color}ARCHIVE_DIR was not set, setting to WORKSPACE/archive ${no_color}"
+    echo "${label_color}ARCHIVE_DIR was not set, setting to WORKSPACE ${no_color}"
     export ARCHIVE_DIR="${WORKSPACE}"
 fi 
 
 if [ "${ARCHIVE_DIR}" == "./" ]; then
-   echo "${label_color}ARCHIVE_DIR set relative, adjusting to WORKSPACE/archive ${no_color}"
-   export ARCHIVE_DIR="${WORKSPACE}"
+   echo "${label_color}ARCHIVE_DIR set relative, adjusting to current dir absolute ${no_color}"
+   export ARCHIVE_DIR=`pwd`
 fi
 
 if [ -d $ARCHIVE_DIR ]; then
