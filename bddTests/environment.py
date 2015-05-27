@@ -32,7 +32,7 @@ def before_feature(context, feature):
     os.environ["ARCHIVE_DIR"] = "."
     os.environ["IMAGE_NAME"] = "bddapp"
     context.appName = os.environ["IMAGE_NAME"]
-    set_app_version(context, 31)
+    set_app_version(31)
     #Cleaning up any hanging on containers
     cleanupContainers()
         
