@@ -75,7 +75,18 @@ def before_tag(context, tag):
                 except subprocess.CalledProcessError as e:
                     print (e.cmd)
                     print (e.output)
-                    raise e
+                    print ("BUILD COMMAND FAILED, retrying in 10 seconds:")
+                    print
+                    time.sleep(10)
+                    print("ice build -t "+appPrefix+str(version) +" .")
+                    print
+                    try:
+                        subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
+                    except subprocess.CalledProcessError as d:
+                        print (d.cmd)
+                        print (d.output)
+                        print ("BUILD COMMAND RETRY FAILED, failing test case")
+                        raise d
                 increment_app_version()
                 count = count - 1
             time.sleep(20)
