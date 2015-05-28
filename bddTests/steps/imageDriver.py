@@ -4,6 +4,7 @@ import os
 import urllib2
 import time
 import re
+from environment import *
 
 @given(u'I have a setup pipeline with a Container Image Build Stage')
 def step_impl(context):
@@ -91,7 +92,7 @@ def step_impl(context):
     while tries < 3:
         imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
         print(imageList)
-        matcher = re.compile(context.appName+":"+os.getenv("APPLICATION_VERSION"))
+        matcher = re.compile(context.appName+":"+get_app_version())
         m = matcher.search(imageList)
         if (m):
             break
@@ -115,7 +116,7 @@ def check_images_deleted_until_under_limit(context, limit):
     print
     lines = imageList.splitlines()
     assert (len(lines) == limit)
-    ver = int(os.getenv("APPLICATION_VERSION"))
+    ver = int(get_app_version())
     count = 0
     while (count < limit):
         matcher = re.compile(context.appName+":"+str(ver))
@@ -146,7 +147,7 @@ def step_impl(context):
     print(context.tags)
     usedCount = get_used_count(context)
     createdCount = get_created_count(context)
-    appVer = int(os.getenv("APPLICATION_VERSION"))
+    appVer = int(get_app_version())
     #figure out what images shouldn't be used (if any) and check they are gone
     if (createdCount > usedCount):
         unusedVersions = range(appVer - createdCount, appVer - usedCount)
@@ -173,7 +174,7 @@ def step_impl(context):
         raise e
     print(imageList)
     print
-    version = int(os.getenv("APPLICATION_VERSION"))-usedCount
+    version = int(get_app_version())-usedCount
     while usedCount > 0:
         matcher = re.compile(context.appName+":"+str(version))
         assert matcher.search(imageList)
@@ -199,10 +200,16 @@ def step_impl(context):
     count = get_totImage_count()
     while (count < 25):
         #create image at count
-        print("ice build -t "+appPrefix+str(count) +" .")
-        print(subprocess.check_output("ice build -t "+appPrefix+str(count) +" .", shell=True))
-        count = count + 1
-
+        try:
+            print("ice build -t "+appPrefix+str(get_app_version()) +" .")
+            print(subprocess.check_output("ice build -t "+appPrefix+str(get_app_version()) +" .", shell=True))
+            increment_app_version()
+            count = count + 1
+        except subprocess.CalledProcessError as e:
+            print (e.cmd)
+            print (e.output)
+            print
+            #TODO: perhaps do something else, but right now don't error, perhaps we are legit at the limit
 
 @then(u'The new image will not be built')
 def step_impl(context):
@@ -210,7 +217,7 @@ def step_impl(context):
     while tries < 3:
         imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
         print(imageList)
-        matcher = re.compile(context.appName+":"+os.getenv("APPLICATION_VERSION"))
+        matcher = re.compile(context.appName+":"+get_app_version())
         m = matcher.search(imageList)
         if (m):
             break
