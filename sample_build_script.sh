@@ -59,7 +59,7 @@ else
     exit 1
 fi  
 
-########################################################################################
-# Copy any artifacts that will be needed for deployment and testing to $archive_dir    #
-########################################################################################
-echo "IMAGE_NAME=${FULL_REPOSITORY_NAME}" >> ${ARCHIVE_DIR}/build.properties
+######################################################################################
+# Copy any artifacts that will be needed for deployment and testing to $WORKSPACE    #
+######################################################################################
+echo "IMAGE_NAME=${FULL_REPOSITORY_NAME}" >> ${WORKSPACE}/build.properties
