@@ -6,6 +6,9 @@ import time
 
 
 def get_app_version():
+    env = os.environ["APPLICATION_VERSION"]
+    if env is None:
+        os.environ["APPLICATION_VERSION"] = "31"
     return os.environ["APPLICATION_VERSION"]
     
 def set_app_version(ver):
