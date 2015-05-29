@@ -129,8 +129,15 @@ def cleanupContainers():
             print (e.cmd)
             print (e.output)
             print
-        for i in range(10):
-            inspectOutput = subprocess.check_output("ice inspect " + m.group(0), shell=True)
+        for i in range(15):
+            try:
+                inspectOutput = subprocess.check_output("ice inspect " + m.group(0), shell=True)
+            except subprocess.CalledProcessError as e:
+                print ("Error code returned by ice inspect")
+                print (e.cmd)
+                print (e.output)
+                print
+                inspectOutput = e.output
             statusMatcher = re.compile("\"Status\": \"(\S*)\"")
             mInspect = statusMatcher.search(inspectOutput)
             if mInspect:
@@ -163,35 +170,7 @@ def after_scenario(context, scenario):
             removeImages = True
     if (useCount > 0):
         #make sure I clean-up containers
-        version = int(get_app_version())-useCount
-        while useCount > 0:
-            try:
-                print(subprocess.check_output("ice stop "+containerName(version), shell=True))
-                print
-            except subprocess.CalledProcessError as e:
-                print (e.cmd)
-                print (e.output)
-                print
-            for i in range(10):
-                inspectOutput = subprocess.check_output("ice inspect " + containerName(version), shell=True)
-                statusMatcher = re.compile("\"Status\": \"(\S*)\"")
-                m = statusMatcher.search(inspectOutput)
-                if m:
-                    print (m.group(0))
-                    print
-                    status = m.group(1)
-                    if (status != "Running"):
-                        break
-                time.sleep(6)
-            try:
-                print(subprocess.check_output("ice rm "+containerName(version), shell=True))
-                print
-            except subprocess.CalledProcessError as e:
-                print (e.cmd)
-                print (e.output)
-                print
-            version = version + 1
-            useCount = useCount - 1
+        cleanupContainers()
     if (createCount > 0 or removeImages):
         #cleanup images
         try:
