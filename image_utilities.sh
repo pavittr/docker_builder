@@ -32,7 +32,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
         log_and_echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name
-            ICE_IMAGES_ARRAY=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g | sed 's/,//'g)
+            ICE_IMAGES_ARRAY=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g | sed 's/,//'g)
             # loop the list of spaces under the org and find the name of the images that are in used
             cf spaces > inspect.log 2> /dev/null
             RESULT=$?
@@ -53,7 +53,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     else
                         cf target -s ${space} > /dev/null
                         if [ $? -eq 0 ]; then
-                            ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e ${NAMESPACE}/${IMAGE_NAME}:[0-9]*)
+                            ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
                             ICE_PS_IMAGES_ARRAY+=" "
                         fi
                     fi
