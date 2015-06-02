@@ -111,7 +111,7 @@ def step_impl(context):
     assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
     
 def check_images_deleted_until_under_limit(context, limit):
-    imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
+    imageList = subprocess.check_output("ice images | grep \""+context.appName+":[0-9]\\+\"", shell=True)
     print(imageList)
     print
     lines = imageList.splitlines()
@@ -252,3 +252,61 @@ def step_impl(context):
 def step_impl(context):
     usedCount = get_used_count(context)
     assert (usedCount >= 5)
+    
+
+@given(u'I have set the number images to keep to 1')
+def step_impl(context):
+    os.environ["IMAGE_LIMIT"]="1"
+
+@given(u'I have images in the form of image_namexx')
+def step_impl(context):
+    try:
+        imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"xx:"+str(get_app_version())
+        print("ice build -t "+imgName +" .")
+        print(subprocess.check_output("ice build -t "+imgName +" .", shell=True))
+        increment_app_version()
+        context.imgxx = imgName
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
+
+@given(u'I have images with the same name but tagged with an alpha-string (alchemy/imagename:uniquetag)')
+def step_impl(context):
+    try:
+        imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":tag"
+        print("ice build -t "+imgName +" .")
+        print(subprocess.check_output("ice build -t "+imgName +" .", shell=True))
+        context.img_tag = imgName
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
+
+def check_for_image(fullImgName):
+    output = subprocess.check_output("ice inspect images | grep "+fullImgName, shell=True)
+    return output 
+
+@then(u'the images in the form of image_namexx will not be deleted')
+def step_impl(context):
+    assert check_for_image(context.imgxx)
+    try:
+        print ("ice rmi "+context.imgxx)
+        print(subprocess.check_output("ice rmi "+context.imgxx, shell=True))
+        print
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
+    
+@then(u'the images tagged with an alpha-string will not be deleted')
+def step_impl(context):
+    assert check_for_image(context.img_tag)
+    try:
+        print ("ice rmi "+context.img_tag)
+        print(subprocess.check_output("ice rmi "+context.img_tag, shell=True))
+        print
+    except subprocess.CalledProcessError as e:
+        print (e.cmd)
+        print (e.output)
+        print
