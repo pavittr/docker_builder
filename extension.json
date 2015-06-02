@@ -80,7 +80,7 @@ fi
 ######################################################################################
 # Copy any artifacts that will be needed for deployment and testing to $WORKSPACE    #
 ######################################################################################
-echo \"IMAGE_NAME=${FULL_REPOSITORY_NAME}\" >> ${WORKSPACE}/build.properties",
+echo \"IMAGE_NAME=${FULL_REPOSITORY_NAME}\" >> $ARCHIVE_DIR/build.properties",
             "label_key": "COMMAND_KEY",
             "desc_key": "COMMAND_DESC"
         }

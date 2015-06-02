@@ -272,10 +272,15 @@ if [ -z $WORKSPACE ]; then
     exit 1
 fi 
 
-# adjusting archive dir to point to workspace, so that it
-# works consistently.  User will be pointed to use $WORKSPACE
-# instead in the sample script.
-export ARCHIVE_DIR="${WORKSPACE}"
+if [ -z $ARCHIVE_DIR ]; then
+    echo -e "${label_color}ARCHIVE_DIR was not set, setting to WORKSPACE ${no_color}"
+    export ARCHIVE_DIR="${WORKSPACE}"
+fi
+
+if [ "$ARCHIVE_DIR" == "./" ]; then
+    echo -e "${label_color}ARCHIVE_DIR set relative, adjusting to current dir absolute ${no_color}"
+    export ARCHIVE_DIR=`pwd`
+fi
 
 if [ -d $ARCHIVE_DIR ]; then
   echo -e "Archiving to $ARCHIVE_DIR"
