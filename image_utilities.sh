@@ -28,7 +28,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater than or equal to image limit
-        NUMBER_IMAGES=$(grep ${REGISTRY_URL}/${IMAGE_NAME} inspect.log | grep \"Image\": | wc -l)
+        NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" inspect.log | grep \"Image\": | wc -l)
         log_and_echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name

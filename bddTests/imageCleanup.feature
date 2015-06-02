@@ -20,6 +20,20 @@ When The container Image Build job is run
 Then The new image is built
 And unused images will be deleted from oldest to newest until we are under the limit
 
+@createimages2
+Scenario: Check similar image names
+Given I have a setup pipeline with a Container Image Build Stage
+And I have set the number images to keep to 1
+And I have less than the image limit in used images
+And I have more than the image limit in used and unused images
+And I have images in the form of image_namexx
+And I have images with the same name but tagged with an alpha-string (alchemy/imagename:uniquetag)
+When The container Image Build job is run
+Then The new image is built
+And unused images will be deleted from oldest to newest until we are under the limit
+And the images in the form of image_namexx will not be deleted
+And the images tagged with an alpha-string will not be deleted
+
 @createimages5
 @useimages3
 Scenario: Too many used images
