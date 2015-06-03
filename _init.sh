@@ -150,7 +150,7 @@ fi
 if [ -z "${USE_CACHED_LAYERS}" ]; then 
     export USE_CACHED_LAYERS="true"
 fi 
-if [ "${USE_CACHED_LAYERS}" == "true" ]; then 
+if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then 
     if [ "${MAX_CACHING_TIME}x" == "x" ]; then
         MAX_CACHING_TIME=300
     fi
