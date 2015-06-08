@@ -36,11 +36,11 @@ def before_feature(context, feature):
     os.environ["IMAGE_NAME"] = "bddapp"
     context.appName = os.environ["IMAGE_NAME"]
     set_app_version(31)
+    #setup a list of exceptions found during environment ice commands
+    context.exceptions = []
     #Cleaning up any hanging on containers
     cleanupContainers(context)
     
-    #setup a list of exceptions found during environment ice commands
-    context.exceptions = []
         
     #Cleaning up any hanging on images
     try:
