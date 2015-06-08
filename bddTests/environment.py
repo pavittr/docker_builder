@@ -37,7 +37,10 @@ def before_feature(context, feature):
     context.appName = os.environ["IMAGE_NAME"]
     set_app_version(31)
     #Cleaning up any hanging on containers
-    cleanupContainers()
+    cleanupContainers(context)
+    
+    #setup a list of exceptions found during environment ice commands
+    context.exceptions = []
         
     #Cleaning up any hanging on images
     try:
@@ -50,6 +53,35 @@ def before_feature(context, feature):
         print (e.cmd)
         print (e.output)
         print
+        
+def subprocess_retry(context, command, showOutput):
+    try:
+        print(command)
+        print
+        output = subprocess.check_output(command, shell=True)
+        if (showOutput):
+            print(output)
+            print
+        return output
+    except subprocess.CalledProcessError as e:
+        context.exceptions.append(e)
+        print(e.cmd)
+        print(e.output)
+        print("Non-zero return code, retrying in 10 seconds")
+        print
+        time.sleep(10)
+        try:
+            output = subprocess.check_output(command, shell=True)
+            print(output)
+            print
+            return output
+        except subprocess.CalledProcessError as d:
+            print("Process call still failed, recording failure and continuing")
+            print(d.cmd)
+            print(d.output)
+            print
+            context.exceptions.append(d)
+            return d.output
     
 def after_feature(context, feature):
     #shutil.rmtree("workspace")
@@ -69,75 +101,35 @@ def before_tag(context, tag):
             appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":"
             while count > 0:
                 version = get_app_version()
-                print("\n=================pwd===============")
-                print(subprocess.check_output("pwd", shell=True));
-                try:
-                    print("ice build -t "+appPrefix+str(version) +" .")
-                    print
-                    subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
-                except subprocess.CalledProcessError as e:
-                    print (e.cmd)
-                    print (e.output)
-                    print ("BUILD COMMAND FAILED, retrying in 10 seconds:")
-                    print
-                    time.sleep(10)
-                    print("ice build -t "+appPrefix+str(version) +" .")
-                    print
-                    try:
-                        subprocess.check_output("ice build -t "+appPrefix+str(version) +" .", shell=True)
-                    except subprocess.CalledProcessError as d:
-                        print (d.cmd)
-                        print (d.output)
-                        print ("BUILD COMMAND RETRY FAILED, failing test case")
-                        raise d
+                subprocess_retry(context,"ice build -t "+appPrefix+str(version) +" .", False)
                 increment_app_version()
                 count = count - 1
-            time.sleep(20)
-            print("ice images")
-            print(subprocess.check_output("ice images", shell=True))
+            print("Waiting 30 seconds after building images")
+            time.sleep(30)
+            subprocess_retry(context,"ice images", True)
         if command == "useimages":
             version = int(get_app_version())-count
             appPrefix = os.getenv("NAMESPACE")+"/"+os.getenv("IMAGE_NAME")+":"
             while count > 0:
                 print("Starting container: "+containerName(version))
-                try:
-                    subprocess.check_output("ice run --name "+containerName(version) +" "+appPrefix+str(version), shell=True)
-                    print 
-                except subprocess.CalledProcessError as e:
-                    print (e.cmd)
-                    print (e.output)
-                    #TODO: it would be really nice to stop all containers I've already started before bailing
-                    raise e
+                subprocess_retry(context,"ice run --name "+containerName(version) +" "+appPrefix+str(version), False)
                 version = version + 1
                 count = count - 1
-            time.sleep(20)
-            print("ice ps")
-            print(subprocess.check_output("ice ps", shell=True))
+            print("Waiting 30 seconds after starting images")
+            time.sleep(30)
+            subprocess_retry(context,"ice ps", True)
             
             
 def containerName(version):
     return os.getenv("IMAGE_NAME")+str(version) +"C"
     
-def cleanupContainers():
-    psOutput = subprocess.check_output("ice ps", shell=True)
+def cleanupContainers(context):
+    psOutput = subprocess_retry(context, "ice ps", False)
     for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
         print("Removing container: "+m.group(0))
-        try:
-            print(subprocess.check_output("ice stop "+m.group(0), shell=True))
-            print
-        except subprocess.CalledProcessError as e:
-            print (e.cmd)
-            print (e.output)
-            print
+        subprocess_retry(context, "ice stop "+m.group(0), True)
         for i in range(15):
-            try:
-                inspectOutput = subprocess.check_output("ice inspect " + m.group(0), shell=True)
-            except subprocess.CalledProcessError as e:
-                print ("Error code returned by ice inspect")
-                print (e.cmd)
-                print (e.output)
-                print
-                inspectOutput = e.output
+            inspectOutput = subprocess_retry(context, "ice inspect " + m.group(0), False)
             statusMatcher = re.compile("\"Status\": \"(\S*)\"")
             mInspect = statusMatcher.search(inspectOutput)
             if mInspect:
@@ -147,13 +139,7 @@ def cleanupContainers():
                 if (status != "Running"):
                     break
             time.sleep(6)
-        try:
-            print(subprocess.check_output("ice rm "+m.group(0), shell=True))
-            print
-        except subprocess.CalledProcessError as e:
-            print (e.cmd)
-            print (e.output)
-            print
+        subprocess_retry(context, "ice rm "+m.group(0), True)
 
 def after_scenario(context, scenario):
     matcher = re.compile("(\D*)(\d+)")
@@ -170,30 +156,16 @@ def after_scenario(context, scenario):
             removeImages = True
     if (useCount > 0):
         #make sure I clean-up containers
-        cleanupContainers()
+        cleanupContainers(context)
     if (createCount > 0 or removeImages):
         #cleanup images
-        try:
-            imageList = subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME"), shell=True)
-        except subprocess.CalledProcessError as e:
-            print ("ERROR return code "+ str(e.returncode) +" for ice images")
-            print (e.cmd)
-            print (e.output)
-            print
-            return
+        imageList = subprocess_retry(context, "ice images | grep "+os.getenv("IMAGE_NAME"), False)
         lines = imageList.splitlines()
         imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":\\d+")
         for line in lines:
             m = imageMatcher.search(line)
             if m:
-                try:
-                    print(subprocess.check_output("ice rmi "+m.group(0), shell=True))
-                    print
-                except subprocess.CalledProcessError as e:
-                    print ("ERROR return code "+ str(e.returncode) + " for ice rmi "+m.group(0))
-                    print (e.cmd)
-                    print (e.output)
-                    print
+                subprocess_retry(context, "ice rmi "+m.group(0), True)
         print("Finished cleaning up images.")
         print
     #don't reuse the app version created by the build script, so move up one always

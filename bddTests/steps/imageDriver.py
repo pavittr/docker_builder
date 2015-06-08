@@ -15,15 +15,7 @@ def step_impl(context):
     os.environ["IMAGE_LIMIT"]="3"
     
 def get_appImage_count(context):
-    try:
-        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
-        raise e
-    print(imageList)
-    print
+    imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
     lines = imageList.splitlines()
     Count = int(len(lines))
     print (Count)
@@ -31,15 +23,7 @@ def get_appImage_count(context):
     return Count
 
 def get_totImage_count():
-    try:
-        imageList = subprocess.check_output("ice images | grep "+os.environ["NAMESPACE"]+"/", shell=True)
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
-        raise e
-    print(imageList)
-    print
+    subprocess_retry(context, "ice images | grep "+os.environ["NAMESPACE"]+"/", True)
     lines = imageList.splitlines()
     Count = int(len(lines))
     print (Count)
@@ -89,9 +73,8 @@ def step_impl(context):
 @then(u'The new image is built')
 def step_impl(context):
     tries = 0
-    while tries < 3:
-        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
-        print(imageList)
+    while tries < 6:
+        imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
         matcher = re.compile(context.appName+":"+get_app_version())
         m = matcher.search(imageList)
         if (m):
@@ -111,9 +94,7 @@ def step_impl(context):
     assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
     
 def check_images_deleted_until_under_limit(context, limit):
-    imageList = subprocess.check_output("ice images | grep \""+context.appName+":[0-9]\\+\"", shell=True)
-    print(imageList)
-    print
+    imageList = subprocess_retry(context, "ice images | grep \""+context.appName+":[0-9]\\+\"", True)
     lines = imageList.splitlines()
     assert (len(lines) == limit)
     ver = int(get_app_version())
@@ -155,8 +136,7 @@ def step_impl(context):
         print
         assert (unusedVersions)
         for ver in unusedVersions:
-            imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
-            print(imageList)
+            imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
             matcher = re.compile(context.appName+":"+str(ver))
             m = matcher.search(imageList)
             assert m is None
@@ -165,15 +145,7 @@ def step_impl(context):
 def step_impl(context):
     usedCount = get_used_count(context)
     assert usedCount > 0
-    try:
-        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
-        raise e
-    print(imageList)
-    print
+    imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
     version = int(get_app_version())-usedCount
     while usedCount > 0:
         matcher = re.compile(context.appName+":"+str(version))
@@ -200,23 +172,15 @@ def step_impl(context):
     count = get_totImage_count()
     while (count < 25):
         #create image at count
-        try:
-            print("ice build -t "+appPrefix+str(get_app_version()) +" .")
-            print(subprocess.check_output("ice build -t "+appPrefix+str(get_app_version()) +" .", shell=True))
-            increment_app_version()
-            count = count + 1
-        except subprocess.CalledProcessError as e:
-            print (e.cmd)
-            print (e.output)
-            print
-            #TODO: perhaps do something else, but right now don't error, perhaps we are legit at the limit
+        subprocess_retry(context,"ice build -t "+appPrefix+str(get_app_version()) +" .", True)
+        increment_app_version()
+        count = count + 1
 
 @then(u'The new image will not be built')
 def step_impl(context):
     tries = 0
-    while tries < 3:
-        imageList = subprocess.check_output("ice images | grep "+context.appName, shell=True)
-        print(imageList)
+    while tries < 6:
+        imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
         matcher = re.compile(context.appName+":"+get_app_version())
         m = matcher.search(imageList)
         if (m):
@@ -260,53 +224,52 @@ def step_impl(context):
 
 @given(u'I have images in the form of image_namexx')
 def step_impl(context):
-    try:
-        imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"xx:"+str(get_app_version())
-        print("ice build -t "+imgName +" .")
-        print(subprocess.check_output("ice build -t "+imgName +" .", shell=True))
-        increment_app_version()
-        context.imgxx = imgName
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
+    imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"xx:"+str(get_app_version())
+    subprocess_retry(context,"ice build -t "+imgName +" .", True)
+    increment_app_version()
+    context.imgxx = imgName
 
 @given(u'I have images with the same name but tagged with an alpha-string (alchemy/imagename:uniquetag)')
 def step_impl(context):
-    try:
-        imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":tag"
-        print("ice build -t "+imgName +" .")
-        print(subprocess.check_output("ice build -t "+imgName +" .", shell=True))
-        context.img_tag = imgName
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
+    imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":tag"
+    subprocess_retry(context,"ice build -t "+imgName +" .", True)
+    context.img_tag = imgName
 
-def check_for_image(fullImgName):
-    output = subprocess.check_output("ice inspect images | grep "+fullImgName, shell=True)
+
+def check_for_image(context, fullImgName):
+    output = subprocess_retry(context, "ice inspect images | grep "+fullImgName, False)
     return output 
 
 @then(u'the images in the form of image_namexx will not be deleted')
 def step_impl(context):
-    assert check_for_image(context.imgxx)
-    try:
-        print ("ice rmi "+context.imgxx)
-        print(subprocess.check_output("ice rmi "+context.imgxx, shell=True))
-        print
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
-    
+    assert check_for_image(context, context.imgxx)
+    subprocess_retry(context, "ice rmi "+context.imgxx, True)
+
+
 @then(u'the images tagged with an alpha-string will not be deleted')
 def step_impl(context):
-    assert check_for_image(context.img_tag)
-    try:
-        print ("ice rmi "+context.img_tag)
-        print(subprocess.check_output("ice rmi "+context.img_tag, shell=True))
-        print
-    except subprocess.CalledProcessError as e:
-        print (e.cmd)
-        print (e.output)
-        print
+    assert check_for_image(context, context.img_tag)
+    subprocess_retry(context, "ice rmi "+context.img_tag, True)
+    
+    
+@given(u'I want to generate some exceptions')
+def step_impl(context):
+    pass
+    
+@then(u'I generate {num} exceptions')
+def step_impl(context, num):
+    tries = 0
+    while tries < int(num):
+        subprocess_retry(context, "echo \"Failure "+str(tries)+"\"; [ ]", False)
+        tries = tries + 1
+
+@given(u'I have run a series of tests and kept track of any subprocess exceptions')
+def step_impl(context):
+    pass
+
+@then(u'The number of exceptions will be no more than {num}')
+def step_impl(context, num):
+    exceptionCount = len(context.exceptions)
+    print ("There were "+str(exceptionCount)+" exception(s) found during test execution")
+    print
+    assert exceptionCount <= int(num)
