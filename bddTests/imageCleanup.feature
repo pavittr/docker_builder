@@ -85,3 +85,25 @@ When The container Image Build job is run
 Then The new image is built
 And all unused images will be deleted
 And A warning will be issued that the images in use could not be deleted
+
+#@wip
+#Scenario: Dummy scenario to generate exceptions
+#Given I want to generate some exceptions
+#Then I generate 1 exceptions
+
+
+Scenario Outline: Check reliability of ice commands
+Given I have run a series of tests and kept track of any subprocess exceptions
+Then The number of exceptions will be no more than <num>
+
+Examples: Reasonable Failure Rate
+   | num |
+   |  0  |
+   |  1  |
+   |  3  |
+ 
+ Examples: Unreasonable Failure Rate
+   | num |
+   |  5  |
+   |  7  |
+   |  9  |
