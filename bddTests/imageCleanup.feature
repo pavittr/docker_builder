@@ -46,14 +46,15 @@ And all unused images will be deleted
 And no used images will be deleted
 And A warning will be issued that the images in use could not be deleted
 
-@removeimages
-@ignorebuildfailure
-Scenario: At ICS image limit
-Given I have a setup pipeline with a Container Image Build Stage
-And I have set the number images to keep to a value equal to or greater than the ICS image limit
-And I am currently at the ICS image limit
-When The container Image Build job is run
-Then The new image will not be built
+#@removeimages
+#@ignorebuildfailure
+#removing this test from BDD
+#Scenario: At ICS image limit
+#Given I have a setup pipeline with a Container Image Build Stage
+#And I have set the number images to keep to a value equal to or greater than the ICS image limit
+#And I am currently at the ICS image limit
+#When The container Image Build job is run
+#Then The new image will not be built
 
 @createimages5
 Scenario: Negative number set
