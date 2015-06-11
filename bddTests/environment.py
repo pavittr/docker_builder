@@ -106,7 +106,7 @@ def containerName(version):
     
 def cleanupImages(context, pause=False):
     #cleanup images
-    imageList = subprocess_retry(context, "ice images | grep "+os.getenv("IMAGE_NAME"), False)
+    imageList = subprocess_retry(context, "ice images", False)
     lines = imageList.splitlines()
     imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":\\d+")
     imagesFound = False
