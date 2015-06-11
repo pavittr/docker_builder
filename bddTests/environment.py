@@ -40,21 +40,9 @@ def before_feature(context, feature):
     context.exceptions = []
     #Cleaning up any hanging on containers
     cleanupContainers(context)
-    
+    cleanupImages(context, True)
         
-    #Cleaning up any hanging on images
-    try:
-        print(subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME")+" | awk '{print $6}' | xargs -n 1 ice rmi", shell=True))
-        print("Waiting 120 seconds after removal of images")
-        print
-        time.sleep(120)
-    except subprocess.CalledProcessError as e:
-        print ("No images found, continuing with test setup")
-        print (e.cmd)
-        print (e.output)
-        print
-        
-def subprocess_retry(context, command, showOutput):
+def subprocess_retry(context, command, showOutput, retryCount=2):
     try:
         print(command)
         print
@@ -67,21 +55,14 @@ def subprocess_retry(context, command, showOutput):
         context.exceptions.append(e)
         print(e.cmd)
         print(e.output)
-        print("Non-zero return code, retrying in 10 seconds")
-        print
-        time.sleep(10)
-        try:
-            output = subprocess.check_output(command, shell=True)
-            print(output)
+        if (retryCount > 0):
+            print("Non-zero return code; recording failure and retrying in 10 seconds")
             print
-            return output
-        except subprocess.CalledProcessError as d:
-            print("Process call still failed, recording failure and continuing")
-            print(d.cmd)
-            print(d.output)
-            print
-            context.exceptions.append(d)
-            return d.output
+            time.sleep(10)
+            return subprocess_retry(context, command, showOutput, retryCount-1)
+        else:
+            print("Non-zero return code; exceeded retry count: recording failure and continuing")
+            return e.output
     
 def after_feature(context, feature):
     #shutil.rmtree("workspace")
@@ -123,6 +104,25 @@ def before_tag(context, tag):
 def containerName(version):
     return os.getenv("IMAGE_NAME")+str(version) +"C"
     
+def cleanupImages(context, pause=False):
+    #cleanup images
+    imageList = subprocess_retry(context, "ice images | grep "+os.getenv("IMAGE_NAME"), False)
+    lines = imageList.splitlines()
+    imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":\\d+")
+    imagesFound = False
+    for line in lines:
+        m = imageMatcher.search(line)
+        if m:
+            subprocess_retry(context, "ice rmi "+m.group(0), True)
+            imagesFound = True
+    if imagesFound:
+        if pause:
+            print("Wiating 120 seconds to allow images to be deleted")
+            time.sleep(120)
+        print("Finished cleaning up images.")
+        print
+    
+    
 def cleanupContainers(context):
     psOutput = subprocess_retry(context, "ice ps", False)
     for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
@@ -159,15 +159,7 @@ def after_scenario(context, scenario):
         cleanupContainers(context)
     if (createCount > 0 or removeImages):
         #cleanup images
-        imageList = subprocess_retry(context, "ice images | grep "+os.getenv("IMAGE_NAME"), False)
-        lines = imageList.splitlines()
-        imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":\\d+")
-        for line in lines:
-            m = imageMatcher.search(line)
-            if m:
-                subprocess_retry(context, "ice rmi "+m.group(0), True)
-        print("Finished cleaning up images.")
-        print
+        cleanupImages(context)
     #don't reuse the app version created by the build script, so move up one always
     increment_app_version()
     

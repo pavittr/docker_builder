@@ -22,8 +22,8 @@ def get_appImage_count(context):
     print
     return Count
 
-def get_totImage_count():
-    subprocess_retry(context, "ice images | grep "+os.environ["NAMESPACE"]+"/", True)
+def get_totImage_count(context):
+    imageList = subprocess_retry(context, "ice images | grep "+os.environ["NAMESPACE"]+"/", True)
     lines = imageList.splitlines()
     Count = int(len(lines))
     print (Count)
@@ -169,7 +169,7 @@ def step_impl(context):
     #I need to create images until the number of images is equal to 25
     #This code assumes that there are no images of name IMAGE_NAME:##
     appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":"
-    count = get_totImage_count()
+    count = get_totImage_count(context)
     while (count < 25):
         #create image at count
         subprocess_retry(context,"ice build -t "+appPrefix+str(get_app_version()) +" .", True)
@@ -271,5 +271,28 @@ def step_impl(context):
 def step_impl(context, num):
     exceptionCount = len(context.exceptions)
     print ("There were "+str(exceptionCount)+" exception(s) found during test execution")
-    print
+    print 
+    if (exceptionCount > 0):
+        print ("============================================================")
+        print ("==========Failing commands:                       ==========")
+    i = 1
+    for e in context.exceptions:
+        print ("=== "+str(i)+": "+e.cmd)
+        i = i + 1
+    if (exceptionCount > 0):
+        print ("============================================================")
+        print
+        print ("============================================================")
+        print ("==========Captured output:                        ==========")
+        print ("============================================================")
+        print
+    i = 1
+    for e in context.exceptions:
+        print ("============================================================")
+        print ("=== "+str(i)+": "+e.cmd)
+        print ("============================================================")
+        print (e.output)
+        print
+        print
+        i = i + 1
     assert exceptionCount <= int(num)
