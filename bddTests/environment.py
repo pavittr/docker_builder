@@ -108,7 +108,7 @@ def cleanupImages(context, pause=False):
     #cleanup images
     imageList = subprocess_retry(context, "ice images", False)
     lines = imageList.splitlines()
-    imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME"))
+    imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"\S*:\S+")
     imagesFound = False
     for line in lines:
         m = imageMatcher.search(line)
@@ -128,7 +128,7 @@ def cleanupContainers(context):
     for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
         print("Removing container: "+m.group(0))
         subprocess_retry(context, "ice stop "+m.group(0), True)
-        for i in range(15):
+        for i in range(30):
             inspectOutput = subprocess_retry(context, "ice inspect " + m.group(0), False)
             statusMatcher = re.compile("\"Status\": \"(\S*)\"")
             mInspect = statusMatcher.search(inspectOutput)
@@ -139,7 +139,7 @@ def cleanupContainers(context):
                 if (status != "Running"):
                     break
             time.sleep(6)
-        subprocess_retry(context, "ice rm "+m.group(0), True)
+        subprocess_retry(context, "ice rm --force "+m.group(0), True)
 
 def after_scenario(context, scenario):
     matcher = re.compile("(\D*)(\d+)")

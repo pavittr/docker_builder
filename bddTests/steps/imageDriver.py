@@ -15,17 +15,17 @@ def step_impl(context):
     os.environ["IMAGE_LIMIT"]="3"
     
 def get_appImage_count(context):
-    imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
-    lines = imageList.splitlines()
-    Count = int(len(lines))
+    imageList = subprocess_retry(context, "ice images", True)
+    matches = re.findall(context.appName+":\d+", imageList)
+    Count = int(len(matches))
     print (Count)
     print
     return Count
 
 def get_totImage_count(context):
-    imageList = subprocess_retry(context, "ice images | grep "+os.environ["NAMESPACE"]+"/", True)
-    lines = imageList.splitlines()
-    Count = int(len(lines))
+    imageList = subprocess_retry(context, "ice images", True)
+    matches = re.findall(os.environ["NAMESPACE"]+"/")
+    Count = int(len(matches))
     print (Count)
     print
     return Count
@@ -74,7 +74,7 @@ def step_impl(context):
 def step_impl(context):
     tries = 0
     while tries < 6:
-        imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
+        imageList = subprocess_retry(context, "ice images", True)
         matcher = re.compile(context.appName+":"+get_app_version())
         m = matcher.search(imageList)
         if (m):
@@ -94,9 +94,9 @@ def step_impl(context):
     assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
     
 def check_images_deleted_until_under_limit(context, limit):
-    imageList = subprocess_retry(context, "ice images | grep \""+context.appName+":[0-9]\\+\"", True)
-    lines = imageList.splitlines()
-    assert (len(lines) == limit)
+    imageList = subprocess_retry(context, "ice images", True)
+    matches = re.findall(context.appName+":\d+", imageList)
+    assert (len(matches) == limit)
     ver = int(get_app_version())
     count = 0
     while (count < limit):
@@ -135,8 +135,8 @@ def step_impl(context):
         print (unusedVersions)
         print
         assert (unusedVersions)
+        imageList = subprocess_retry(context, "ice images", True)
         for ver in unusedVersions:
-            imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
             matcher = re.compile(context.appName+":"+str(ver))
             m = matcher.search(imageList)
             assert m is None
@@ -145,7 +145,7 @@ def step_impl(context):
 def step_impl(context):
     usedCount = get_used_count(context)
     assert usedCount > 0
-    imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
+    imageList = subprocess_retry(context, "ice images", True)
     version = int(get_app_version())-usedCount
     while usedCount > 0:
         matcher = re.compile(context.appName+":"+str(version))
@@ -180,7 +180,7 @@ def step_impl(context):
 def step_impl(context):
     tries = 0
     while tries < 6:
-        imageList = subprocess_retry(context, "ice images | grep "+context.appName, True)
+        imageList = subprocess_retry(context, "ice images", True)
         matcher = re.compile(context.appName+":"+get_app_version())
         m = matcher.search(imageList)
         if (m):
@@ -237,8 +237,8 @@ def step_impl(context):
 
 
 def check_for_image(context, fullImgName):
-    output = subprocess_retry(context, "ice inspect images | grep "+fullImgName, False)
-    return output 
+    output = subprocess_retry(context, "ice inspect images", False)
+    return re.search(fullImgName, output) 
 
 @then(u'the images in the form of image_namexx will not be deleted')
 def step_impl(context):
