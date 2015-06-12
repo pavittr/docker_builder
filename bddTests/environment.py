@@ -108,7 +108,7 @@ def cleanupImages(context, pause=False):
     #cleanup images
     imageList = subprocess_retry(context, "ice images", False)
     lines = imageList.splitlines()
-    imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":\\d+")
+    imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME"))
     imagesFound = False
     for line in lines:
         m = imageMatcher.search(line)
