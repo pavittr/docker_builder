@@ -243,13 +243,11 @@ def check_for_image(context, fullImgName):
 @then(u'the images in the form of image_namexx will not be deleted')
 def step_impl(context):
     assert check_for_image(context, context.imgxx)
-    subprocess_retry(context, "ice rmi "+context.imgxx, True)
 
 
 @then(u'the images tagged with an alpha-string will not be deleted')
 def step_impl(context):
     assert check_for_image(context, context.img_tag)
-    subprocess_retry(context, "ice rmi "+context.img_tag, True)
     
     
 @given(u'I want to generate some exceptions')
