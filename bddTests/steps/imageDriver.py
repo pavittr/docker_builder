@@ -228,12 +228,18 @@ def step_impl(context):
     subprocess_retry(context,"ice build -t "+imgName +" .", True)
     increment_app_version()
     context.imgxx = imgName
+    print("Sleeping for 120 seconds after building image")
+    print
+    time.sleep(120)
 
 @given(u'I have images with the same name but tagged with an alpha-string (alchemy/imagename:uniquetag)')
 def step_impl(context):
     imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":tag"
     subprocess_retry(context,"ice build -t "+imgName +" .", True)
     context.img_tag = imgName
+    print("Sleeping for 120 seconds after building image")
+    print
+    time.sleep(120)
 
 
 def check_for_image(context, fullImgName):

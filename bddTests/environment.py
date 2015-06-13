@@ -85,8 +85,8 @@ def before_tag(context, tag):
                 subprocess_retry(context,"ice build -t "+appPrefix+str(version) +" .", False)
                 increment_app_version()
                 count = count - 1
-            print("Waiting 30 seconds after building images")
-            time.sleep(30)
+            print("Waiting 120 seconds after building images")
+            time.sleep(120)
             subprocess_retry(context,"ice images", True)
         if command == "useimages":
             version = int(get_app_version())-count
@@ -96,8 +96,8 @@ def before_tag(context, tag):
                 subprocess_retry(context,"ice run --name "+containerName(version) +" "+appPrefix+str(version), False)
                 version = version + 1
                 count = count - 1
-            print("Waiting 30 seconds after starting images")
-            time.sleep(30)
+            print("Waiting 120 seconds after starting images")
+            time.sleep(120)
             subprocess_retry(context,"ice ps", True)
             
             
