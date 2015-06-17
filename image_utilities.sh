@@ -54,7 +54,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 # save current space first
                 $CFCMD target > target.log 2> /dev/null
                 CURRENT_SPACE=`grep "Space:" target.log | awk '{print $2}'`
-                debugme echo "current space is $CURRENT_SPACE"
+                log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
                 FOUND=""
                 TESTED_ALL=true
                 SPACE_ARRAY=$(cat inspect.log)
