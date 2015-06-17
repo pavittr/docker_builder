@@ -70,7 +70,8 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         fi
                         continue
                     else
-                        $CFCMD target -s ${space}
+                        $CFCMD target -s ${space} > target.log 2> /dev/null
+                        debugme cat target.log
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
                             ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
@@ -82,7 +83,8 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     fi
                 done
                 # restore my old space
-                $CFCMD target -s ${CURRENT_SPACE} > /dev/null
+                $CFCMD target -s ${CURRENT_SPACE} > target.log 2> /dev/null
+                debugme cat target.log
                 if [ "$TESTED_ALL" = true ] ; then
                     i=0
                     j=0
