@@ -15,6 +15,17 @@
 #   See the License for the specific language governing permissions and
 #********************************************************************************
 
+debugme() {
+  [[ $DEBUG = 1 ]] && "$@" || :
+}
+
+if [ -f ${EXT_DIR}/cf ]; then
+   CFCMD=${EXT_DIR}/cf
+else
+   CFCMD=cf
+fi
+log_and_echo "$DEBUGGING" "cf is $CFCMD"
+
 if [ "${NAMESPACE}X" == "X" ]; then
     log_and_echo "$ERROR" "NAMESPACE must be set in the environment before calling this script."
     exit 1
@@ -34,12 +45,18 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             # create array of images name
             ICE_IMAGES_ARRAY=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g | sed 's/,//'g)
             # loop the list of spaces under the org and find the name of the images that are in used
-            cf spaces > inspect.log 2> /dev/null
+            $CFCMD spaces > inspect.log 2> /dev/null
             RESULT=$?
+            debugme echo "cf spaces output:"
+            debugme cat inspect.log
+            debugme echo "end cf spaces output"
             if [ $RESULT -eq 0 ]; then
                 # save current space first
-                CURRENT_SPACE=`cf target | grep "Space:" | awk '{printf "%s", $2}'`
+                $CFCMD target > target.log 2> /dev/null
+                CURRENT_SPACE=`grep "Space:" target.log | awk '{print $2}'`
+                log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
                 FOUND=""
+                TESTED_ALL=true
                 SPACE_ARRAY=$(cat inspect.log)
                 for space in ${SPACE_ARRAY[@]}
                 do
@@ -51,72 +68,80 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         fi
                         continue
                     else
-                        cf target -s ${space} > /dev/null
+                        $CFCMD target -s ${space} > /dev/null
                         if [ $? -eq 0 ]; then
+                            log_and_echo "$DEBUGGING" "Checking space ${space}"
                             ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
                             ICE_PS_IMAGES_ARRAY+=" "
+                        else
+                            log_and_echo "$ERROR" "Unable to change to space ${space}.  Could not check for used images."
+                            TESTED_ALL=false
                         fi
                     fi
                 done
                 # restore my old space
-                cf target -s ${CURRENT_SPACE} > /dev/null
-                i=0
-                j=0
-                #echo "images array:"
-                #echo $ICE_IMAGES_ARRAY
-                #echo "ps images array"
-                #echo $ICE_PS_IMAGES_ARRAY
-                for image in ${ICE_IMAGES_ARRAY[@]}
-                do
-                    #echo "IMAGES_ARRAY_NOT_USED-1: ${image}"
-                    in_used=0
-                    for image_used in ${ICE_PS_IMAGES_ARRAY[@]}
+                $CFCMD target -s ${CURRENT_SPACE} > /dev/null
+                if [ "$TESTED_ALL" = true ] ; then
+                    i=0
+                    j=0
+                    #echo "images array:"
+                    #echo $ICE_IMAGES_ARRAY
+                    #echo "ps images array"
+                    #echo $ICE_PS_IMAGES_ARRAY
+                    for image in ${ICE_IMAGES_ARRAY[@]}
                     do
-                        image_used=${CCS_REGISTRY_HOST}/${image_used}
-                        #echo "IMAGES_ARRAY_USED-2: ${image_used}"
-                        if [ $image == $image_used ]; then
-                            #echo "IMAGES_ARRAY_USED: ${image}"
-                            IMAGES_ARRAY_USED[i]=$image
-                            ((i++))
-                            in_used=1
-                            break
-                        fi
-                    done
-                    if [ $in_used -eq 0 ]; then
-                        #echo "IMAGES_ARRAY_NOT_USED: ${image}"
-                        IMAGES_ARRAY_NOT_USED[j]=$image
-                        ((j++))
-                    fi
-                done
-                # if number of images greater then image limit, then delete unused images from oldest to newest until we are under the limit or out of unused images
-                len_used=${#IMAGES_ARRAY_USED[*]}
-                len_not_used=${#IMAGES_ARRAY_NOT_USED[*]}
-                log_and_echo "number of images in use: ${len_used} and number of images not in use: ${len_not_used}"
-                log_and_echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
-                log_and_echo "used images: ${IMAGES_ARRAY_USED[@]}"
-                if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
-                    if [ $len_not_used -gt 0 ]; then
-                        while [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]
+                        #echo "IMAGES_ARRAY_NOT_USED-1: ${image}"
+                        in_used=0
+                        for image_used in ${ICE_PS_IMAGES_ARRAY[@]}
                         do
-                            ((len_not_used--))
-                            ((NUMBER_IMAGES--))
-                            ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
-                            RESULT=$?
-                            if [ $RESULT -eq 0 ]; then
-                                log_and_echo "deleting image success: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
-                            else
-                                log_and_echo "$ERROR" "deleting image failed: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
-                            fi
-                            if [ $len_not_used -le 0 ]; then
+                            image_used=${CCS_REGISTRY_HOST}/${image_used}
+                            #echo "IMAGES_ARRAY_USED-2: ${image_used}"
+                            if [ $image == $image_used ]; then
+                                #echo "IMAGES_ARRAY_USED: ${image}"
+                                IMAGES_ARRAY_USED[i]=$image
+                                ((i++))
+                                in_used=1
                                 break
                             fi
                         done
-                    else
-                        log_and_echo "$LABEL" "No unused images found."
+                        if [ $in_used -eq 0 ]; then
+                            #echo "IMAGES_ARRAY_NOT_USED: ${image}"
+                            IMAGES_ARRAY_NOT_USED[j]=$image
+                            ((j++))
+                        fi
+                    done
+                    # if number of images greater then image limit, then delete unused images from oldest to newest until we are under the limit or out of unused images
+                    len_used=${#IMAGES_ARRAY_USED[*]}
+                    len_not_used=${#IMAGES_ARRAY_NOT_USED[*]}
+                    log_and_echo "number of images in use: ${len_used} and number of images not in use: ${len_not_used}"
+                    log_and_echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
+                    log_and_echo "used images: ${IMAGES_ARRAY_USED[@]}"
+                    if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
+                        if [ $len_not_used -gt 0 ]; then
+                            while [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]
+                            do
+                                ((len_not_used--))
+                                ((NUMBER_IMAGES--))
+                                ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
+                                RESULT=$?
+                                if [ $RESULT -eq 0 ]; then
+                                    log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                else
+                                    log_and_echo "$ERROR" "deleting image failed: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                fi
+                                if [ $len_not_used -le 0 ]; then
+                                    break
+                                fi
+                            done
+                        else
+                            log_and_echo "$LABEL" "No unused images found."
+                        fi
+                        if [ $len_used -ge $IMAGE_LIMIT ]; then
+                            log_and_echo "$WARN" "Warning: Too many images in use.  Unable to meet ${IMAGE_LIMIT} image limit.  Consider increasing IMAGE_LIMIT."
+                        fi
                     fi
-                    if [ $len_used -ge $IMAGE_LIMIT ]; then
-                        log_and_echo "$WARN" "Warning: Too many images in use.  Unable to meet ${IMAGE_LIMIT} image limit.  Consider increasing IMAGE_LIMIT."
-                    fi
+                else
+                    log_and_echo "$ERROR" "Unable to check all spaces for used containers, not removing"
                 fi
             else
                 log_and_echo "$ERROR" "Unable to read cf spaces.  Could not check for used images."
