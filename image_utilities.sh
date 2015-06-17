@@ -24,7 +24,7 @@ if [ -f ${EXT_DIR}/cf ]; then
 else
    CFCMD=cf
 fi
-log_and_echo "$DEBUG" "cf is $CFCMD"
+log_and_echo "$DEBUGGING" "cf is $CFCMD"
 
 if [ "${NAMESPACE}X" == "X" ]; then
     log_and_echo "$ERROR" "NAMESPACE must be set in the environment before calling this script."
@@ -70,7 +70,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     else
                         $CFCMD target -s ${space} > /dev/null
                         if [ $? -eq 0 ]; then
-                            log_and_echo "$DEBUG" "Checking space ${space}"
+                            log_and_echo "$DEBUGGING" "Checking space ${space}"
                             ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
                             ICE_PS_IMAGES_ARRAY+=" "
                         else
