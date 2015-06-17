@@ -84,10 +84,8 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 if [ "$TESTED_ALL" = true ] ; then
                     i=0
                     j=0
-                    #echo "images array:"
-                    #echo $ICE_IMAGES_ARRAY
-                    #echo "ps images array"
-                    #echo $ICE_PS_IMAGES_ARRAY
+                    log_and_echo "$DEBUGGING" "images array: ${ICE_IMAGES_ARRAY}"
+                    log_and_echo "$DEBUGGING" "ps images array: ${ICE_PS_IMAGES_ARRAY}"
                     for image in ${ICE_IMAGES_ARRAY[@]}
                     do
                         #echo "IMAGES_ARRAY_NOT_USED-1: ${image}"
