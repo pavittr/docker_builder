@@ -14,7 +14,7 @@
     "params": [
         {
             "name": "USE_CACHED_LAYERS",
-            "type": "Text",
+            "type": "Checkbox",
             "required": "false",
             "default_value":"true",
             "label_key": "CACHE_KEY",
