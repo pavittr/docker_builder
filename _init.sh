@@ -315,24 +315,20 @@ fi
 #############################
 # Install Cloud Foundry CLI #
 #############################
+echo "Installing Cloud Foundry CLI"
+pushd $EXT_DIR >/dev/null
+gunzip cf-linux-amd64.tgz &> /dev/null
+tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    echo "Installing Cloud Foundry CLI"
-    pushd . 
-    cd $EXT_DIR 
-    gunzip cf-linux-amd64.tgz &> /dev/null
-    tar -xvf cf-linux-amd64.tar  &> /dev/null
-    cf help &> /dev/null
-    RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Could not install the cloud foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
-        ${EXT_DIR}/print_help.sh    
-        exit 1
-    fi  
-    popd
-    echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
-fi 
+    echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
+    ${EXT_DIR}/print_help.sh
+    exit $RESULT
+fi
+popd >/dev/null
+echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
+
 
 #################################
 # Set Bluemix Host Information  #
