@@ -23,6 +23,7 @@ if [ -f ${EXT_DIR}/cf ]; then
    CFCMD=${EXT_DIR}/cf
 else
    CFCMD=cf
+   debugme ls ${EXT_DIR}
 fi
 log_and_echo "$DEBUGGING" "cf is $CFCMD"
 
@@ -53,6 +54,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             if [ $RESULT -eq 0 ]; then
                 # save current space first
                 $CFCMD target > target.log 2> /dev/null
+                debugme cat target.log 
                 CURRENT_SPACE=`grep "Space:" target.log | awk '{print $2}'`
                 log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
                 FOUND=""
@@ -68,7 +70,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         fi
                         continue
                     else
-                        $CFCMD target -s ${space} > /dev/null
+                        $CFCMD target -s ${space}
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
                             ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
@@ -92,15 +94,18 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         in_used=0
                         for image_used in ${ICE_PS_IMAGES_ARRAY[@]}
                         do
+                            debugme echo "IMAGES_ARRAY_USED: ${image_used}"
                             image_used=${CCS_REGISTRY_HOST}/${image_used}
-                            #echo "IMAGES_ARRAY_USED-2: ${image_used}"
+                            debugme echo "IMAGES_ARRAY_USED: ${image_used}"
                             if [ $image == $image_used ]; then
-                                #echo "IMAGES_ARRAY_USED: ${image}"
+                                debugme echo "${image} used by ${image_used}"
                                 IMAGES_ARRAY_USED[i]=$image
                                 ((i++))
                                 in_used=1
                                 break
-                            fi
+                            else
+                                debugme echo "${image} was not used by ${image_used}"
+                            fi 
                         done
                         if [ $in_used -eq 0 ]; then
                             #echo "IMAGES_ARRAY_NOT_USED: ${image}"
@@ -120,7 +125,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                             do
                                 ((len_not_used--))
                                 ((NUMBER_IMAGES--))
-                                ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
+                                echo "XXX ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
                                 RESULT=$?
                                 if [ $RESULT -eq 0 ]; then
                                     log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
