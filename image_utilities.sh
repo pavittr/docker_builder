@@ -90,21 +90,18 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     log_and_echo "$DEBUGGING" "ps images array: ${ICE_PS_IMAGES_ARRAY}"
                     for image in ${ICE_IMAGES_ARRAY[@]}
                     do
-                        #echo "IMAGES_ARRAY_NOT_USED-1: ${image}"
                         in_used=0
                         for image_used in ${ICE_PS_IMAGES_ARRAY[@]}
                         do
-                            debugme echo "IMAGES_ARRAY_USED: ${image_used}"
                             image_used=${CCS_REGISTRY_HOST}/${image_used}
-                            debugme echo "IMAGES_ARRAY_USED: ${image_used}"
                             if [ $image == $image_used ]; then
-                                debugme echo "${image} used by ${image_used}"
+                                log_and_echo "$DEBUGGING" "${image} used by ${image_used}"
                                 IMAGES_ARRAY_USED[i]=$image
                                 ((i++))
                                 in_used=1
                                 break
                             else
-                                debugme echo "${image} was not used by ${image_used}"
+                                log_and_echo "$DEBUGGING" "${image} was not used by ${image_used}"
                             fi 
                         done
                         if [ $in_used -eq 0 ]; then
@@ -125,7 +122,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                             do
                                 ((len_not_used--))
                                 ((NUMBER_IMAGES--))
-                                echo "XXX ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
+                                ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
                                 RESULT=$?
                                 if [ $RESULT -eq 0 ]; then
                                     log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
