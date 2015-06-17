@@ -122,8 +122,14 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                             do
                                 ((len_not_used--))
                                 ((NUMBER_IMAGES--))
-                                ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
-                                RESULT=$?
+                                if [ "${IMAGE_REMOVE}" == "FALSE" ]; then 
+                                    echo "NOT removing image"
+                                    echo "ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
+                                    RESULT=1
+                                else 
+                                    ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
+                                    RESULT=$?
+                                fi 
                                 if [ $RESULT -eq 0 ]; then
                                     log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
                                 else
