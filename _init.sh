@@ -242,8 +242,7 @@ echo "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $IMAGE_NAME ]; then 
     echo -e "${red}Please set IMAGE_NAME in the environment to desired name ${no_color}" | tee -a "$ERROR_LOG_FILE"
-    ${EXT_DIR}/print_help.sh
-    exit 1
+    export IMAGE_NAME="defaultimagename"
 fi 
 
 if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
