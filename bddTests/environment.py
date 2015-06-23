@@ -44,11 +44,11 @@ def before_feature(context, feature):
         
 def subprocess_retry(context, command, showOutput, retryCount=2):
     try:
-        print(command)
+        print(time.strftime("<%I:%M:%S> ")+command)
         print
         output = subprocess.check_output(command, shell=True)
         if (showOutput):
-            print(output)
+            print(time.strftime("<%I:%M:%S> ")+output)
             print
         return output
     except subprocess.CalledProcessError as e:
@@ -56,12 +56,12 @@ def subprocess_retry(context, command, showOutput, retryCount=2):
         print(e.cmd)
         print(e.output)
         if (retryCount > 0):
-            print("Non-zero return code; recording failure and retrying in 10 seconds")
+            print(time.strftime("<%I:%M:%S> ")+"Non-zero return code; recording failure and retrying in 10 seconds")
             print
             time.sleep(10)
             return subprocess_retry(context, command, showOutput, retryCount-1)
         else:
-            print("Non-zero return code; exceeded retry count: recording failure and continuing")
+            print(time.strftime("<%I:%M:%S> ")+"Non-zero return code; exceeded retry count: recording failure and continuing")
             return e.output
     
 def after_feature(context, feature):
@@ -85,7 +85,7 @@ def before_tag(context, tag):
                 subprocess_retry(context,"ice build -t "+appPrefix+str(version) +" .", False)
                 increment_app_version()
                 count = count - 1
-            print("Waiting 120 seconds after building images")
+            print(time.strftime("<%I:%M:%S> ")+"Waiting 120 seconds after building images")
             time.sleep(120)
             subprocess_retry(context,"ice images", True)
         if command == "useimages":
@@ -96,7 +96,7 @@ def before_tag(context, tag):
                 subprocess_retry(context,"ice run --name "+containerName(version) +" "+appPrefix+str(version), False)
                 version = version + 1
                 count = count - 1
-            print("Waiting 120 seconds after starting images")
+            print(time.strftime("<%I:%M:%S> ")+"Waiting 120 seconds after starting images")
             time.sleep(120)
             subprocess_retry(context,"ice ps", True)
             
