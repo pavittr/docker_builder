@@ -354,6 +354,9 @@ if [ -n "$BLUEMIX_TARGET" ]; then
             exit 1
         fi
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+        sed -i "s/ccs_host =.*/ccs_host = $CCS_API_HOST/g" ice-cfg-staging.ini
+        sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" ice-cfg-staging.ini
+        sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" ice-cfg-staging.ini
         export ICE_CFG="ice-cfg-staging.ini"
     elif [ "$BLUEMIX_TARGET" == "dalprod" ]; then 
         if [ -z "$CCS_API_HOST" ]; then
@@ -365,6 +368,9 @@ if [ -n "$BLUEMIX_TARGET" ]; then
             exit 1
         fi
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
+        sed -i "s/ccs_host =.*/ccs_host = $CCS_API_HOST/g" ice-cfg-prod.ini
+        sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" ice-cfg-prod.ini
+        sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" ice-cfg-prod.ini
         export ICE_CFG="ice-cfg-prod.ini"
     else 
         echo -e "${red}Unknown Bluemix environment specified${no_color}" | tee -a "$ERROR_LOG_FILE"
