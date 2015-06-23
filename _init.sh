@@ -344,6 +344,28 @@ if [ -n "$BLUEMIX_TARGET" ]; then
         export CCS_REGISTRY_HOST="registry-ice.ng.bluemix.net"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
         export ICE_CFG="ice-cfg-prod.ini"
+    elif [ "$BLUEMIX_TARGET" == "dalstaging" ]; then 
+        if [ -z "$CCS_API_HOST" ]; then
+            echo -e "${red} CCS_API_HOST must be set for this environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
+            exit 1
+        fi
+        if [ -z "$CCS_REGISTRY_HOST" ]; then
+            echo -e "${red} CCS_REGISTRY_HOST must be set for this environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
+            exit 1
+        fi
+        export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
+        export ICE_CFG="ice-cfg-staging.ini"
+    elif [ "$BLUEMIX_TARGET" == "dalprod" ]; then 
+        if [ -z "$CCS_API_HOST" ]; then
+            echo -e "${red} CCS_API_HOST must be set for this environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
+            exit 1
+        fi
+        if [ -z "$CCS_REGISTRY_HOST" ]; then
+            echo -e "${red} CCS_REGISTRY_HOST must be set for this environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
+            exit 1
+        fi
+        export BLUEMIX_API_HOST="api.ng.bluemix.net"
+        export ICE_CFG="ice-cfg-prod.ini"
     else 
         echo -e "${red}Unknown Bluemix environment specified${no_color}" | tee -a "$ERROR_LOG_FILE"
     fi 
