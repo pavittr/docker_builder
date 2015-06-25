@@ -543,10 +543,10 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
         if [ $? -eq 0 ]; then
             # dockerfile could be trying to pull image from the wrong repo
             # double check
-            image_file=`echo $repo_image | awk -F"/" '{print $NF}'`
-            image_file_and_reg=`echo $repo_image | awk '{print $NF}'`
+            image_file_and_reg=`echo ${repo_image} | awk '{print $NF}'| tr -d '[[:space:]]'`
+            image_file=`echo ${image_file_and_reg} | awk -F"/" '{print $NF}'`
             # and check the current registry to see if the file is actually there anyway
-            cur_reg_image=`ice images | grep $image_file | awk '{print $NF}'`
+            cur_reg_image=`ice images | grep ${image_file} | awk '{print $NF}'`
             # make dockerfile name easier to read
             dockfile=`echo $file | awk -F"/" '{print $NF}'`
             # warn the user
