@@ -534,6 +534,30 @@ else
     debugme cat validate.log 
 fi 
 
+debugme echo "Validating Dockerfile FROM in proper registry"
+if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
+    # check for possibility of multiple registries, make sure
+    # dockerfile, if it's pulling from either, is using right one
+    for file in $( ls ${WORKSPACE}/Dockerfile* ); do
+        repo_image=`grep -i "^from $BETA_REG_PREFIX" $file`
+        if [ $? -eq 0 ]; then
+            # dockerfile could be trying to pull image from the wrong repo
+            # double check
+            image_file=`echo $repo_image | awk -F"/" '{print $NF}'`
+            # and check the current registry to see if the file is actually there anyway
+            cur_reg_image=`ice images | grep $image_file | awk '{print $NF}'`
+            # warn the user
+            log_and_echo "$WARN" "File \"${file}\" appears to be trying to load image ${image}, but your current image registry is ${CCS_REGISTRY_HOST}."
+            if [ -n "$cur_reg_image" ]; then
+                echo -e "${label_color}The current registry contains image ${cur_reg_image}, which may be similar. If this is what you intended, please edit your Dockerfile to this one"
+                echo -e "If this is not it, you may wish to migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
+            else
+                echo -e "${label_color}The current registry does not appear to contain a similar image. You may wish to migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
+            fi
+        fi
+    done
+fi
+
 log_and_echo "$LABEL" "Initialization complete"
 
 # run image cleanup if necessary
