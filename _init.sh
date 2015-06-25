@@ -547,9 +547,9 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
             # and check the current registry to see if the file is actually there anyway
             cur_reg_image=`ice images | grep $image_file | awk '{print $NF}'`
             # warn the user
-            log_and_echo "$WARN" "File \"${file}\" appears to be trying to load image ${image}, but your current image registry is ${CCS_REGISTRY_HOST}."
+            log_and_echo "$ERROR" "File \"${file}\" appears to be trying to load image ${repo_image}, but your current image registry is ${CCS_REGISTRY_HOST}."
             if [ -n "$cur_reg_image" ]; then
-                echo -e "${label_color}The current registry contains image ${cur_reg_image}, which may be similar. If this is what you intended, please edit your Dockerfile to this one"
+                echo -e "${label_color}The current registry contains image ${cur_reg_image}, which may be similar. If this is what you intended, please edit your Dockerfile to use this image instead"
                 echo -e "If this is not it, you may wish to migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
             else
                 echo -e "${label_color}The current registry does not appear to contain a similar image. You may wish to migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
