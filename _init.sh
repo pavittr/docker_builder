@@ -544,15 +544,16 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
             # dockerfile could be trying to pull image from the wrong repo
             # double check
             image_file=`echo $repo_image | awk -F"/" '{print $NF}'`
+            image_file_and_reg=`echo $repo_image | awk '{print $NF}'`
             # and check the current registry to see if the file is actually there anyway
             cur_reg_image=`ice images | grep $image_file | awk '{print $NF}'`
             # make dockerfile name easier to read
             dockfile=`echo $file | awk -F"/" '{print $NF}'`
             # warn the user
-            log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${repo_image}, but your current image registry is ${CCS_REGISTRY_HOST}."
+            log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${image_file_and_reg}, but your current image registry is ${CCS_REGISTRY_HOST}."
             if [ -n "$cur_reg_image" ]; then
                 echo -e "${label_color}The current registry does contain image ${cur_reg_image}, which may be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
-                echo -e "If ${cur_reg_image} is not a proper replacement for ${repo_image}, migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
+                echo -e "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
             else
                 echo -e "${label_color}The current registry does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
             fi
