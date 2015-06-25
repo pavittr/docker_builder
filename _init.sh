@@ -551,7 +551,7 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
             # warn the user
             log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${repo_image}, but your current image registry is ${CCS_REGISTRY_HOST}."
             if [ -n "$cur_reg_image" ]; then
-                echo -e "${label_color}The current registry does contain image ${cur_reg_image}, which may be similar. If so, edit the FROM statement in ${dockfile} to use this image instead."
+                echo -e "${label_color}The current registry does contain image ${cur_reg_image}, which may be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
                 echo -e "If ${cur_reg_image} is not a proper replacement for ${repo_image}, migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
             else
                 echo -e "${label_color}The current registry does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to registry ${CCS_REGISTRY_HOST}.${no_color}"
