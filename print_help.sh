@@ -37,7 +37,6 @@ if [ -n "$ERROR_LOG_FILE" ]; then
     fi
 fi
 
-echo -e "Typically a failed deploy can happen for a number of reasons.  We leave any containers that have been deployed up so that they can be diagnosed.  If you would like to remove a number of containers change the deployment strategy on the job to clean which will get rid of all but the last deployment."
 echo -e "There are a number of ways that you can get help:"
 echo -e "1. Post a question on ${label_color} https://developer.ibm.com/answers/ ${no_color} and 'Ask a question' with tags 'docker', 'containers' and 'devops-services'"
 echo -e "2. Open a Work Item in our public devops project: ${label_color} https://hub.jazz.net/project/alchemy/Alchemy-Ostanes ${no_color}"
