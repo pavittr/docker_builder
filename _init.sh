@@ -29,9 +29,9 @@ export no_color='\e[0m' # No Color
 # beta servers
 BETA_API_PREFIX="api-ice"
 BETA_REG_PREFIX="registry-ice"
-# default servers (currently beta)
-DEF_API_PREFIX=$BETA_API_PREFIX
-DEF_REG_PREFIX=$BETA_REG_PREFIX
+# default servers
+DEF_API_PREFIX="containers-api"
+DEF_REG_PREFIX="registry"
 
 ##################################################
 # Simple function to only run command if DEBUG=1 # 
