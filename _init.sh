@@ -453,13 +453,13 @@ fi
 
 printEnablementInfo() {
     echo -e "${label_color}No namespace has been defined for this user ${no_color}"
-    echo -e "${label_color}A common cause of this is when the user has not been enabled for IBM Containers on Bluemix${no_color}"
     echo -e "Please check the following: "
     echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
     echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
     echo -e "   - Select 'Create a Container'"
-    echo -e "" 
-    echo -e "If there is a message indicating that your account needs to be enabled for IBM Containers, confirm that you would like to do so, and wait for confirmation that your account has been enabled"
+    echo -e "Or using the ICE command line: "
+    echo -e "   - ice login -a api.ng.bluemix.net -H containers-api.ng.bluemix.net -R registry.ng.bluemix.net"
+    echo -e "   - ${label_color}ice namespace set [your-desired-namespace]"
 }
 
 
