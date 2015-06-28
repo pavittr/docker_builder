@@ -459,7 +459,7 @@ printEnablementInfo() {
     echo -e "   - Select 'Create a Container'"
     echo -e "Or using the ICE command line: "
     echo -e "   - ice login -a api.ng.bluemix.net -H containers-api.ng.bluemix.net -R registry.ng.bluemix.net"
-    echo -e "   - ${label_color}ice namespace set [your-desired-namespace]"
+    echo -e "   - ${label_color}ice namespace set [your-desired-namespace] ${no_color}"
 }
 
 
