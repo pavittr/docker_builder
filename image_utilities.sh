@@ -129,13 +129,14 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                     echo "ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
                                     RESULT=1
                                 else 
-                                    ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
+                                    RESPONSE=$(ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} 2> /dev/null)
                                     RESULT=$?
                                 fi 
                                 if [ $RESULT -eq 0 ]; then
                                     log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
                                 else
                                     log_and_echo "$ERROR" "deleting image failed: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                    log_and_echo "$ERROR" "${RESPONSE}"
                                 fi
                                 if [ $len_not_used -le 0 ]; then
                                     break
