@@ -37,6 +37,7 @@ And the images tagged with an alpha-string will not be deleted
 
 @createimages5
 @useimages3
+@shortrun
 Scenario: Too many used images
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a value below the ICS image limit
@@ -79,7 +80,6 @@ And unused images will be deleted from oldest to newest until we are under the d
 
 @createimages8
 @useimages5
-@shortrun
 Scenario: Default value with extra used images
 Given I have a setup pipeline with a Container Image Build Stage
 And There is no user-defined image limit
