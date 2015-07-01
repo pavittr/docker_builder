@@ -21,6 +21,7 @@ Then The new image is built
 And unused images will be deleted from oldest to newest until we are under the limit
 
 @createimages2
+@shortrun
 Scenario: Check similar image names
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to 1
@@ -78,6 +79,7 @@ And unused images will be deleted from oldest to newest until we are under the d
 
 @createimages8
 @useimages5
+@shortrun
 Scenario: Default value with extra used images
 Given I have a setup pipeline with a Container Image Build Stage
 And There is no user-defined image limit
@@ -92,7 +94,7 @@ And A warning will be issued that the images in use could not be deleted
 #Given I want to generate some exceptions
 #Then I generate 1 exceptions
 
-
+@shortrun
 Scenario Outline: Check reliability of ice commands
 Given I have run a series of tests and kept track of any subprocess exceptions
 Then The number of exceptions will be no more than <num>
