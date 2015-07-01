@@ -129,7 +129,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                     echo "ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
                                     RESULT=1
                                 else 
-                                    ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
+                                    ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} 2> /dev/null
                                     RESULT=$?
                                 fi 
                                 if [ $RESULT -eq 0 ]; then
