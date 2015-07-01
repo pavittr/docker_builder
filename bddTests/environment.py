@@ -128,6 +128,7 @@ def cleanupContainers(context):
     for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
         print("Removing container: "+m.group(0))
         subprocess_retry(context, "ice stop "+m.group(0), True)
+    for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
         for i in range(30):
             inspectOutput = subprocess_retry(context, "ice inspect " + m.group(0), False)
             statusMatcher = re.compile("\"Status\": \"(\S*)\"")
