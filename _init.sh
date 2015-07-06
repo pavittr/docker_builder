@@ -454,7 +454,7 @@ fi
 printEnablementInfo() {
     echo -e "${label_color}No namespace has been defined for this user ${no_color}"
     echo -e "Please check the following: "
-    echo -e "   - Login to Bluemix (https://console.ng.bluemix.net)"
+    echo -e "   - Login to Bluemix ( https://console.ng.bluemix.net )"
     echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
     echo -e "   - Select 'Create a Container'"
     echo -e "Or using the ICE command line: "
