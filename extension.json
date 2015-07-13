@@ -56,13 +56,13 @@ if [ -f Dockerfile ]; then
     echo -e \"${label_color}Building ${FULL_REPOSITORY_NAME} ${no_color}\"
     ${EXT_DIR}/utilities/sendMessage.sh -l info -m \"New container build requested for ${FULL_REPOSITORY_NAME}\"
     # build image
-    ice_build_image $ICE_ARGS ${USE_CACHED_LAYERS} ${FULL_REPOSITORY_NAME} ${WORKSPACE} 
+    ice_build_image ${USE_CACHED_LAYERS} ${FULL_REPOSITORY_NAME} ${WORKSPACE} 
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\" | tee -a \"$ERROR_LOG_FILE\"
         echo \"Build command: ${BUILD_COMMAND}\"
-        ice_info $ICE_ARGS
-        ice_images $ICE_ARGS
+        ice_info
+        ice_images
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed\"
         exit 1

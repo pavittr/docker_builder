@@ -424,7 +424,7 @@ source ${EXT_DIR}/ice_utils.sh
 #################################
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
-    ice_login_with_api_key $ICE_ARGS ${API_KEY}
+    ice_login_with_api_key ${API_KEY}
     RESULT=$?
 elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
@@ -454,12 +454,12 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     echo "BLUEMIX_PASSWORD: xxxxx"
     echo ""
     echo -e "${label_color}Logging on with BLUEMIX_USER${no_color}"
-    ice_login_with_bluemix_user $ICE_ARGS ${CCS_API_HOST} ${CCS_REGISTRY_HOST} ${BLUEMIX_API_HOST} ${BLUEMIX_USER} ${BLUEMIX_PASSWORD} ${BLUEMIX_ORG} ${BLUEMIX_SPACE}
+    ice_login_with_bluemix_user ${CCS_API_HOST} ${CCS_REGISTRY_HOST} ${BLUEMIX_API_HOST} ${BLUEMIX_USER} ${BLUEMIX_PASSWORD} ${BLUEMIX_ORG} ${BLUEMIX_SPACE}
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
-    ice_login_check $ICE_ARGS
+    ice_login_check
     RESULT=$?
 fi 
 
