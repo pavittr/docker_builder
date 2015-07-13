@@ -417,7 +417,7 @@ printEnablementInfo() {
 #################################
 # Source the ice_utils          #
 #################################
-source ${EXT_DIR}/ice_utils.sh
+source ${EXT_DIR}/utilities/ice_utils.sh
 
 #################################
 # Login to Container Service    #
