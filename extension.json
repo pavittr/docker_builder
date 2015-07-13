@@ -50,25 +50,19 @@ echo -e \"${label_color}No unit tests cases have been checked in ${no_color}\"
 # FULL_REPOSITORY_NAME=${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION}
 # If you wish to receive slack notifications, set SLACK_WEBHOOK_PATH as a property on the stage.
 
+
+# Possible adding retries to build the image
 if [ -f Dockerfile ]; then 
     echo -e \"${label_color}Building ${FULL_REPOSITORY_NAME} ${no_color}\"
     ${EXT_DIR}/utilities/sendMessage.sh -l info -m \"New container build requested for ${FULL_REPOSITORY_NAME}\"
-    BUILD_COMMAND=\"\"
-    if [ \"${USE_CACHED_LAYERS}\" == \"true\" ]; then 
-        BUILD_COMMAND=\"ice build --pull --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}\"
-        ${BUILD_COMMAND}
-        RESULT=$?
-    else 
-        BUILD_COMMAND=\"ice build --no-cache --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}\"
-        ${BUILD_COMMAND}
-        RESULT=$?
-    fi 
-
+    # build image
+    ice_build_image $ICE_ARGS ${USE_CACHED_LAYERS} ${FULL_REPOSITORY_NAME} ${WORKSPACE} 
+    RESULT=$?
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\" | tee -a \"$ERROR_LOG_FILE\"
         echo \"Build command: ${BUILD_COMMAND}\"
-        ice info 
-        ice images
+        ice_info $ICE_ARGS
+        ice_images $ICE_ARGS
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed\"
         exit 1

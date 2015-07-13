@@ -387,15 +387,44 @@ sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" $EXT_DIR/ice-cfg.ini
 sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
 
+########################
+# Setup git_retry      #
+########################
+source ${EXT_DIR}/git_util.sh
 
 ################################
-# Login to Container Service   #
+# get the extensions utilities #
 ################################
+pushd . >/dev/null
+cd $EXT_DIR 
+git_retry clone https://github.com/Osthanes/utilities.git utilities
+popd >/dev/null
+
+################################
+# Print EnablementInfo         #
+################################
+printEnablementInfo() {
+    echo -e "${label_color}No namespace has been defined for this user ${no_color}"
+    echo -e "Please check the following: "
+    echo -e "   - Login to Bluemix ( https://console.ng.bluemix.net )"
+    echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
+    echo -e "   - Select 'Create a Container'"
+    echo -e "Or using the ICE command line: "
+    echo -e "   - ice login -a api.ng.bluemix.net -H containers-api.ng.bluemix.net -R registry.ng.bluemix.net"
+    echo -e "   - ${label_color}ice namespace set [your-desired-namespace] ${no_color}"
+}
+
+#################################
+# Source the ice_utils          #
+#################################
+source ${EXT_DIR}/ice_utils.sh
+
+#################################
+# Login to Container Service    #
+#################################
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
-    debugme echo "Login command: ice $ICE_ARGS login --key ${API_KEY}"
-    #ice $ICE_ARGS login --key ${API_KEY} --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} 
-    ice $ICE_ARGS login --key ${API_KEY} 2> /dev/null
+    ice_login_with_api_key $ICE_ARGS ${API_KEY}
     RESULT=$?
 elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
@@ -424,44 +453,15 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
     echo "BLUEMIX_PASSWORD: xxxxx"
     echo ""
-    echo -e "${label_color}Logging in to Bluemix and IBM Container Service using environment properties${no_color}"
-    debugme echo "login command: ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE}"
-    ice $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 2> /dev/null
+    echo -e "${label_color}Logging on with BLUEMIX_USER${no_color}"
+    ice_login_with_bluemix_user $ICE_ARGS ${CCS_API_HOST} ${CCS_REGISTRY_HOST} ${BLUEMIX_API_HOST} ${BLUEMIX_USER} ${BLUEMIX_PASSWORD} ${BLUEMIX_ORG} ${BLUEMIX_SPACE}
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 
     echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
-    mkdir -p ~/.ice
-    debugme cat "${EXT_DIR}/${ICE_CFG}"
-    cp ${EXT_DIR}/${ICE_CFG} ~/.ice/ice-cfg.ini
-    debugme cat ~/.ice/ice-cfg.ini
-    debugme echo "config.json:"
-    debugme cat /home/jenkins/.cf/config.json | cut -c1-2
-    debugme cat /home/jenkins/.cf/config.json | cut -c3-
-    debugme echo "testing ice login via ice info command"
-    ice --verbose info > info.log 2> /dev/null
+    ice_login_check $ICE_ARGS
     RESULT=$?
-    debugme cat info.log 
-    if [ $RESULT -eq 0 ]; then
-        echo "ice info was successful.  Checking login to registry server" 
-        ice images &> /dev/null
-        RESULT=$? 
-    else 
-        echo "ice info did not return successfully.  Login failed."
-    fi 
 fi 
-
-printEnablementInfo() {
-    echo -e "${label_color}No namespace has been defined for this user ${no_color}"
-    echo -e "Please check the following: "
-    echo -e "   - Login to Bluemix ( https://console.ng.bluemix.net )"
-    echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
-    echo -e "   - Select 'Create a Container'"
-    echo -e "Or using the ICE command line: "
-    echo -e "   - ice login -a api.ng.bluemix.net -H containers-api.ng.bluemix.net -R registry.ng.bluemix.net"
-    echo -e "   - ${label_color}ice namespace set [your-desired-namespace] ${no_color}"
-}
-
 
 # check login result 
 if [ $RESULT -eq 1 ]; then
@@ -477,19 +477,6 @@ else
     echo -e "${green}Successfully logged into IBM Container Service${no_color}"
     ice info 2> /dev/null
 fi 
-
-########################
-# Setup git_retry      #
-########################
-source ${EXT_DIR}/git_util.sh
-
-################################
-# get the extensions utilities #
-################################
-pushd . >/dev/null
-cd $EXT_DIR 
-git_retry clone https://github.com/Osthanes/utilities.git utilities
-popd >/dev/null
 
 ############################
 # enable logging to logmet #
