@@ -61,8 +61,8 @@ if [ -f Dockerfile ]; then
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\" | tee -a \"$ERROR_LOG_FILE\"
         echo \"Build command: ${BUILD_COMMAND}\"
-        ice_info
-        ice_images
+        ice info
+        ice images
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed\"
         exit 1

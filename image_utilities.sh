@@ -36,7 +36,7 @@ if [ -z $IMAGE_LIMIT ]; then
     IMAGE_LIMIT=5
 fi
 if [ $IMAGE_LIMIT -gt 0 ]; then
-    ice inspect images > inspect.log 2> /dev/null
+    ice_inspect_images
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater than or equal to image limit
@@ -129,8 +129,9 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                     echo "ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
                                     RESULT=1
                                 else 
-                                    RESPONSE=$(ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} 2> /dev/null)
+                                    ice_rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}
                                     RESULT=$?
+                                    RESPONSE=${RET_RESPONCE}
                                 fi 
                                 if [ $RESULT -eq 0 ]; then
                                     log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
