@@ -424,7 +424,7 @@ source ${EXT_DIR}/utilities/ice_utils.sh
 #################################
 if [ -n "$API_KEY" ]; then 
     echo -e "${label_color}Logging on with API_KEY${no_color}"
-    ice_login_with_api_key ${API_KEY}
+    ice_retry $ICE_ARGS login --key ${API_KEY} 2> /dev/null
     RESULT=$?
 elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     # need to gather information from the environment 
@@ -454,7 +454,7 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     echo "BLUEMIX_PASSWORD: xxxxx"
     echo ""
     echo -e "${label_color}Logging on with BLUEMIX_USER${no_color}"
-    ice_login_with_bluemix_user ${CCS_API_HOST} ${CCS_REGISTRY_HOST} ${BLUEMIX_API_HOST} ${BLUEMIX_USER} ${BLUEMIX_PASSWORD} ${BLUEMIX_ORG} ${BLUEMIX_SPACE}
+    ice_retry $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 2> /dev/null
     RESULT=$?
 else 
     # we are already logged in.  Simply check via ice command 

@@ -36,15 +36,15 @@ if [ -z $IMAGE_LIMIT ]; then
     IMAGE_LIMIT=5
 fi
 if [ $IMAGE_LIMIT -gt 0 ]; then
-    ice_inspect_images
+    ice_retry_save_output inspect images 2> /dev/null
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater than or equal to image limit
-        NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" inspect.log | grep \"Image\": | wc -l)
+        NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | grep \"Image\": | wc -l)
         log_and_echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name
-            ICE_IMAGES_ARRAY=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" inspect.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g | sed 's/,//'g)
+            ICE_IMAGES_ARRAY=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g | sed 's/,//'g)
             # loop the list of spaces under the org and find the name of the images that are in used
             $CFCMD spaces > inspect.log 2> /dev/null
             RESULT=$?
@@ -74,7 +74,8 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         debugme cat target.log
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
-                            ICE_PS_IMAGES_ARRAY+=$(ice ps -q | awk '{print $1}' | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
+                            ice_retry_save_output ice ps -q
+                            ICE_PS_IMAGES_ARRAY+=$(awk '{print $1}' iceretry.log | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
                             ICE_PS_IMAGES_ARRAY+=" "
                         else
                             log_and_echo "$ERROR" "Unable to change to space ${space}.  Could not check for used images."
@@ -129,7 +130,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                     echo "ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
                                     RESULT=1
                                 else 
-                                    ice_rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}
+                                    ice_retry rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
                                     RESULT=$?
                                     RESPONSE=${RET_RESPONCE}
                                 fi 
