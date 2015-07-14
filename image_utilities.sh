@@ -74,7 +74,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         debugme cat target.log
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
-                            ice_retry_save_output ice ps -q
+                            ice_retry_save_output ps -q
                             ICE_PS_IMAGES_ARRAY+=$(awk '{print $1}' iceretry.log | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
                             ICE_PS_IMAGES_ARRAY+=" "
                         else
