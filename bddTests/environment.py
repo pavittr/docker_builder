@@ -33,7 +33,7 @@ def before_feature(context, feature):
     os.chdir("simpleDocker")
     #os.mkdir("archive")
     os.environ["ARCHIVE_DIR"] = "."
-    os.environ["IMAGE_NAME"] = "bddapp"
+    os.environ["IMAGE_NAME"] = "newbdd"
     context.appName = os.environ["IMAGE_NAME"]
     set_app_version(31)
     #setup a list of exceptions found during environment ice commands
