@@ -264,12 +264,14 @@ if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
         echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}" | tee -a "$ERROR_LOG_FILE"
         cat validate.log 
         ${EXT_DIR}/print_help.sh
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Invalid image name. $(get_error_info)"
         exit ${VALID_NAME}
     else 
         debugme cat validate.log 
     fi 
 else 
     echo -e "${red}Warning could not find utilities in ${EXT_DIR}${no_color}" | tee -a "$ERROR_LOG_FILE"
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get builder_utilities.sh. $(get_error_info)"
 fi 
 
 ################################
@@ -278,6 +280,7 @@ fi
 if [ -z $WORKSPACE ]; then 
     echo -e "${red}Please set WORKSPACE in the environment${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to discover namespace. $(get_error_info)"
     exit 1
 fi 
 
@@ -316,6 +319,7 @@ if [ $RESULT -ne 0 ]; then
         echo -e "${red}Failed to install IBM Container Service CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
         debugme python --version
         ${EXT_DIR}/print_help.sh
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to inatall IBM Container Service CLI. $(get_error_info)"
         exit $RESULT
     fi
     echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
@@ -333,6 +337,7 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
     echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
     ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to inatall Cloud Foundry CLI. $(get_error_info)"
     exit $RESULT
 fi
 popd >/dev/null
@@ -387,9 +392,11 @@ sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" $EXT_DIR/ice-cfg.ini
 sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
 
-########################
-# Setup git_retry      #
-########################
+#################################
+# Source sh files               #
+#################################
+source ${EXT_DIR}/utilities/ice_utils.sh
+source ${EXT_DIR}/utilities/logging_utils.sh
 source ${EXT_DIR}/git_util.sh
 
 ################################
@@ -415,11 +422,6 @@ printEnablementInfo() {
 }
 
 #################################
-# Source the ice_utils          #
-#################################
-source ${EXT_DIR}/utilities/ice_utils.sh
-
-#################################
 # Login to Container Service    #
 #################################
 if [ -n "$API_KEY" ]; then 
@@ -432,11 +434,13 @@ elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
     if [ -z "$BLUEMIX_USER" ]; then 
         echo -e "${red} Please set BLUEMIX_USER on environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get BLUEMIX_USER ID. $(get_error_info)"
         exit 1
     fi 
     if [ -z "$BLUEMIX_PASSWORD" ]; then 
         echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
         ${EXT_DIR}/print_help.sh    
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get BLUEMIX_PASSWORD. $(get_error_info)"
         exit 1 
     fi 
     if [ -z "$BLUEMIX_ORG" ]; then 
@@ -472,6 +476,7 @@ if [ $RESULT -eq 1 ]; then
         printEnablementInfo        
     fi
     ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to login to IBM Container Service CLI. $(get_error_info)"
     exit $RESULT
 else 
     echo -e "${green}Successfully logged into IBM Container Service${no_color}"
@@ -481,7 +486,6 @@ fi
 ############################
 # enable logging to logmet #
 ############################
-source $EXT_DIR/utilities/logging_utils.sh
 setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}" "${BLUEMIX_SPACE}" "${BLUEMIX_ORG}" "${BLUEMIX_TARGET}"
 
 
@@ -495,12 +499,14 @@ if [ $RESULT -eq 0 ]; then
         log_and_echo "$ERROR" "Did not discover namespace using ice namespace get, but no error was returned"
         printEnablementInfo
         ${EXT_DIR}/print_help.sh
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to discover namespace. $(get_error_info)"
         exit $RESULT
     fi
 else 
     log_and_echo "$ERROR" "ice namespace get' returned an error"
     printEnablementInfo
     ${EXT_DIR}/print_help.sh    
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get namespace. $(get_error_info)"
     exit 1
 fi 
 
@@ -516,6 +522,7 @@ if [ ${VALID_NAME} -ne 0 ]; then
     log_and_echo "$ERROR" " ${FULL_REPOSITORY_NAME} is not a valid repository name"
     log_and_echo `cat validate.log` 
     ${EXT_DIR}/print_help.sh
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Invalid repository name. $(get_error_info)"
     exit ${VALID_NAME}
 else 
     debugme cat validate.log 

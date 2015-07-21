@@ -50,8 +50,6 @@ echo -e \"${label_color}No unit tests cases have been checked in ${no_color}\"
 # FULL_REPOSITORY_NAME=${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION}
 # If you wish to receive slack notifications, set SLACK_WEBHOOK_PATH as a property on the stage.
 
-
-# Possible adding retries to build the image
 if [ -f Dockerfile ]; then 
     echo -e \"${label_color}Building ${FULL_REPOSITORY_NAME} ${no_color}\"
     ${EXT_DIR}/utilities/sendMessage.sh -l info -m \"New container build requested for ${FULL_REPOSITORY_NAME}\"
@@ -69,18 +67,19 @@ if [ -f Dockerfile ]; then
 
     if [ $RESULT -ne 0 ]; then
         echo -e \"${red}Error building image ${no_color}\" | tee -a \"$ERROR_LOG_FILE\"
-        echo \"Build command: ice ${BUILD_COMMAND}\"
+        echo -e \"${red}Build command: ice ${BUILD_COMMAND}\" | tee -a \"$ERROR_LOG_FILE\"
         ice info 
         ice images
         ${EXT_DIR}/print_help.sh
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed\"
+        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed. $(get_error_info)\"
         exit 1
     else
-        ${EXT_DIR}/utilities/sendMessage.sh -l good -m \"Container build of ${FULL_REPOSITORY_NAME} was successful\"
         echo -e \"${green}Container build of ${FULL_REPOSITORY_NAME} was successful ${no_color}\"
+        ${EXT_DIR}/utilities/sendMessage.sh -l good -m \"Container build of ${FULL_REPOSITORY_NAME} was successful\"
     fi  
 else 
     echo -e \"${red}Dockerfile not found in project${no_color}\"
+    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Failed to get Dockerfile. $(get_error_info)\"
     exit 1
 fi  
 

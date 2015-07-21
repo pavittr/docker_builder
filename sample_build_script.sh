@@ -35,18 +35,18 @@ if [ -f Dockerfile ]; then
     echo -e "${label_color}Building ${FULL_REPOSITORY_NAME} ${no_color}"
     BUILD_COMMAND=""
     if [ "${USE_CACHED_LAYERS}" == "true" ]; then 
-        BUILD_COMMAND="ice build --pull --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}"
-        ${BUILD_COMMAND}
+        BUILD_COMMAND="build --pull --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}"
+        ice_retry ${BUILD_COMMAND}
         RESULT=$?
     else 
-        BUILD_COMMAND="ice build --no-cache --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}"
-        ${BUILD_COMMAND}
+        BUILD_COMMAND="build --no-cache --tag ${FULL_REPOSITORY_NAME} ${WORKSPACE}"
+        ice_retry ${BUILD_COMMAND}
         RESULT=$?
     fi 
 
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Error building image ${no_color}"
-        echo "Build command: ${BUILD_COMMAND}"
+        echo "Build command: ice ${BUILD_COMMAND}"
         ice info 
         ice images
         "${EXT_DIR}"/print_help.sh
