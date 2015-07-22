@@ -393,11 +393,9 @@ sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
 
 #################################
-# Source sh files               #
+# Source git_util file          #
 #################################
 source ${EXT_DIR}/git_util.sh
-source ${EXT_DIR}/utilities/ice_utils.sh
-source ${EXT_DIR}/utilities/logging_utils.sh
 
 ################################
 # get the extensions utilities #
@@ -406,6 +404,12 @@ pushd . >/dev/null
 cd $EXT_DIR 
 git_retry clone https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
+
+#################################
+# Source utilities sh files     #
+#################################
+source ${EXT_DIR}/utilities/ice_utils.sh
+source ${EXT_DIR}/utilities/logging_utils.sh
 
 ################################
 # Print EnablementInfo         #
