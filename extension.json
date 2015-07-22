@@ -66,8 +66,7 @@ if [ -f Dockerfile ]; then
     fi 
 
     if [ $RESULT -ne 0 ]; then
-        echo -e \"${red}Error building image ${no_color}\" | tee -a \"$ERROR_LOG_FILE\"
-        echo -e \"${red}Build command: ice ${BUILD_COMMAND}\" | tee -a \"$ERROR_LOG_FILE\"
+        echo -e \"${red}Error building image ${no_color}${no_color}\" | tee -a \"$ERROR_LOG_FILE\"
         ice info 
         ice images
         ${EXT_DIR}/print_help.sh
