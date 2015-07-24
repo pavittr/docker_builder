@@ -412,106 +412,30 @@ sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
 
 ################################
-# Print EnablementInfo         #
+# Login to Container Service   #
 ################################
-printEnablementInfo() {
-    echo -e "${label_color}No namespace has been defined for this user ${no_color}"
-    echo -e "Please check the following: "
-    echo -e "   - Login to Bluemix ( https://console.ng.bluemix.net )"
-    echo -e "   - Select the 'IBM Containers' icon from the Dashboard" 
-    echo -e "   - Select 'Create a Container'"
-    echo -e "Or using the ICE command line: "
-    echo -e "   - ice login -a api.ng.bluemix.net -H containers-api.ng.bluemix.net -R registry.ng.bluemix.net"
-    echo -e "   - ${label_color}ice namespace set [your-desired-namespace] ${no_color}"
-}
-
-#################################
-# Login to Container Service    #
-#################################
-if [ -n "$API_KEY" ]; then 
-    echo -e "${label_color}Logging on with API_KEY${no_color}"
-    ice_retry $ICE_ARGS login --key ${API_KEY} 2> /dev/null
-    RESULT=$?
-elif [ -n "$BLUEMIX_USER" ] || [ ! -f ~/.cf/config.json ]; then
-    # need to gather information from the environment 
-    # Get the Bluemix user and password information 
-    if [ -z "$BLUEMIX_USER" ]; then 
-        echo -e "${red} Please set BLUEMIX_USER on environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
-        ${EXT_DIR}/print_help.sh
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get BLUEMIX_USER ID. $(get_error_info)"
-        exit 1
-    fi 
-    if [ -z "$BLUEMIX_PASSWORD" ]; then 
-        echo -e "${red} Please set BLUEMIX_PASSWORD as an environment property environment ${no_color}" | tee -a "$ERROR_LOG_FILE"
-        ${EXT_DIR}/print_help.sh    
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get BLUEMIX_PASSWORD. $(get_error_info)"
-        exit 1 
-    fi 
-    if [ -z "$BLUEMIX_ORG" ]; then 
-        export BLUEMIX_ORG=$BLUEMIX_USER
-        echo -e "${label_color} Using ${BLUEMIX_ORG} for Bluemix organization, please set BLUEMIX_ORG if on the environment if you wish to change this. ${no_color} "
-    fi 
-    if [ -z "$BLUEMIX_SPACE" ]; then
-        export BLUEMIX_SPACE="dev"
-        echo -e "${label_color} Using ${BLUEMIX_SPACE} for Bluemix space, please set BLUEMIX_SPACE if on the environment if you wish to change this. ${no_color} "
-    fi 
-    echo -e "${label_color}Targetting information.  Can be updated by setting environment variables${no_color}"
-    echo "BLUEMIX_USER: ${BLUEMIX_USER}"
-    echo "BLUEMIX_SPACE: ${BLUEMIX_SPACE}"
-    echo "BLUEMIX_ORG: ${BLUEMIX_ORG}"
-    echo "BLUEMIX_PASSWORD: xxxxx"
-    echo ""
-    echo -e "${label_color}Logging on with BLUEMIX_USER${no_color}"
-    ice_retry $ICE_ARGS login --cf --host ${CCS_API_HOST} --registry ${CCS_REGISTRY_HOST} --api ${BLUEMIX_API_HOST} --user ${BLUEMIX_USER} --psswd ${BLUEMIX_PASSWORD} --org ${BLUEMIX_ORG} --space ${BLUEMIX_SPACE} 2> /dev/null
-    RESULT=$?
-else 
-    # we are already logged in.  Simply check via ice command 
-    echo -e "${label_color}Logging into IBM Container Service using credentials passed from IBM DevOps Services ${no_color}"
-    ice_login_check
-    RESULT=$?
-fi 
-
-# check login result 
-if [ $RESULT -eq 1 ]; then
-    echo -e "${red}Failed to login to IBM Container Service${no_color}" | tee -a "$ERROR_LOG_FILE"
-    ice namespace get 2> /dev/null
-    HAS_NAMESPACE=$?
-    if [ $HAS_NAMESPACE -eq 1 ]; then 
-        printEnablementInfo        
-    fi
-    ${EXT_DIR}/print_help.sh
-    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to login to IBM Container Service CLI. $(get_error_info)"
+login_to_container_service
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
     exit $RESULT
-else 
-    echo -e "${green}Successfully logged into IBM Container Service${no_color}"
-    ice info 2> /dev/null
 fi 
 
 ############################
 # enable logging to logmet #
 ############################
-setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}" "${BLUEMIX_SPACE}" "${BLUEMIX_ORG}" "${BLUEMIX_TARGET}"
-
-
-########################
-# REGISTRY INFORMATION #
-########################
-export NAMESPACE=$(ice namespace get)
+setup_met_logging "${BLUEMIX_USER}" "${BLUEMIX_PASSWORD}"
 RESULT=$?
-if [ $RESULT -eq 0 ]; then
-    if [ -z $NAMESPACE ]; then
-        log_and_echo "$ERROR" "Did not discover namespace using ice namespace get, but no error was returned"
-        printEnablementInfo
-        ${EXT_DIR}/print_help.sh
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to discover namespace. $(get_error_info)"
-        exit $RESULT
-    fi
-else 
-    log_and_echo "$ERROR" "ice namespace get' returned an error"
-    printEnablementInfo
-    ${EXT_DIR}/print_help.sh    
-    ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get namespace. $(get_error_info)"
-    exit 1
+if [ $RESULT -ne 0 ]; then
+    log_and_echo "$WARN" "LOGMET setup failed with return code ${RESULT}"
+fi
+
+################################
+# Login to Container Service   #
+################################
+get_name_space
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+    exit $RESULT
 fi 
 
 log_and_echo "$LABEL" "Users namespace is $NAMESPACE"
