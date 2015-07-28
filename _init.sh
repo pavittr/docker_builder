@@ -383,7 +383,6 @@ if [ -n "$BLUEMIX_TARGET" ]; then
 else
     CF_API=`cf api`
     RESULT=$?
-    echo $CF_API
     if [ $RESULT -eq 0 ]; then
         # find the bluemix api host
         export BLUEMIX_API_HOST=`echo $CF_API  | awk '{print $3}' | sed '0,/.*\/\//s///'`
