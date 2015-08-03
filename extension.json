@@ -73,7 +73,7 @@ if [ -f Dockerfile ]; then
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed. $(get_error_info)\"
         exit 1
     else
-        log_and_echo \"$SUCCESSFULL\" \"Container build of ${FULL_REPOSITORY_NAME} was successful\"
+        log_and_echo \"$SUCCESSFUL\" \"Container build of ${FULL_REPOSITORY_NAME} was successful\"
         ${EXT_DIR}/utilities/sendMessage.sh -l good -m \"Container build of ${FULL_REPOSITORY_NAME} was successful\"
     fi  
 else 
