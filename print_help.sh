@@ -23,22 +23,22 @@ export red='\e[0;31m'
 export label_color='\e[0;33m'
 export no_color='\e[0m' # No Color
 
-log_and_echo "$LABEL" "We are sorry you are having trouble."
+echo -e "${label_color}We are sorry you are having trouble. ${no_color}"
 
 if [ -n "$ERROR_LOG_FILE" ]; then
     if [ -e "${ERROR_LOG_FILE}" ]; then
         ERROR_COUNT=`wc "${ERROR_LOG_FILE}" | awk '{print $1}'` 
         if [ ${ERROR_COUNT} -eq 1 ]; then
-            log_and_echo "$LABEL" "There was ${ERROR_COUNT} error message recorded during execution:"
+            echo -e "${label_color}There was ${ERROR_COUNT} error recorded during execution:${no_color}"
         else
-            log_and_echo "$LABEL" "There were ${ERROR_COUNT} error messages recorded during execution:"
+            echo -e "${label_color}There were ${ERROR_COUNT} errors recorded during execution:${no_color}"
         fi
-        log_and_echo "$INFO" "$(cat "${ERROR_LOG_FILE}")"
+        cat "${ERROR_LOG_FILE}"
     fi
 fi
 
-log_and_echo "$INFO" "There are a number of ways that you can get help:"
-log_and_echo "$INFO" "1. Post a question on  https://developer.ibm.com/answers/ and 'Ask a question' with tags 'docker', 'containers' and 'devops-services'"
-log_and_echo "$INFO" "2. Open a Work Item in our public devops project: https://hub.jazz.net/project/alchemy/Alchemy-Ostanes "
-log_and_echo "$INFO" "" 
-log_and_echo "$INFO" "You can also review and fork our sample scripts on https://github.com/Osthanes "
+echo -e "There are a number of ways that you can get help:"
+echo -e "1. Post a question on ${label_color} https://developer.ibm.com/answers/ ${no_color} and 'Ask a question' with tags 'docker', 'containers' and 'devops-services'"
+echo -e "2. Open a Work Item in our public devops project: ${label_color} https://hub.jazz.net/project/alchemy/Alchemy-Ostanes ${no_color}"
+echo 
+echo -e "You can also review and fork our sample scripts on ${label_color} https://github.com/Osthanes ${no_color}"

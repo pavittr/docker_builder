@@ -270,7 +270,7 @@ fi
 log_and_echo "$LABEL" "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $IMAGE_NAME ]; then 
-    log_and_echo "$LABEL" "Please set IMAGE_NAME in the environment to desired name"
+    log_and_echo "$ERROR" "Please set IMAGE_NAME in the environment to desired name"
     export IMAGE_NAME="defaultimagename"
 fi 
 
@@ -304,7 +304,7 @@ if [ -z $WORKSPACE ]; then
 fi 
 
 if [ -z $ARCHIVE_DIR ]; then
-    log_and_echo "$LABEL" "ARCHIVE_DIR was not set, setting to WORKSPACE"
+    log_and_echo "$LABEL" "ARCHIVE_DIR was not set, setting to WORKSPACE ${WORKSPACE}"
     export ARCHIVE_DIR="${WORKSPACE}"
 fi
 
@@ -314,9 +314,9 @@ if [ "$ARCHIVE_DIR" == "./" ]; then
 fi
 
 if [ -d $ARCHIVE_DIR ]; then
-  log_and_echo "$LABEL" "Archiving to $ARCHIVE_DIR"
+  log_and_echo "$INFO" "Archiving to $ARCHIVE_DIR"
 else 
-  log_and_echo "$LABEL" "Creating archive directory $ARCHIVE_DIR"
+  log_and_echo "$INFO" "Creating archive directory $ARCHIVE_DIR"
   mkdir $ARCHIVE_DIR 
 fi 
 export LOG_DIR=$ARCHIVE_DIR
@@ -324,7 +324,7 @@ export LOG_DIR=$ARCHIVE_DIR
 ######################
 # Install ICE CLI    #
 ######################
-log_and_echo "$LABEL" "Installing IBM Container Service CLI"
+log_and_echo "$INFO" "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
@@ -347,7 +347,7 @@ fi
 #############################
 # Install Cloud Foundry CLI #
 #############################
-log_and_echo "$LABEL" "Installing Cloud Foundry CLI"
+log_and_echo "$INFO" "Installing Cloud Foundry CLI"
 pushd $EXT_DIR >/dev/null
 gunzip cf-linux-amd64.tgz &> /dev/null
 tar -xvf cf-linux-amd64.tar  &> /dev/null
@@ -369,14 +369,11 @@ log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI"
 if [ -n "$BLUEMIX_TARGET" ]; then
     # cf not setup yet, try manual setup
     if [ "$BLUEMIX_TARGET" == "staging" ]; then 
-        log_and_echo "$LABEL" "Targetting staging Bluemix"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
     elif [ "$BLUEMIX_TARGET" == "prod" ]; then 
-        log_and_echo "$LABEL" "Targetting production Bluemix"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
     else 
-        log_and_echo "$ERROR" "Unknown Bluemix environment specified: ${BLUEMIX_TARGET}"
-        log_and_echo "$LABEL" "Targetting production Bluemix"
+        log_and_echo "$ERROR" "Unknown Bluemix environment specified: ${BLUEMIX_TARGET}, Defaulting to production"
         export BLUEMIX_TARGET="prod"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
     fi 
@@ -395,13 +392,12 @@ else
             export BLUEMIX_TARGET="prod"
         fi
     else 
-        log_and_echo "$LABEL" "Targetting production Bluemix"
         export BLUEMIX_TARGET="prod"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
     fi
 fi
-log_and_echo "$LABEL" "Bluemix host is '${BLUEMIX_API_HOST}'"
-log_and_echo "$LABEL" "Bluemix target is '${BLUEMIX_TARGET}'"
+log_and_echo "$INFO" "Bluemix host is '${BLUEMIX_API_HOST}'"
+log_and_echo "$INFO" "Bluemix target is '${BLUEMIX_TARGET}'"
 # strip off the hostname to get full domain
 CF_TARGET=`echo $BLUEMIX_API_HOST | sed 's/[^\.]*//'`
 if [ -z "$API_PREFIX" ]; then
@@ -484,7 +480,7 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
             log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${image_file_and_reg}, but your current image repository is ${CCS_REGISTRY_HOST}."
             if [ -n "$cur_reg_image" ]; then
                 log_and_echo "$LABEL" "${label_color}The current repository does contain image ${cur_reg_image}, which might be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
-                log_and_echo "$LABEL" "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
+                log_and_echo "$INFO" "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
             else
                 log_and_echo "$LABEL" "The current repository does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
             fi
