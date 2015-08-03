@@ -15,15 +15,11 @@
 #   See the License for the specific language governing permissions and
 #********************************************************************************
 
-debugme() {
-  [[ $DEBUG = 1 ]] && "$@" || :
-}
-
 if [ -f ${EXT_DIR}/cf ]; then
    CFCMD=${EXT_DIR}/cf
 else
    CFCMD=cf
-   debugme ls ${EXT_DIR}
+   log_and_echo "$DEBUGGING" "$(ls ${EXT_DIR})"
 fi
 log_and_echo "$DEBUGGING" "cf is $CFCMD"
 
@@ -48,13 +44,13 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             # loop the list of spaces under the org and find the name of the images that are in used
             $CFCMD spaces > inspect.log 2> /dev/null
             RESULT=$?
-            debugme echo "cf spaces output:"
-            debugme cat inspect.log
-            debugme echo "end cf spaces output"
+            log_and_echo "$DEBUGGING" "cf spaces output:"
+            log_and_echo "$DEBUGGING" "$(cat inspect.log)"
+            log_and_echo "$DEBUGGING" "end cf spaces output"
             if [ $RESULT -eq 0 ]; then
                 # save current space first
                 $CFCMD target > target.log 2> /dev/null
-                debugme cat target.log 
+                log_and_echo "$DEBUGGING" "$(cat target.log)" 
                 CURRENT_SPACE=`grep "Space:" target.log | awk '{print $2}'`
                 log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
                 FOUND=""
@@ -71,7 +67,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         continue
                     else
                         $CFCMD target -s ${space} > target.log 2> /dev/null
-                        debugme cat target.log
+                        log_and_echo "$DEBUGGING" "$(cat target.log)"
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
                             ice_retry_save_output ps -q
@@ -85,7 +81,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 done
                 # restore my old space
                 $CFCMD target -s ${CURRENT_SPACE} > target.log 2> /dev/null
-                debugme cat target.log
+                log_and_echo "$DEBUGGING" "$(cat target.log)"
                 if [ "$TESTED_ALL" = true ] ; then
                     i=0
                     j=0
