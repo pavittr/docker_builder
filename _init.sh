@@ -186,7 +186,7 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
     if [ "${MAX_CACHING_TIME_LEFT}x" == "x" ]; then
         MAX_CACHING_TIME_LEFT=120
     fi
-    echo "Adjusting timestamps for files to allow cached layers"
+    log_and_echo "$INFO" "Adjusting timestamps for files to allow cached layers"
     tsadj_start_time=$(date +"%s")
 
     update_file_timestamp() {
@@ -213,9 +213,9 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
                 (( eta_total = all_file_count * tsadj_diff / FILE_COUNTER ));
                 (( eta_remaining = eta_total - tsadj_diff ));
                 if [ $eta_total -gt $MAX_CACHING_TIME ] && [ $eta_remaining -gt $MAX_CACHING_TIME_LEFT ]; then
-                    debugme echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
-                    debugme echo "eta total ( `date -u -d @"$eta_total" +'%-Mm %-Ss'` ) and remaining ( `date -u -d @"$eta_remaining" +'%-Mm %-Ss'` )"
-                    debugme echo "Would take too much time to adjust timestamps, skipping"
+                    log_and_echo "$DEBUGGING" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+                    log_and_echo "$DEBUGGING" "eta total ( `date -u -d @"$eta_total" +'%-Mm %-Ss'` ) and remaining ( `date -u -d @"$eta_remaining" +'%-Mm %-Ss'` )"
+                    log_and_echo "$DEBUGGING" "Would take too much time to adjust timestamps, skipping"
                     eta_total=-1
                     break;
                 fi 
@@ -225,7 +225,7 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
         if ! ((FILE_COUNTER % 1000)); then
             tsadj_end_time=$(date +"%s")
             tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
-            echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+            log_and_echo "$INFO" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
         fi
     done
     IFS=$old_ifs
@@ -233,10 +233,10 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
         if ((FILE_COUNTER % 1000)); then
             tsadj_end_time=$(date +"%s")
             tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
-            echo "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+            log_and_echo "$INFO" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
         fi
     fi
-    echo "Timestamps adjusted"
+    log_and_echo "$INFO" "Timestamps adjusted"
 fi 
 
 ################################
@@ -262,25 +262,25 @@ debugme echo "installing bc"
 sudo apt-get install bc >/dev/null 2>&1
 debugme echo "done installing bc"
 if [ -n "$BUILD_OFFSET" ]; then 
-    echo "Using BUILD_OFFSET of $BUILD_OFFSET"
+    log_and_echo "$INFO" "Using BUILD_OFFSET of $BUILD_OFFSET"
     export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
     export BUILD_NUMBER=$(echo "$BUILD_NUMBER + $BUILD_OFFSET" | bc)
 fi 
 
-echo "APPLICATION_VERSION: $APPLICATION_VERSION"
+log_and_echo "$INFO" "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $IMAGE_NAME ]; then 
-    echo -e "${red}Please set IMAGE_NAME in the environment to desired name ${no_color}" | tee -a "$ERROR_LOG_FILE"
+    log_and_echo "$ERROR" "Please set IMAGE_NAME in the environment to desired name"
     export IMAGE_NAME="defaultimagename"
 fi 
 
 if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
     source ${EXT_DIR}/builder_utilities.sh 
-    debugme echo "Validating image name"
+    log_and_echo "$DEBUGGING" "Validating image name"
     pipeline_validate_full ${IMAGE_NAME} >validate.log 2>&1 
     VALID_NAME=$?
     if [ ${VALID_NAME} -ne 0 ]; then     
-        echo -e "${red}${IMAGE_NAME} is not a valid image name for Docker${no_color}" | tee -a "$ERROR_LOG_FILE"
+        log_and_echo "$ERROR" "${IMAGE_NAME} is not a valid image name for Docker"
         cat validate.log 
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Invalid image name. $(get_error_info)"
@@ -289,7 +289,7 @@ if [ -f ${EXT_DIR}/builder_utilities.sh ]; then
         debugme cat validate.log 
     fi 
 else 
-    echo -e "${red}Warning could not find utilities in ${EXT_DIR}${no_color}" | tee -a "$ERROR_LOG_FILE"
+    log_and_echo "$ERROR" "Warning could not find utilities in ${EXT_DIR}"
     ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to get builder_utilities.sh. $(get_error_info)"
 fi 
 
@@ -297,26 +297,26 @@ fi
 # Setup archive information    #
 ################################
 if [ -z $WORKSPACE ]; then 
-    echo -e "${red}Please set WORKSPACE in the environment${no_color}" | tee -a "$ERROR_LOG_FILE"
+    log_and_echo "$ERROR" "Please set WORKSPACE in the environment"
     ${EXT_DIR}/print_help.sh
     ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to discover namespace. $(get_error_info)"
     exit 1
 fi 
 
 if [ -z $ARCHIVE_DIR ]; then
-    echo -e "${label_color}ARCHIVE_DIR was not set, setting to WORKSPACE ${no_color}"
+    log_and_echo "$LABEL" "ARCHIVE_DIR was not set, setting to WORKSPACE ${WORKSPACE}"
     export ARCHIVE_DIR="${WORKSPACE}"
 fi
 
 if [ "$ARCHIVE_DIR" == "./" ]; then
-    echo -e "${label_color}ARCHIVE_DIR set relative, adjusting to current dir absolute ${no_color}"
+    log_and_echo "$LABEL" "ARCHIVE_DIR set relative, adjusting to current dir absolute"
     export ARCHIVE_DIR=`pwd`
 fi
 
 if [ -d $ARCHIVE_DIR ]; then
-  echo -e "Archiving to $ARCHIVE_DIR"
+  log_and_echo "$INFO" "Archiving to $ARCHIVE_DIR"
 else 
-  echo -e "Creating archive directory $ARCHIVE_DIR"
+  log_and_echo "$INFO" "Creating archive directory $ARCHIVE_DIR"
   mkdir $ARCHIVE_DIR 
 fi 
 export LOG_DIR=$ARCHIVE_DIR
@@ -324,7 +324,7 @@ export LOG_DIR=$ARCHIVE_DIR
 ######################
 # Install ICE CLI    #
 ######################
-echo "Installing IBM Container Service CLI"
+log_and_echo "$INFO" "Installing IBM Container Service CLI"
 ice help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
@@ -335,32 +335,32 @@ if [ $RESULT -ne 0 ]; then
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-        echo -e "${red}Failed to install IBM Container Service CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
+        log_and_echo "$ERROR" "Failed to install IBM Container Service CLI"
         debugme python --version
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
         exit $RESULT
     fi
-    echo -e "${label_color}Successfully installed IBM Container Service CLI ${no_color}"
+    log_and_echo "$LABEL" "Successfully installed IBM Container Service CLI"
 fi 
 
 #############################
 # Install Cloud Foundry CLI #
 #############################
-echo "Installing Cloud Foundry CLI"
+log_and_echo "$INFO" "Installing Cloud Foundry CLI"
 pushd $EXT_DIR >/dev/null
 gunzip cf-linux-amd64.tgz &> /dev/null
 tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
-    echo -e "${red}Could not install the Cloud Foundry CLI ${no_color}" | tee -a "$ERROR_LOG_FILE"
+    log_and_echo "$ERROR" "Could not install the Cloud Foundry CLI"
     ${EXT_DIR}/print_help.sh
     ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
     exit $RESULT
 fi
 popd >/dev/null
-echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
+log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI"
 
 ##########################################
 # setup bluemix env
@@ -369,14 +369,11 @@ echo -e "${label_color}Successfully installed Cloud Foundry CLI ${no_color}"
 if [ -n "$BLUEMIX_TARGET" ]; then
     # cf not setup yet, try manual setup
     if [ "$BLUEMIX_TARGET" == "staging" ]; then 
-        echo -e "Targetting staging Bluemix"
         export BLUEMIX_API_HOST="api.stage1.ng.bluemix.net"
     elif [ "$BLUEMIX_TARGET" == "prod" ]; then 
-        echo -e "Targetting production Bluemix"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
     else 
-        echo -e "${red}Unknown Bluemix environment specified: ${BLUEMIX_TARGET}${no_color}" | tee -a "$ERROR_LOG_FILE"
-        echo -e "Targetting production Bluemix"
+        log_and_echo "$ERROR" "Unknown Bluemix environment specified: ${BLUEMIX_TARGET}, Defaulting to production"
         export BLUEMIX_TARGET="prod"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
     fi 
@@ -395,13 +392,12 @@ else
             export BLUEMIX_TARGET="prod"
         fi
     else 
-        echo -e "Targetting production Bluemix"
         export BLUEMIX_TARGET="prod"
         export BLUEMIX_API_HOST="api.ng.bluemix.net"
     fi
 fi
-echo -e "Bluemix host is '${BLUEMIX_API_HOST}'"
-echo -e "Bluemix target is '${BLUEMIX_TARGET}'"
+log_and_echo "$INFO" "Bluemix host is '${BLUEMIX_API_HOST}'"
+log_and_echo "$INFO" "Bluemix target is '${BLUEMIX_TARGET}'"
 # strip off the hostname to get full domain
 CF_TARGET=`echo $BLUEMIX_API_HOST | sed 's/[^\.]*//'`
 if [ -z "$API_PREFIX" ]; then
@@ -452,7 +448,7 @@ export REGISTRY_URL=${CCS_REGISTRY_HOST}/${NAMESPACE}
 export FULL_REPOSITORY_NAME=${REGISTRY_URL}/${IMAGE_NAME}:${APPLICATION_VERSION}
 log_and_echo "$LABEL" "The desired image repository name will be ${FULL_REPOSITORY_NAME}"
 
-debugme echo "Validating full repository name"
+log_and_echo "$DEBUGGING" "Validating full repository name"
 pipeline_validate_full  ${FULL_REPOSITORY_NAME} >validate.log 2>&1 
 VALID_NAME=$?
 if [ ${VALID_NAME} -ne 0 ]; then    
@@ -465,7 +461,7 @@ else
     debugme cat validate.log 
 fi 
 
-debugme echo "Validating Dockerfile FROM in proper registry"
+log_and_echo "$DEBUGGING" "Validating Dockerfile FROM in proper registry"
 if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
     # check for possibility of multiple registries, make sure
     # dockerfile, if it's pulling from either, is using right one
@@ -483,10 +479,10 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
             # warn the user
             log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${image_file_and_reg}, but your current image repository is ${CCS_REGISTRY_HOST}."
             if [ -n "$cur_reg_image" ]; then
-                echo -e "${label_color}The current repository does contain image ${cur_reg_image}, which might be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
-                echo -e "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}.${no_color}"
+                log_and_echo "$LABEL" "The current repository does contain image ${cur_reg_image}, which might be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
+                log_and_echo "$LABEL" "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
             else
-                echo -e "${label_color}The current repository does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}.${no_color}"
+                log_and_echo "$LABEL" "The current repository does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
             fi
         fi
     done
