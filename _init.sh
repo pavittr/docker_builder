@@ -186,7 +186,7 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
     if [ "${MAX_CACHING_TIME_LEFT}x" == "x" ]; then
         MAX_CACHING_TIME_LEFT=120
     fi
-    log_and_echo "$LABEL" "Adjusting timestamps for files to allow cached layers"
+    log_and_echo "$INFO" "Adjusting timestamps for files to allow cached layers"
     tsadj_start_time=$(date +"%s")
 
     update_file_timestamp() {
@@ -225,7 +225,7 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
         if ! ((FILE_COUNTER % 1000)); then
             tsadj_end_time=$(date +"%s")
             tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
-            log_and_echo "$LABEL" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+            log_and_echo "$INFO" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
         fi
     done
     IFS=$old_ifs
@@ -233,10 +233,10 @@ if [ "${USE_CACHED_LAYERS}" == "true" ] && [ -d .git ]; then
         if ((FILE_COUNTER % 1000)); then
             tsadj_end_time=$(date +"%s")
             tsadj_diff=$(($tsadj_end_time-$tsadj_start_time))
-            log_and_echo "$LABEL" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
+            log_and_echo "$INFO" "$FILE_COUNTER files processed in `date -u -d @"$tsadj_diff" +'%-Mm %-Ss'`"
         fi
     fi
-    log_and_echo "$LABEL" "Timestamps adjusted"
+    log_and_echo "$INFO" "Timestamps adjusted"
 fi 
 
 ################################
@@ -258,16 +258,16 @@ if [ -z "$APPLICATION_VERSION" ]; then
         export APPLICATION_VERSION=$SELECTED_BUILD
     fi 
 fi 
-log_and_echo "$DEBUGGING" "installing bc"
+debugme echo "installing bc"
 sudo apt-get install bc >/dev/null 2>&1
-log_and_echo "$DEBUGGING" "done installing bc"
+debugme echo "done installing bc"
 if [ -n "$BUILD_OFFSET" ]; then 
-    log_and_echo "$LABEL" "Using BUILD_OFFSET of $BUILD_OFFSET"
+    log_and_echo "$INFO" "Using BUILD_OFFSET of $BUILD_OFFSET"
     export APPLICATION_VERSION=$(echo "$APPLICATION_VERSION + $BUILD_OFFSET" | bc)
     export BUILD_NUMBER=$(echo "$BUILD_NUMBER + $BUILD_OFFSET" | bc)
 fi 
 
-log_and_echo "$LABEL" "APPLICATION_VERSION: $APPLICATION_VERSION"
+log_and_echo "$INFO" "APPLICATION_VERSION: $APPLICATION_VERSION"
 
 if [ -z $IMAGE_NAME ]; then 
     log_and_echo "$ERROR" "Please set IMAGE_NAME in the environment to desired name"
@@ -479,8 +479,8 @@ if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
             # warn the user
             log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${image_file_and_reg}, but your current image repository is ${CCS_REGISTRY_HOST}."
             if [ -n "$cur_reg_image" ]; then
-                log_and_echo "$LABEL" "${label_color}The current repository does contain image ${cur_reg_image}, which might be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
-                log_and_echo "$INFO" "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
+                log_and_echo "$LABEL" "The current repository does contain image ${cur_reg_image}, which might be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
+                log_and_echo "$LABEL" "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
             else
                 log_and_echo "$LABEL" "The current repository does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
             fi
