@@ -32,6 +32,7 @@ BETA_REG_PREFIX="registry-ice"
 # default servers
 DEF_API_PREFIX="containers-api"
 DEF_REG_PREFIX="registry"
+export MODULE_NAME="docker-builder"
 
 ##################################################
 # Simple function to only run command if DEBUG=1 # 
