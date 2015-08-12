@@ -125,13 +125,22 @@ def cleanupImages(context, pause=False):
     
 def cleanupContainers(context):
     psOutput = subprocess_retry(context, "ice ps", False)
-    for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
-        print("Removing container: "+m.group(0))
-        subprocess_retry(context, "ice stop "+m.group(0), True)
+    psLines = psOutput.splitlines()
+    cNameMatcher = re.compile(os.environ["IMAGE_NAME"]+"\d+C")
+    stoppedMatcher = re.compile("crashed|shutdown", re.IGNORECASE)
+    for line in psLines:
+        mName = cNameMatcher.search(line)
+        if mName:
+            mStopped = stoppedMatcher.search(line)
+            if mStopped:
+                print("Container "+mName.group(0)+" is \""+mStopped.group(0)+"\", not trying to stop")
+            else:
+                print("Stopping container: "+mName.group(0))
+                subprocess_retry(context, "ice stop "+mName.group(0), True)
+    statusMatcher = re.compile("\"Status\": \"(\S*)\"")
     for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
         for i in range(30):
             inspectOutput = subprocess_retry(context, "ice inspect " + m.group(0), False)
-            statusMatcher = re.compile("\"Status\": \"(\S*)\"")
             mInspect = statusMatcher.search(inspectOutput)
             if mInspect:
                 print (mInspect.group(0))
