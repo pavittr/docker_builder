@@ -98,7 +98,7 @@ def before_tag(context, tag):
                 count = count - 1
             print(time.strftime("<%I:%M:%S> ")+"Waiting 120 seconds after starting images")
             time.sleep(120)
-            subprocess_retry(context,"ice ps", True)
+            subprocess_retry(context,"ice ps -a", True)
             
             
 def containerName(version):
@@ -124,7 +124,7 @@ def cleanupImages(context, pause=False):
     
     
 def cleanupContainers(context):
-    psOutput = subprocess_retry(context, "ice ps", False)
+    psOutput = subprocess_retry(context, "ice ps -a", False)
     psLines = psOutput.splitlines()
     cNameMatcher = re.compile(os.environ["IMAGE_NAME"]+"\d+C")
     stoppedMatcher = re.compile("crashed|shutdown", re.IGNORECASE)
