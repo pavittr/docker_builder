@@ -466,7 +466,7 @@ log_and_echo "$DEBUGGING" "Validating Dockerfile FROM in proper registry"
 if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
     # check for possibility of multiple registries, make sure
     # dockerfile, if it's pulling from either, is using right one
-    for file in $( ls ${WORKSPACE}/Dockerfile* ); do
+    for file in $( find ${WORKSPACE} -name Dockerfile* ); do
         repo_image=`grep -i "^from $BETA_REG_PREFIX" $file`
         if [ $? -eq 0 ]; then
             # dockerfile could be trying to pull image from the wrong repo
