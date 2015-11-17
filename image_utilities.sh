@@ -55,12 +55,18 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 # save current space first
                 $CFCMD target > target.log 2> /dev/null
                 debugme cat target.log 
-                CURRENT_SPACE=`grep "Space:" target.log | awk '{print $2}'`
+                #Use Show only matching chars option in grep to allow spaces in the current space name
+                CURRENT_SPACE=`grep "Space:" target.log | grep -o ":.*" | grep -o "[^: ].*"`
                 log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
                 FOUND=""
                 TESTED_ALL=true
-                SPACE_ARRAY=$(cat inspect.log)
-                for space in ${SPACE_ARRAY[@]}
+                #Build space array as an array to properly handle spaces in space names
+                SPACE_ARRAY=()
+                while read line; do 
+                    SPACE_ARRAY+=("$line"); 
+                done < inspect.log;
+                #Array needs to be in quotes to properly handle spaces in space names
+                for space in "${SPACE_ARRAY[@]}"
                 do
                     # cf spaces gives a couple lines of headers.  skip those until we find the line
                     # 'name', then read the rest of the lines as space names
@@ -70,7 +76,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         fi
                         continue
                     else
-                        $CFCMD target -s ${space} > target.log 2> /dev/null
+                        $CFCMD target -s "${space}" > target.log 2> /dev/null
                         debugme cat target.log
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
@@ -84,7 +90,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     fi
                 done
                 # restore my old space
-                $CFCMD target -s ${CURRENT_SPACE} > target.log 2> /dev/null
+                $CFCMD target -s "${CURRENT_SPACE}" > target.log 2> /dev/null
                 debugme cat target.log
                 if [ "$TESTED_ALL" = true ] ; then
                     i=0
