@@ -36,7 +36,7 @@
 # The following colors have been defined to help with presentation of logs: green, red, label_color, no_color.  
 log_and_echo \"$LABEL\" \"Starting build script\"
 
-# The IBM Container Service CLI (ice), Git client (git), IDS Inventory CLI (ids-inv) and Python 2.7.3 (python) have been installed.
+# The IBM Container BM Containers plug-in (cf ic), Git client (git), and IDS Inventory CLI (ids-inv) have been installed.
 # Based on the organization and space selected in the Job credentials are in place for both IBM Container Service and IBM Bluemix 
 #####################
 # Run unit tests    #
@@ -68,8 +68,8 @@ if [ -f Dockerfile ]; then
 
     if [ $RESULT -ne 0 ]; then
         log_and_echo \"$ERROR\" \"Error building image\"
-        ice info 
-        ice images
+        ice_retry info 
+        ice_retry images
         ${EXT_DIR}/print_help.sh
         ${EXT_DIR}/utilities/sendMessage.sh -l bad -m \"Container build of ${FULL_REPOSITORY_NAME} failed. $(get_error_info)\"
         exit 1
