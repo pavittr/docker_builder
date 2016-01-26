@@ -327,8 +327,8 @@ export LOG_DIR=$ARCHIVE_DIR
 #############################
 log_and_echo "$INFO" "Installing Cloud Foundry CLI"
 pushd $EXT_DIR >/dev/null
--gunzip cf-linux-amd64.tgz &> /dev/null
--tar -xvf cf-linux-amd64.tar  &> /dev/null
+gunzip cf-linux-amd64.tgz &> /dev/null
+tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
