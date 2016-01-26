@@ -81,7 +81,11 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         if [ $? -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
                             ice_retry_save_output ps -q
-                            ICE_PS_IMAGES_ARRAY+=$(awk '{print $1}' iceretry.log | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
+                            if [ "$USE_ICE_CLI" = "1" ]; then
+                                ICE_PS_IMAGES_ARRAY+=$(awk '{print $1}' iceretry.log | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
+                            else
+                                ICE_PS_IMAGES_ARRAY+=$(awk '{print $2}' iceretry.log | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
+                            fi
                             ICE_PS_IMAGES_ARRAY+=" "
                         else
                             log_and_echo "$ERROR" "Unable to change to space ${space}.  Could not check for used images."
