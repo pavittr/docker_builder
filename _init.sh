@@ -327,9 +327,8 @@ export LOG_DIR=$ARCHIVE_DIR
 #############################
 log_and_echo "$INFO" "Installing Cloud Foundry CLI"
 pushd $EXT_DIR >/dev/null
-#gunzip cf-linux-amd64.tgz &> /dev/null
-#tar -xvf cf-linux-amd64.tar  &> /dev/null
-curl -o cf-linux-amd64.tgz -v -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=6.13.0&source=github-rel"
+-gunzip cf-linux-amd64.tgz &> /dev/null
+-tar -xvf cf-linux-amd64.tar  &> /dev/null
 cf help &> /dev/null
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
@@ -338,8 +337,9 @@ if [ $RESULT -ne 0 ]; then
     ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
     exit $RESULT
 fi
+CF_VER=$(cf -v)
 popd >/dev/null
-log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI"
+log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${DOCKER_VER}"
 
 #####################################
 # Install IBM Container Service CLI #
