@@ -165,7 +165,7 @@ source ${EXT_DIR}/git_util.sh
 ################################
 pushd . >/dev/null
 cd $EXT_DIR 
-git_retry clone https://github.com/Osthanes/utilities.git utilities
+git_retry clone -b bahram-cfic https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
 
 #################################
@@ -339,39 +339,40 @@ if [ $RESULT -ne 0 ]; then
 fi
 CF_VER=$(cf -v)
 popd >/dev/null
-log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${DOCKER_VER}"
+log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${CF_VER}"
 
 #####################################
 # Install IBM Container Service CLI #
 #####################################
-if [ "$USE_ICE_CLI" = "1" ]; then
-    # Install ICE CLI
-    log_and_echo "$INFO" "Installing IBM Container Service CLI"
+# Install ICE CLI
+log_and_echo "$INFO" "Installing IBM Container Service CLI"
+ice help &> /dev/null
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+#    installwithpython3
+    installwithpython27
+#    installwithpython277
+#    installwithpython34
     ice help &> /dev/null
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
-    #    installwithpython3
-        installwithpython27
-    #    installwithpython277
-    #    installwithpython34
-        ice help &> /dev/null
-        RESULT=$?
-        if [ $RESULT -ne 0 ]; then
-            log_and_echo "$ERROR" "Failed to install IBM Container Service CLI"
-            debugme python --version
+        log_and_echo "$ERROR" "Failed to install IBM Container Service CLI"
+        debugme python --version
+        if [ "$USE_ICE_CLI" = "1" ]; then
             ${EXT_DIR}/print_help.sh
             ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
             exit $RESULT
         fi
+    else
         log_and_echo "$LABEL" "Successfully installed IBM Container Service CLI"
-    fi 
-else
-    # Install the IBM Containers plug-in (cf ic)
-    install_cf_ic
-    RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        exit $RESULT
-    fi 
+    fi
+fi 
+
+# Install the IBM Containers plug-in (cf ic)
+install_cf_ic
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+    exit $RESULT
 fi
 
 ##########################################
@@ -429,22 +430,13 @@ sed -i "s/reg_host =.*/reg_host = $CCS_REGISTRY_HOST/g" $EXT_DIR/ice-cfg.ini
 sed -i "s/cf_api_url =.*/cf_api_url = $BLUEMIX_API_HOST/g" $EXT_DIR/ice-cfg.ini
 export ICE_CFG="ice-cfg.ini"
 
-if [ "$USE_ICE_CLI" = "1" ]; then
-    ################################
-    # Login to Container Service   #
-    ################################
-    login_to_container_service
-    RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        exit $RESULT
-    fi 
-else    
-    # set targeting information from config.json file
-    if [ -f ~/.cf/config.json ]; then
-        get_targeting_info
-    fi
-
-    
+################################
+# Login to Container Service   #
+################################
+login_to_container_service
+RESULT=$?
+if [ $RESULT -ne 0 ] && [ "$USE_ICE_CLI" = "1" ]; then
+    exit $RESULT
 fi
 
 ############################
