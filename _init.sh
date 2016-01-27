@@ -344,10 +344,12 @@ log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${CF_VER}"
 #############################################
 # nstall the IBM Containers plug-in (cf ic) #
 #############################################
-install_cf_ic
-RESULT=$?
-if [ $RESULT -ne 0 ]; then
-    exit $RESULT
+if [ "$USE_ICE_CLI" != "1" ]; then
+    install_cf_ic
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        exit $RESULT
+    fi
 fi
 
 #####################################
