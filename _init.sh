@@ -368,17 +368,6 @@ if [ $RESULT -ne 0 ]; then
     fi
 fi 
 
-#############################################
-# Install the IBM Containers plug-in (cf ic) #
-#############################################
-if [ "$USE_ICE_CLI" != "1" ]; then
-    install_cf_ic
-    RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        exit $RESULT
-    fi
-fi
-
 ##########################################
 # setup bluemix env
 ##########################################
@@ -441,6 +430,17 @@ login_to_container_service
 RESULT=$?
 if [ $RESULT -ne 0 ] && [ "$USE_ICE_CLI" = "1" ]; then
     exit $RESULT
+fi
+
+#############################################
+# Install the IBM Containers plug-in (cf ic) #
+#############################################
+if [ "$USE_ICE_CLI" != "1" ]; then
+    install_cf_ic
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        exit $RESULT
+    fi
 fi
 
 ############################
