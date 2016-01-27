@@ -47,8 +47,8 @@ if [ -f Dockerfile ]; then
     if [ $RESULT -ne 0 ]; then
         echo -e "${red}Error building image ${no_color}"
         echo "Build command: ice ${BUILD_COMMAND}"
-        ice info 
-        ice images
+        ice_retry info 
+        ice_retry images
         "${EXT_DIR}"/print_help.sh
         exit 1
     else

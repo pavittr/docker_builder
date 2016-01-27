@@ -165,7 +165,7 @@ source ${EXT_DIR}/git_util.sh
 ################################
 pushd . >/dev/null
 cd $EXT_DIR 
-git_retry clone https://github.com/Osthanes/utilities.git utilities
+git_retry clone -b bahram-cfic https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
 
 #################################
@@ -322,29 +322,6 @@ else
 fi 
 export LOG_DIR=$ARCHIVE_DIR
 
-######################
-# Install ICE CLI    #
-######################
-log_and_echo "$INFO" "Installing IBM Container Service CLI"
-ice help &> /dev/null
-RESULT=$?
-if [ $RESULT -ne 0 ]; then
-#    installwithpython3
-    installwithpython27
-#    installwithpython277
-#    installwithpython34
-    ice help &> /dev/null
-    RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        log_and_echo "$ERROR" "Failed to install IBM Container Service CLI"
-        debugme python --version
-        ${EXT_DIR}/print_help.sh
-        ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
-        exit $RESULT
-    fi
-    log_and_echo "$LABEL" "Successfully installed IBM Container Service CLI"
-fi 
-
 #############################
 # Install Cloud Foundry CLI #
 #############################
@@ -360,8 +337,47 @@ if [ $RESULT -ne 0 ]; then
     ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install Cloud Foundry CLI. $(get_error_info)"
     exit $RESULT
 fi
+CF_VER=$(cf -v)
 popd >/dev/null
-log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI"
+log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${CF_VER}"
+
+#############################################
+# nstall the IBM Containers plug-in (cf ic) #
+#############################################
+if [ "$USE_ICE_CLI" != "1" ]; then
+    install_cf_ic
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        exit $RESULT
+    fi
+fi
+
+#####################################
+# Install IBM Container Service CLI #
+#####################################
+# Install ICE CLI
+log_and_echo "$INFO" "Installing IBM Container Service CLI"
+ice help &> /dev/null
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+#    installwithpython3
+    installwithpython27
+#    installwithpython277
+#    installwithpython34
+    ice help &> /dev/null
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        log_and_echo "$ERROR" "Failed to install IBM Container Service CLI"
+        debugme python --version
+        if [ "$USE_ICE_CLI" = "1" ]; then
+            ${EXT_DIR}/print_help.sh
+            ${EXT_DIR}/utilities/sendMessage.sh -l bad -m "Failed to install IBM Container Service CLI. $(get_error_info)"
+            exit $RESULT
+        fi
+    else
+        log_and_echo "$LABEL" "Successfully installed IBM Container Service CLI"
+    fi
+fi 
 
 ##########################################
 # setup bluemix env
@@ -423,9 +439,9 @@ export ICE_CFG="ice-cfg.ini"
 ################################
 login_to_container_service
 RESULT=$?
-if [ $RESULT -ne 0 ]; then
+if [ $RESULT -ne 0 ] && [ "$USE_ICE_CLI" = "1" ]; then
     exit $RESULT
-fi 
+fi
 
 ############################
 # enable logging to logmet #
@@ -437,7 +453,7 @@ if [ $RESULT -ne 0 ]; then
 fi
 
 ################################
-# Login to Container Service   #
+# Get the namespace            #
 ################################
 get_name_space
 RESULT=$?
