@@ -343,17 +343,6 @@ CF_VER=$(cf -v)
 popd >/dev/null
 log_and_echo "$LABEL" "Successfully installed Cloud Foundry CLI ${CF_VER}"
 
-#############################################
-# Install the IBM Containers plug-in (cf ic) #
-#############################################
-if [ "$USE_ICE_CLI" != "1" ]; then
-    install_cf_ic
-    RESULT=$?
-    if [ $RESULT -ne 0 ]; then
-        exit $RESULT
-    fi
-fi
-
 #####################################
 # Install IBM Container Service CLI #
 #####################################
@@ -380,6 +369,17 @@ if [ $RESULT -ne 0 ]; then
         log_and_echo "$LABEL" "Successfully installed IBM Container Service CLI"
     fi
 fi 
+
+#############################################
+# Install the IBM Containers plug-in (cf ic) #
+#############################################
+if [ "$USE_ICE_CLI" != "1" ]; then
+    install_cf_ic
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+        exit $RESULT
+    fi
+fi
 
 ##########################################
 # setup bluemix env
