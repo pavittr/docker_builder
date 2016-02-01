@@ -374,12 +374,12 @@ fi
 # Install the IBM Containers plug-in (cf ic) #
 #############################################
 if [ "$USE_ICE_CLI" != "1" ]; then
+    export IC_COMMAND="${EXT_DIR}/cf ic"
     install_cf_ic
     RESULT=$?
     if [ $RESULT -ne 0 ]; then
         exit $RESULT
-    fi
-    export IC_COMMAND="${EXT_DIR}/cf ic"
+    fi 
 else
     export IC_COMMAND="ice"
 fi
