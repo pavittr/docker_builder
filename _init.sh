@@ -379,6 +379,9 @@ if [ "$USE_ICE_CLI" != "1" ]; then
     if [ $RESULT -ne 0 ]; then
         exit $RESULT
     fi
+    export IC_COMMAND="${EXT_DIR}/cf ic"
+else
+    export IC_COMMAND="ice"
 fi
 
 ##########################################
@@ -480,33 +483,6 @@ if [ ${VALID_NAME} -ne 0 ]; then
 else 
     debugme cat validate.log 
 fi 
-
-log_and_echo "$DEBUGGING" "Validating Dockerfile FROM in proper registry"
-if [ "$REG_PREFIX" != "$BETA_REG_PREFIX" ]; then
-    # check for possibility of multiple registries, make sure
-    # dockerfile, if it's pulling from either, is using right one
-    for file in $( find ${WORKSPACE} -name Dockerfile* ); do
-        repo_image=`grep -i "^from $BETA_REG_PREFIX" $file`
-        if [ $? -eq 0 ]; then
-            # dockerfile could be trying to pull image from the wrong repo
-            # double check
-            image_file_and_reg=`echo ${repo_image} | awk '{print $NF}'| tr -d '[[:space:]]'`
-            image_file=`echo ${image_file_and_reg} | awk -F"/" '{print $NF}'`
-            # and check the current registry to see if the file is actually there anyway
-            cur_reg_image=`ice images | grep ${image_file} | awk '{print $NF}'`
-            # make dockerfile name easier to read
-            dockfile=`echo $file | awk -F"/" '{print $NF}'`
-            # warn the user
-            log_and_echo "$ERROR" "The file ${dockfile} appears to be trying to load image ${image_file_and_reg}, but your current image repository is ${CCS_REGISTRY_HOST}."
-            if [ -n "$cur_reg_image" ]; then
-                log_and_echo "$LABEL" "The current repository does contain image ${cur_reg_image}, which might be similar. If this is an appropriate replacement, edit the FROM statement in ${dockfile} to use this image instead."
-                log_and_echo "$LABEL" "If ${cur_reg_image} is not a proper replacement for ${image_file_and_reg}, migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
-            else
-                log_and_echo "$LABEL" "The current repository does not appear to contain a similar image. You may migrate the old image using 'ice migrate_images', or push the correct image to repository ${CCS_REGISTRY_HOST}."
-            fi
-        fi
-    done
-fi
 
 log_and_echo "$LABEL" "Initialization complete"
 
