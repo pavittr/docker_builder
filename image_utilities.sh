@@ -140,7 +140,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                 ((NUMBER_IMAGES--))
                                 if [ "${IMAGE_REMOVE}" == "FALSE" ]; then 
                                     echo "NOT removing image"
-                                    echo "ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
+                                    echo "$IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
                                     RESULT=1
                                 else 
                                     ice_retry rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
@@ -148,9 +148,9 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                     RESPONSE=${RET_RESPONCE}
                                 fi 
                                 if [ $RESULT -eq 0 ]; then
-                                    log_and_echo "successfully deleted image: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                    log_and_echo "successfully deleted image: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
                                 else
-                                    log_and_echo "$ERROR" "deleting image failed: ice rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                    log_and_echo "$ERROR" "deleting image failed: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
                                     log_and_echo "$ERROR" "${RESPONSE}"
                                 fi
                                 if [ $len_not_used -le 0 ]; then
@@ -174,6 +174,6 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             log_and_echo "The number of images are less than the image limit"
         fi
     else
-        log_and_echo "$ERROR" "Failed to get image list from ice.  Check ice login."
+        log_and_echo "$ERROR" "Failed to get image list from $IC_COMMAND.  Check $IC_COMMAND login."
     fi
 fi
