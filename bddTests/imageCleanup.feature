@@ -11,6 +11,7 @@ When The container Image Build job is run
 Then The new image is built
 
 @createimages5
+@shortrun
 Scenario: Start with more unused images
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to a value below the ICS image limit
