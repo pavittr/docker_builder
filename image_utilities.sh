@@ -54,7 +54,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             if [ $RESULT -eq 0 ]; then
                 # save current space first
                 $CFCMD target > target.log 2> /dev/null
-                debugme cat target.log 
+                debugme "$(cat target.log)"
                 #Use Show only matching chars option in grep to allow spaces in the current space name
                 CURRENT_SPACE=$(grep '^Space:' target.log | awk -F: '{print $2;}' | sed 's/^ *//g' | sed 's/ *$//g')
                 log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
@@ -82,12 +82,17 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                         if [ $RESULT -eq 0 ]; then
                             log_and_echo "$DEBUGGING" "Checking space ${space}"
                             if [ "$USE_ICE_CLI" = "1" ]; then
-                                ice_retry_save_output ps -q
+                                ice_retry_save_output ps -q -a
                                 ICE_PS_IMAGES_ARRAY+=$(awk '{print $1}' iceretry.log | xargs -n 1 ice inspect 2>/dev/null | grep "Image" | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
                             else
                                 ice_retry init &> /dev/null
-                                ice_retry_save_output ps
-                                ICE_PS_IMAGES_ARRAY+=$(awk '{print $2}' iceretry.log | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
+                                RESULT=$?
+                                if [ $RESULT -eq 0 ]; then 
+                                    ice_retry_save_output ps -a
+                                    ICE_PS_IMAGES_ARRAY+=$(awk '{print $2}' iceretry.log | grep -oh -e "${NAMESPACE}/${IMAGE_NAME}:[0-9]\+")
+                                else
+                                    $IC_COMMAND init
+                                    log_and_echo "$ERROR" "$IC_COMMAND init command failed for space ${space}.  Could not check for used images for space ${space}."
                             fi
                             ICE_PS_IMAGES_ARRAY+=" "
                         else
