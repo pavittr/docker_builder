@@ -54,7 +54,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
             if [ $RESULT -eq 0 ]; then
                 # save current space first
                 $CFCMD target > target.log 2> /dev/null
-                debugme "$(cat target.log)"
+                debugme cat target.log
                 #Use Show only matching chars option in grep to allow spaces in the current space name
                 CURRENT_SPACE=$(grep '^Space:' target.log | awk -F: '{print $2;}' | sed 's/^ *//g' | sed 's/ *$//g')
                 log_and_echo "$DEBUGGING" "current space is $CURRENT_SPACE"
