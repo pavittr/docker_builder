@@ -93,6 +93,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                 else
                                     $IC_COMMAND init
                                     log_and_echo "$ERROR" "$IC_COMMAND init command failed for space ${space}.  Could not check for used images for space ${space}."
+                                fi
                             fi
                             ICE_PS_IMAGES_ARRAY+=" "
                         else
