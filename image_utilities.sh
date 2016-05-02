@@ -141,7 +141,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
                         if [ $len_not_used -gt 0 ]; then
                             # sort the IMAGES_ARRAY_NOT_USED array
-                            IMAGES_ARRAY_NOT_USED=( $(
+                            bsIMAGES_ARRAY_NOT_USED=( $(
                             for el in "${IMAGES_ARRAY_NOT_USED[@]}"
                             do
                                echo "$el"
@@ -166,6 +166,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                                     log_and_echo "$ERROR" "deleting image failed: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$index_not_used]}"
                                     log_and_echo "$ERROR" "${RESPONSE}"
                                 fi
+                                 ((index_not_used++))
                                 if [ $len_not_used -le 0 ]; then
                                     break
                                 fi
