@@ -135,13 +135,13 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     # if number of images greater then image limit, then delete unused images from oldest to newest until we are under the limit or out of unused images
                     len_used=${#IMAGES_ARRAY_USED[*]}
                     len_not_used=${#IMAGES_ARRAY_NOT_USED[*]}
-                    IMAGES_ARRAY_NOT_USED=( $(
                     log_and_echo "number of images in use: ${len_used} and number of images not in use: ${len_not_used}"
                     log_and_echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
                     log_and_echo "used images: ${IMAGES_ARRAY_USED[@]}"
                     if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
                         if [ $len_not_used -gt 0 ]; then
                             # sort the IMAGES_ARRAY_NOT_USED array
+                            IMAGES_ARRAY_NOT_USED=( $(
                             for el in "${IMAGES_ARRAY_NOT_USED[@]}"
                             do
                                echo "$el"
