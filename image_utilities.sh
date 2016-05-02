@@ -135,28 +135,35 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     # if number of images greater then image limit, then delete unused images from oldest to newest until we are under the limit or out of unused images
                     len_used=${#IMAGES_ARRAY_USED[*]}
                     len_not_used=${#IMAGES_ARRAY_NOT_USED[*]}
+                    IMAGES_ARRAY_NOT_USED=( $(
                     log_and_echo "number of images in use: ${len_used} and number of images not in use: ${len_not_used}"
                     log_and_echo "unused images: ${IMAGES_ARRAY_NOT_USED[@]}"
                     log_and_echo "used images: ${IMAGES_ARRAY_USED[@]}"
                     if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
                         if [ $len_not_used -gt 0 ]; then
+                            # sort the IMAGES_ARRAY_NOT_USED array
+                            for el in "${IMAGES_ARRAY_NOT_USED[@]}"
+                            do
+                               echo "$el"
+                            done | sort) ) 
+                            index_not_used=0                       
                             while [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]
                             do
                                 ((len_not_used--))
                                 ((NUMBER_IMAGES--))
                                 if [ "${IMAGE_REMOVE}" == "FALSE" ]; then 
                                     echo "NOT removing image"
-                                    echo "$IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null"
+                                    echo "$IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$index_not_used]} > /dev/null"
                                     RESULT=1
                                 else 
-                                    ice_retry rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]} > /dev/null
+                                    ice_retry rmi ${IMAGES_ARRAY_NOT_USED[$index_not_used]} > /dev/null
                                     RESULT=$?
                                     RESPONSE=${RET_RESPONCE}
                                 fi 
                                 if [ $RESULT -eq 0 ]; then
-                                    log_and_echo "successfully deleted image: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                    log_and_echo "successfully deleted image: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$index_not_used]}"
                                 else
-                                    log_and_echo "$ERROR" "deleting image failed: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$len_not_used]}"
+                                    log_and_echo "$ERROR" "deleting image failed: $IC_COMMAND rmi ${IMAGES_ARRAY_NOT_USED[$index_not_used]}"
                                     log_and_echo "$ERROR" "${RESPONSE}"
                                 fi
                                 if [ $len_not_used -le 0 ]; then
