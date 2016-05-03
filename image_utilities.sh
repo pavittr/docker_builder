@@ -141,11 +141,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
                         if [ $len_not_used -gt 0 ]; then
                             # sort the IMAGES_ARRAY_NOT_USED array
-                            IMAGES_ARRAY_NOT_USED=( $(
-                            for el in "${IMAGES_ARRAY_NOT_USED[@]}"
-                            do
-                               echo "$el"
-                            done | sort) ) 
+                            for el in "${IMAGES_ARRAY_NOT_USED[@]}"; do echo "$el";  done | sort -t":" -k2 -n
                             index_not_used=0                       
                             while [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]
                             do
