@@ -141,7 +141,7 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                     if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
                         if [ $len_not_used -gt 0 ]; then
                             # sort the IMAGES_ARRAY_NOT_USED array
-                            bsIMAGES_ARRAY_NOT_USED=( $(
+                            IMAGES_ARRAY_NOT_USED=( $(
                             for el in "${IMAGES_ARRAY_NOT_USED[@]}"
                             do
                                echo "$el"
