@@ -15,15 +15,15 @@ def step_impl(context):
     os.environ["IMAGE_LIMIT"]="3"
     
 def get_appImage_count(context):
-    imageList = subprocess_retry(context, "ice images", True)
-    matches = re.findall(context.appName+":\d+", imageList)
+    imageList = subprocess_retry(context, "cf ic images", True)
+    matches = re.findall(context.appName+"\s*\d+", imageList)
     Count = int(len(matches))
     print (Count)
     print
     return Count
 
 def get_totImage_count(context):
-    imageList = subprocess_retry(context, "ice images", True)
+    imageList = subprocess_retry(context, "cf ic images", True)
     matches = re.findall(os.environ["NAMESPACE"]+"/")
     Count = int(len(matches))
     print (Count)
@@ -74,8 +74,8 @@ def step_impl(context):
 def step_impl(context):
     tries = 0
     while tries < 6:
-        imageList = subprocess_retry(context, "ice images", True)
-        matcher = re.compile(context.appName+":"+get_app_version())
+        imageList = subprocess_retry(context, "cf ic images", True)
+        matcher = re.compile(context.appName+"\s*"+get_app_version())
         m = matcher.search(imageList)
         if (m):
             break
@@ -94,13 +94,13 @@ def step_impl(context):
     assert (context.preCount > int(os.environ["IMAGE_LIMIT"]))
     
 def check_images_deleted_until_under_limit(context, limit):
-    imageList = subprocess_retry(context, "ice images", True)
-    matches = re.findall(context.appName+":\d+", imageList)
+    imageList = subprocess_retry(context, "cf ic images", True)
+    matches = re.findall(context.appName+"\s*\d+", imageList)
     assert (len(matches) == limit)
     ver = int(get_app_version())
     count = 0
     while (count < limit):
-        matcher = re.compile(context.appName+":"+str(ver))
+        matcher = re.compile(context.appName+"\s*"+str(ver))
         m = matcher.search(imageList)
         assert (m)
         ver = ver - 1
@@ -135,9 +135,9 @@ def step_impl(context):
         print (unusedVersions)
         print
         assert (unusedVersions)
-        imageList = subprocess_retry(context, "ice images", True)
+        imageList = subprocess_retry(context, "cf ic images", True)
         for ver in unusedVersions:
-            matcher = re.compile(context.appName+":"+str(ver))
+            matcher = re.compile(context.appName+"\s*"+str(ver))
             m = matcher.search(imageList)
             assert m is None
             
@@ -145,10 +145,10 @@ def step_impl(context):
 def step_impl(context):
     usedCount = get_used_count(context)
     assert usedCount > 0
-    imageList = subprocess_retry(context, "ice images", True)
+    imageList = subprocess_retry(context, "cf ic images", True)
     version = int(get_app_version())-usedCount
     while usedCount > 0:
-        matcher = re.compile(context.appName+":"+str(version))
+        matcher = re.compile(context.appName+"\s*"+str(version))
         assert matcher.search(imageList)
         version = version + 1
         usedCount = usedCount - 1
@@ -172,7 +172,7 @@ def step_impl(context):
     count = get_totImage_count(context)
     while (count < 25):
         #create image at count
-        subprocess_retry(context,"ice build -t "+appPrefix+str(get_app_version()) +" .", True)
+        subprocess_retry(context,"cf ic build -t "+appPrefix+str(get_app_version()) +" .", True)
         increment_app_version()
         count = count + 1
 
@@ -180,8 +180,8 @@ def step_impl(context):
 def step_impl(context):
     tries = 0
     while tries < 6:
-        imageList = subprocess_retry(context, "ice images", True)
-        matcher = re.compile(context.appName+":"+get_app_version())
+        imageList = subprocess_retry(context, "cf ic images", True)
+        matcher = re.compile(context.appName+"\s*"+get_app_version())
         m = matcher.search(imageList)
         if (m):
             break
@@ -225,7 +225,7 @@ def step_impl(context):
 @given(u'I have images in the form of image_namexx')
 def step_impl(context):
     imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"xx:"+str(get_app_version())
-    subprocess_retry(context,"ice build -t "+imgName +" .", True)
+    subprocess_retry(context,"cf ic build -t "+imgName +" .", True)
     increment_app_version()
     context.imgxx = imgName
     print("Sleeping for 120 seconds after building image")
@@ -235,7 +235,7 @@ def step_impl(context):
 @given(u'I have images with the same name but tagged with an alpha-string (alchemy/imagename:uniquetag)')
 def step_impl(context):
     imgName = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":tag"
-    subprocess_retry(context,"ice build -t "+imgName +" .", True)
+    subprocess_retry(context,"cf ic build -t "+imgName +" .", True)
     context.img_tag = imgName
     print("Sleeping for 120 seconds after building image")
     print
@@ -243,7 +243,7 @@ def step_impl(context):
 
 
 def check_for_image(context, fullImgName):
-    output = subprocess_retry(context, "ice inspect images", False)
+    output = subprocess_retry(context, "cf ic inspect images", False)
     return re.search(fullImgName, output) 
 
 @then(u'the images in the form of image_namexx will not be deleted')
