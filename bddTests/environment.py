@@ -24,7 +24,7 @@ def increment_app_version():
 
 def before_feature(context, feature):
     #Before running outside of the pipeline you must:
-    ###Set a environment variables for CCS_REGISTRY_HOST, REGISTRY_URL, NAMESPACE and login to ice
+    ###Set a environment variables for CCS_REGISTRY_HOST, REGISTRY_URL, NAMESPACE and login to cf ic
     #os.environ["CCS_REGISTRY_HOST"] = "registry-ice.ng.bluemix.net"
     #os.environ["NAMESPACE"] = "jgarcows"
     #os.environ["REGISTRY_URL"] = "registry-ice.ng.bluemix.net/jgarcows"
@@ -36,7 +36,7 @@ def before_feature(context, feature):
     os.environ["IMAGE_NAME"] = "newbdd"
     context.appName = os.environ["IMAGE_NAME"]
     set_app_version(31)
-    #setup a list of exceptions found during environment ice commands
+    #setup a list of exceptions found during environment cf ic commands
     context.exceptions = []
     #Cleaning up any hanging on containers
     cleanupContainers(context)
@@ -82,23 +82,23 @@ def before_tag(context, tag):
             appPrefix = os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+":"
             while count > 0:
                 version = get_app_version()
-                subprocess_retry(context,"ice build -t "+appPrefix+str(version) +" .", False)
+                subprocess_retry(context,"cf ic build -t "+appPrefix+str(version) +" .", False)
                 increment_app_version()
                 count = count - 1
             print(time.strftime("<%I:%M:%S> ")+"Waiting 120 seconds after building images")
             time.sleep(120)
-            subprocess_retry(context,"ice images", True)
+            subprocess_retry(context,"cf ic images", True)
         if command == "useimages":
             version = int(get_app_version())-count
             appPrefix = os.getenv("NAMESPACE")+"/"+os.getenv("IMAGE_NAME")+":"
             while count > 0:
                 print("Starting container: "+containerName(version))
-                subprocess_retry(context,"ice run --name "+containerName(version) +" "+appPrefix+str(version), False)
+                subprocess_retry(context,"cf ic run --name "+containerName(version) +" "+appPrefix+str(version), False)
                 version = version + 1
                 count = count - 1
             print(time.strftime("<%I:%M:%S> ")+"Waiting 120 seconds after starting images")
             time.sleep(120)
-            subprocess_retry(context,"ice ps -a", True)
+            subprocess_retry(context,"cf ic ps -a", True)
             
             
 def containerName(version):
@@ -106,14 +106,14 @@ def containerName(version):
     
 def cleanupImages(context, pause=False):
     #cleanup images
-    imageList = subprocess_retry(context, "ice images", False)
+    imageList = subprocess_retry(context, "cf ic images", False)
     lines = imageList.splitlines()
-    imageMatcher = re.compile(os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"\S*:\S+")
+    imageMatcher = re.compile("("+os.getenv("REGISTRY_URL") +"/"+ os.getenv("IMAGE_NAME")+"\S*)\s*(\S+)")
     imagesFound = False
     for line in lines:
         m = imageMatcher.search(line)
         if m:
-            subprocess_retry(context, "ice rmi "+m.group(0), True)
+            subprocess_retry(context, "cf ic rmi "+m.group(1)+":"+m.group(2), True)
             imagesFound = True
     if imagesFound:
         if pause:
@@ -124,7 +124,7 @@ def cleanupImages(context, pause=False):
     
     
 def cleanupContainers(context):
-    psOutput = subprocess_retry(context, "ice ps -a", False)
+    psOutput = subprocess_retry(context, "cf ic ps -a", False)
     psLines = psOutput.splitlines()
     cNameMatcher = re.compile(os.environ["IMAGE_NAME"]+"\d+C")
     stoppedMatcher = re.compile("crashed|shutdown", re.IGNORECASE)
@@ -136,11 +136,11 @@ def cleanupContainers(context):
                 print("Container "+mName.group(0)+" is \""+mStopped.group(0)+"\", not trying to stop")
             else:
                 print("Stopping container: "+mName.group(0))
-                subprocess_retry(context, "ice stop "+mName.group(0), True)
+                subprocess_retry(context, "cf ic stop "+mName.group(0), True)
     statusMatcher = re.compile("\"Status\": \"(\S*)\"")
     for m in re.finditer(os.environ["IMAGE_NAME"]+"\d+C", psOutput):
         for i in range(30):
-            inspectOutput = subprocess_retry(context, "ice inspect " + m.group(0), False)
+            inspectOutput = subprocess_retry(context, "cf ic inspect " + m.group(0), False)
             mInspect = statusMatcher.search(inspectOutput)
             if mInspect:
                 print (mInspect.group(0))
@@ -149,7 +149,7 @@ def cleanupContainers(context):
                 if (status != "Running"):
                     break
             time.sleep(6)
-        subprocess_retry(context, "ice rm --force "+m.group(0), True)
+        subprocess_retry(context, "cf ic rm --force "+m.group(0), True)
 
 def after_scenario(context, scenario):
     matcher = re.compile("(\D*)(\d+)")
@@ -173,9 +173,3 @@ def after_scenario(context, scenario):
     #don't reuse the app version created by the build script, so move up one always
     increment_app_version()
     
-#def after_tag(context, tag):
-#    matcher = re.compile("(\D*)(\d+)")
-#    m = matcher.search(tag)
-#    if (m and m.group(1) == "createimages"):
-#        print(subprocess.check_output("ice images | grep "+os.getenv("IMAGE_NAME")+" | awk '{print $6}' | xargs -n 1 ice rmi", shell=True))
-#        print
