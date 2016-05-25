@@ -36,15 +36,23 @@ if [ -z $IMAGE_LIMIT ]; then
     IMAGE_LIMIT=5
 fi
 if [ $IMAGE_LIMIT -gt 0 ]; then
-    ice_retry_save_output inspect images 2> /dev/null
+    ice_retry_save_output images 2> /dev/null
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater than or equal to image limit
-        NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | grep \"Image\": | wc -l)
+        if [ "$USE_ICE_CLI" = "1" ]; then
+            NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | wc -l)
+        else
+            NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}\s\+[0-9]\+" iceretry.log | wc -l)
+        fi
         log_and_echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name
-            ICE_IMAGES_ARRAY=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | awk '/Image/ {printf "%s\n", $2}' | sed 's/"//'g | sed 's/,//'g)
+            if [ "$USE_ICE_CLI" = "1" ]; then
+                ICE_IMAGES_ARRAY=$(grep -o "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log)
+            else
+                ICE_IMAGES_ARRAY=$(grep -o "${REGISTRY_URL}/${IMAGE_NAME}\s\+[0-9]\+" iceretry.log | awk '{print $1":"$2}')
+            fi
             # loop the list of spaces under the org and find the name of the images that are in used
             $CFCMD spaces > inspect.log 2> /dev/null
             RESULT=$?

@@ -117,7 +117,7 @@ def cleanupImages(context, pause=False):
             imagesFound = True
     if imagesFound:
         if pause:
-            print("Wiating 120 seconds to allow images to be deleted")
+            print("Waiting 120 seconds to allow images to be deleted")
             time.sleep(120)
         print("Finished cleaning up images.")
         print
