@@ -40,16 +40,15 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
     RESULT=$?
     if [ $RESULT -eq 0 ]; then
         # find the number of images and check if greater than or equal to image limit
-        NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | wc -l)
-        _USE_CF_PROCESSING=0
-        if [ $NUMBER_IMAGES -eq 0 ]; then
+        if [ "$USE_ICE_CLI" = "1" ]; then
+            NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log | wc -l)
+        else
             NUMBER_IMAGES=$(grep "${REGISTRY_URL}/${IMAGE_NAME}\s\+[0-9]\+" iceretry.log | wc -l)
-            _USE_CF_PROCESSING=1
         fi
         log_and_echo "Number of images: $NUMBER_IMAGES and Image limit: $IMAGE_LIMIT"
         if [ $NUMBER_IMAGES -ge $IMAGE_LIMIT ]; then
             # create array of images name
-            if [ $_USE_CF_PROCESSING -eq 0 ]; then
+            if [ "$USE_ICE_CLI" = "1" ]; then
                 ICE_IMAGES_ARRAY=$(grep -o "${REGISTRY_URL}/${IMAGE_NAME}:[0-9]\+" iceretry.log)
             else
                 ICE_IMAGES_ARRAY=$(grep -o "${REGISTRY_URL}/${IMAGE_NAME}\s\+[0-9]\+" iceretry.log | awk '{print $1":"$2}')
