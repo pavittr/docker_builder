@@ -23,6 +23,7 @@ And unused images will be deleted from oldest to newest until we are under the l
 
 @createimages2
 @shortrun
+@simNames
 Scenario: Check similar image names
 Given I have a setup pipeline with a Container Image Build Stage
 And I have set the number images to keep to 1
@@ -96,6 +97,7 @@ And A warning will be issued that the images in use could not be deleted
 #Then I generate 1 exceptions
 
 @shortrun
+@simNames
 Scenario Outline: Check reliability of ice commands
 Given I have run a series of tests and kept track of any subprocess exceptions
 Then The number of exceptions will be no more than <num>
