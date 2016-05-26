@@ -243,7 +243,10 @@ def step_impl(context):
 
 
 def check_for_image(context, fullImgName):
-    output = subprocess_retry(context, "cf ic inspect images", False)
+    output = subprocess_retry(context, "cf ic images", False)
+    splitName=fullImgName.split(':', 1)
+    if len(splitName) == 2:
+        return re.search(splitName[0]+"\\s+"+splitName[1], output)
     return re.search(fullImgName, output) 
 
 @then(u'the images in the form of image_namexx will not be deleted')
