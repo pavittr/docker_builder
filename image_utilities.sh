@@ -73,6 +73,11 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 while read line; do 
                     SPACE_ARRAY+=("$line"); 
                 done < inspect.log;
+                #Setting to use ice for checking different spaces as cf ic init doesn't work in pipeline on other spaces
+                _SET_USE_ICE_CLI="$USE_ICE_CLI"
+                _SET_IC_COMMAND="$IC_COMMAND"
+                IC_COMMAND="ice"
+                USE_ICE_CLI="1"
                 #Array needs to be in quotes to properly handle spaces in space names
                 for space in "${SPACE_ARRAY[@]}"
                 do
@@ -112,6 +117,11 @@ if [ $IMAGE_LIMIT -gt 0 ]; then
                 done
                 # restore my old space
                 $CFCMD target -s "${CURRENT_SPACE}" > target.log 2> /dev/null
+                #TODO: if/when we use cf ic for space change work, a cf ic init will be required here.
+                #Putting IC_COMMAND back to where it was, as cf ic init doesn't work in pipeline on other spaces
+                IC_COMMAND="$_SET_IC_COMMAND"
+                USE_ICE_CLI="$_SET_USE_ICE_CLI"
+                
                 debugme cat target.log
                 if [ "$TESTED_ALL" = true ] ; then
                     i=0
