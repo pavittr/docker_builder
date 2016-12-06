@@ -14,7 +14,7 @@ Provides extension point for IBM DevOps Services to build a docker container usi
 - APPLICATION_NAME: name of the application 
 - REGISTRY_URL: registry url set when enabling the Container Service in bluemix 
 - VERSION_IMAGES: if set to true, each build will result in a uniquely tagged image.  If false will only tag image as :latest 
-- MAX_IMAGES: maximin number of image versions to store in the registry 
+- IMAGE_LIMIT: the maximum number of versions of this image to store in the registry 
 
 ## Output 
 The output of the build step will be a new image stored in IBM container registry that is tagged base on the build number and latest 
